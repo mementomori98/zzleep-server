@@ -9,4 +9,8 @@ public class TestModel {
     @JsonProperty("message")
     private String message = "Hello World";
 
+    public TestModel(String message) {
+        this.message = message;
+    }
+
 }

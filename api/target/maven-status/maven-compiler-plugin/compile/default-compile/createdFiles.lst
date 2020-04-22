@@ -1,2 +1,3 @@
-zzleep\api\App.class
+zzleep\api\config\SwaggerConfig.class
+zzleep\api\ApiBoot.class
 zzleep\api\controllers\TestController.class

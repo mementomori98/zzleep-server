@@ -15,24 +15,24 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerConfig {
 
-    // @Bean
-    // public Docket api() {
-    //     return new Docket(DocumentationType.SWAGGER_2)
-    //             .useDefaultResponseMessages(false)
-    //             .select()
-    //             .apis(RequestHandlerSelectors
-    //                     .basePackage("zzleep.api.controllers"))
-    //             .paths(PathSelectors.regex("/.*"))
-    //             .build().apiInfo(apiEndPointsInfo());
-    // }
-    //
-    // private ApiInfo apiEndPointsInfo() {
-    //     return new ApiInfoBuilder().title("Zzleep REST API")
-    //             .description("Zzleep sleep tracking api")
-    //             .contact(new Contact("Zzleep ApS :)", "www.google.com", "dont@contact.me"))
-    //             .license("Apache 2.0")
-    //             .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
-    //             .version("1.0.0")
-    //             .build();
-    // }
+    @Bean
+    public Docket api() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .useDefaultResponseMessages(false)
+                .select()
+                .apis(RequestHandlerSelectors
+                        .basePackage("zzleep.api.controllers"))
+                .paths(PathSelectors.regex("/.*"))
+                .build().apiInfo(apiEndPointsInfo());
+    }
+
+    private ApiInfo apiEndPointsInfo() {
+        return new ApiInfoBuilder().title("Zzleep REST API")
+                .description("Zzleep sleep tracking api")
+                .contact(new Contact("Zzleep ApS :)", "www.google.com", "dont@contact.me"))
+                .license("Apache 2.0")
+                .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
+                .version("1.0.0")
+                .build();
+    }
 }

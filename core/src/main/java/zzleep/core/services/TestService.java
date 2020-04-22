@@ -4,6 +4,6 @@ import zzleep.core.models.TestModel;
 
 public interface TestService {
 
-    TestModel get();
+    TestModel get(String message);
 
 }

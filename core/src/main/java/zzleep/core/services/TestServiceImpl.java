@@ -14,7 +14,7 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public TestModel get() {
-        return testRepository.get();
+    public TestModel get(String message) {
+        return new TestModel(message);
     }
 }

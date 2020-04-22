@@ -11,7 +11,7 @@ import zzleep.core.services.TestService;
 import zzleep.core.models.TestModel;
 
 @RestController
-@RequestMapping("/api/test")
+@RequestMapping("/api")
 @Api(value = "Test api")
 public class TestController {
 
@@ -26,14 +26,12 @@ public class TestController {
             @ApiResponse(code = 200, message = "Successfully retrieved TestModel"),
             @ApiResponse(code = 500, message = "A server error occured"),
     })
-    @GetMapping ( produces = { "application/json" })
-    public ResponseEntity<TestModel> get(
-            @ApiParam(value = "Message to be retrieved", required = true) @RequestParam String message
-    )
+    @GetMapping(produces = { "application/json " })
+    public ResponseEntity<TestModel> get(@ApiParam(value = "Some value", required = true) @RequestParam String message)
     {
         return ResponseEntity
                 .status(200)
-                .body(testService.get(message));
+                .body(new TestModel(message));
     }
 
 }

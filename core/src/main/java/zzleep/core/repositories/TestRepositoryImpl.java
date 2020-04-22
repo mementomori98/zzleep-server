@@ -14,8 +14,9 @@ public class TestRepositoryImpl implements TestRepository {
 
     @Override
     public TestModel get() {
-        return context.select("test", row -> new TestModel(
-                row.getString("message")
-        )).get(0);
+        // return context.select("test", new row -> new TestModel(
+        //         row.getString("message")
+        // )).get(0);
+        return new TestModel("Hello");
     }
 }

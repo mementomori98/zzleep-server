@@ -1,4 +1,4 @@
-package zzleep.core.data;
+package zzleep.core.repositories;
 
 import org.springframework.stereotype.Component;
 import zzleep.core.settings.DataConfig;

@@ -3,7 +3,7 @@ package zzleep.api.controllers;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import zzleep.api.services.TestService;
+import zzleep.core.services.TestService;
 import zzleep.core.models.TestModel;
 
 @RestController

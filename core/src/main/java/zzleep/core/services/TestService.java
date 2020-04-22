@@ -1,4 +1,4 @@
-package zzleep.api.services;
+package zzleep.core.services;
 
 import zzleep.core.models.TestModel;
 

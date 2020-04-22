@@ -1,4 +1,4 @@
-package zzleep.core.data;
+package zzleep.core.repositories;
 
 public enum DataResponse {
     OK,

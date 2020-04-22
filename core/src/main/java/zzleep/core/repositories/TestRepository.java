@@ -1,4 +1,4 @@
-package zzleep.api.repositories;
+package zzleep.core.repositories;
 
 import zzleep.core.models.TestModel;
 

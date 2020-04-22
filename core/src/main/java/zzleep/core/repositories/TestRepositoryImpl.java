@@ -1,7 +1,6 @@
-package zzleep.api.repositories;
+package zzleep.core.repositories;
 
 import org.springframework.stereotype.Component;
-import zzleep.core.data.Context;
 import zzleep.core.models.TestModel;
 
 @Component
@@ -15,8 +14,9 @@ public class TestRepositoryImpl implements TestRepository {
 
     @Override
     public TestModel get() {
-        return context.select("test", row -> new TestModel(
-                row.getString("message")
-        )).get(0);
+        // return context.select("test", new row -> new TestModel(
+        //         row.getString("message")
+        // )).get(0);
+        return new TestModel("Hello");
     }
 }

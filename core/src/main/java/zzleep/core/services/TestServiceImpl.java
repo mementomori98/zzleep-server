@@ -1,7 +1,7 @@
-package zzleep.api.services;
+package zzleep.core.services;
 
 import org.springframework.stereotype.Component;
-import zzleep.api.repositories.TestRepository;
+import zzleep.core.repositories.TestRepository;
 import zzleep.core.models.TestModel;
 
 @Component
@@ -14,7 +14,7 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public TestModel get() {
-        return testRepository.get();
+    public TestModel get(String message) {
+        return new TestModel(message);
     }
 }

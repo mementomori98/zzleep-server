@@ -31,7 +31,7 @@ public class TestController {
     {
         return ResponseEntity
                 .status(200)
-                .body(new TestModel("Hello World"));
+                .body(testService.get());
     }
 
 }

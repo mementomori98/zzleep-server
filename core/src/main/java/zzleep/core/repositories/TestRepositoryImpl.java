@@ -1,7 +1,6 @@
-package zzleep.api.repositories;
+package zzleep.core.repositories;
 
 import org.springframework.stereotype.Component;
-import zzleep.core.data.Context;
 import zzleep.core.models.TestModel;
 
 @Component

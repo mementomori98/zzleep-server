@@ -7,18 +7,15 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ComponentScan("zzleep")
-public class App implements CommandLineRunner
+public class CommunicatorBoot implements CommandLineRunner
 {
     public static void main( String[] args )
     {
-        SpringApplication.run(App.class, args);
+        SpringApplication.run(CommunicatorBoot.class, args);
     }
 
     @Override
     public void run(String... args) throws Exception {
-        while (true) {
-            Thread.sleep(5000);
-            System.out.println("Communicator is running...");
-        }
+        System.out.println("Hello World");
     }
 }

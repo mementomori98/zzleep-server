@@ -1,7 +1,7 @@
 package zzleep.core.repositories;
 
 import org.springframework.stereotype.Component;
-import zzleep.core.settings.DataConfig;
+import zzleep.core.settings.DataSettings;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ public class Context {
     private Context() {
         try {
             Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection(DataConfig.getUrl(), DataConfig.getUser(), DataConfig.getPassword());
+            connection = DriverManager.getConnection(DataSettings.getUrl(), DataSettings.getUser(), DataSettings.getPassword());
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }

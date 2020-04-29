@@ -33,7 +33,6 @@ public class TestController {
     @GetMapping
     public ResponseEntity<TestModel> get()
     {
-        logger.error("Test error message", testService.get());
         return ResponseEntity
                 .status(200)
                 .body(testService.get());

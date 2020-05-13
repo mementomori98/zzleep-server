@@ -31,11 +31,11 @@ public class TestController {
             @ApiResponse(code = 500, message = "A server error occured"),
     })
     @GetMapping
-    public ResponseEntity<List<TestModel>> getAll()
+    public ResponseEntity<List<TestModel>> getAll(@RequestParam(defaultValue = "") String message)
     {
         return ResponseEntity
                 .status(200)
-                .body(testRepository.getAll());
+                .body(testRepository.getAll(message));
     }
 
     @GetMapping("/{id}")

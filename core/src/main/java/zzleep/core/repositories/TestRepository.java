@@ -9,6 +9,7 @@ public interface TestRepository {
     TestModel add(TestModel model);
     TestModel get(int id);
     List<TestModel> getAll();
+    List<TestModel> getAll(String message);
     TestModel update(TestModel model);
     void delete(int id);
 

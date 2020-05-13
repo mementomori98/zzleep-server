@@ -39,7 +39,7 @@ public interface Context {
      * @param <TType> the type returned by the extractor
      * @return the list of items returned by the query
      */
-    <TType> List<TType> select(
+    <TType> List<TType> selectAll(
         String table,
         ResultSetExtractor<TType> extractor
     );

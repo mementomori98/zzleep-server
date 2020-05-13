@@ -33,7 +33,13 @@ public class TestRepositoryImpl implements TestRepository {
 
     @Override
     public List<TestModel> getAll() {
-        return context.select(TABLE_NAME, extractor);
+        return context.selectAll(TABLE_NAME, extractor);
+    }
+
+    @Override
+    public List<TestModel> getAll(String message) {
+        String condition = String.format("%s like '%%%s%%'", COL_MESSAGE, message);
+        return context.select(TABLE_NAME, condition, extractor);
     }
 
     @Override

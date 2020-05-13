@@ -70,7 +70,7 @@ public class PostgresContext implements Context {
     public <TType> TType single(String table, String condition, ResultSetExtractor<TType> extractor) {
         try {
             Statement statement = connection.createStatement();
-            ResultSet query = statement.executeQuery(String.format("selectAll * from %s where %s;", table, condition));
+            ResultSet query = statement.executeQuery(String.format("select * from %s where %s;", table, condition));
             if (!query.next()) return null;
             TType result = extractor.extract(query);
             if (query.next()) throw new QueryContainsMultipleElementsException();

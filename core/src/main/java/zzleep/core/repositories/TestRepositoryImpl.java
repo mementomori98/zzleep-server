@@ -15,9 +15,9 @@ public class TestRepositoryImpl implements TestRepository {
     private static final Context.ResultSetExtractor<TestModel> extractor = row ->
         new TestModel(row.getInt(COL_ID), row.getString(COL_MESSAGE));
 
-    private final PostgresContext context;
+    private final Context context;
 
-    public TestRepositoryImpl(PostgresContext context) {
+    public TestRepositoryImpl(Context context) {
         this.context = context;
     }
 
@@ -41,6 +41,7 @@ public class TestRepositoryImpl implements TestRepository {
         String condition = String.format("%s like '%%%s%%'", COL_MESSAGE, message);
         return context.select(TABLE_NAME, condition, extractor);
     }
+
 
     @Override
     public TestModel update(TestModel model) {

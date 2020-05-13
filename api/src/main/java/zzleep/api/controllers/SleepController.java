@@ -4,53 +4,87 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import javassist.NotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import zzleep.core.models.*;
+import zzleep.core.repositories.SleepRepository;
+import zzleep.core.repositories.TestRepository;
 
 @RestController
 @RequestMapping("/sleep")
 @Api(value = "User sleep api")
 public class SleepController {
 
+    private final SleepRepository sleepRepository;
 
+    public SleepController(SleepRepository sleepRepository) {
+        this.sleepRepository = sleepRepository;
+    }
 
-   /* @RequestMapping("/startTracking/{deviceId}")
+    @RequestMapping("/startTracking/{deviceId}")
     @ApiOperation(value = "Start sleep tracking", response = Sleep.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully started tracking the room conditions"),
     })
     @PostMapping
-    public ResponseEntity<Sleep> addSleep(@PathVariable(value="deviceId") String deviceId)
+    public ResponseEntity<Sleep> startTracking(@PathVariable(value="deviceId") String deviceId)
     {
-
-        return ResponseEntity
-                .status(200)
-                .body(new Sleep(1234, new );
+        Sleep sleep;
+        try {
+            sleep = sleepRepository.startTracking(deviceId);
+            return ResponseEntity
+                    .status(200)
+                    .body(sleep);
+        }catch(SleepRepository.SleepNotStoppedException ex)
+        {
+            return ResponseEntity
+                    .status(409)
+                    .body(null);
+        }
     }
 
-    @RequestMapping("/startTracking/{deviceId}");
-    @ApiOperation(value = "Update existing user device")
+    @RequestMapping("/stopTracking/{deviceId}")
+    @ApiOperation(value = "Stop sleep tracking", response = Sleep.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully updated a device"),
+            @ApiResponse(code = 200, message = "Successfully started tracking the room conditions"),
     })
     @PutMapping
-    public ResponseEntity<String> updateDevice(@RequestBody UpdateDeviceModel model)
+    public ResponseEntity<Sleep> stopTracking(@PathVariable(value="deviceId") String deviceId)
     {
-        return ResponseEntity
-                .status(200)
-                .body("");
+        Sleep sleep;
+        try {
+            sleep = sleepRepository.stopTracking(deviceId);
+            return ResponseEntity
+                    .status(200)
+                    .body(sleep);
+        }catch(SleepRepository.SleepNotStartedException ex)
+        {
+            return ResponseEntity
+                    .status(404)
+                    .body(null);
+        }
     }
 
-    @ApiOperation(value = "Get user devices by userId")
+    @RequestMapping("/{sleepId}/{rating}")
+    @ApiOperation(value = "Stop sleep tracking", response = Sleep.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully retrieved account devices"),
+            @ApiResponse(code = 200, message = "Successfully started tracking the room conditions"),
     })
-    @GetMapping
-    public ResponseEntity<Device> getAllUserDevices(@RequestParam(name = "userId") int userId)
+    @PutMapping
+    public ResponseEntity<Sleep> setRating(@PathVariable(value="sleepId") String sleepid, @PathVariable(value="rating") int rating)
     {
-        return ResponseEntity
-                .status(200)
-                .body(new Device(userId, "kitchen?"));
-    }*/
+        Sleep sleep;
+        try {
+            sleep = sleepRepository.rateSleep(sleepid, rating);
+            return ResponseEntity
+                    .status(200)
+                    .body(sleep);
+        }catch(SleepRepository.SleepNotFoundException ex)
+        {
+            return ResponseEntity
+                    .status(404)
+                    .body(null);
+        }
+    }
 }

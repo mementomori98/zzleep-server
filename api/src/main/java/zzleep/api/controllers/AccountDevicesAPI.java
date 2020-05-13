@@ -6,23 +6,23 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import zzleep.core.models.TestModel;
+import zzleep.core.models.*;
 
 @RestController
 @RequestMapping("/devices")
 @Api(value = "User devices api")
 public class AccountDevicesAPI {
 
-    @ApiOperation(value = "Add new device to account")
+    @ApiOperation(value = "Add new device to account", response = Device.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully added a device"),
     })
     @PostMapping
-    public ResponseEntity<String> addDevice(@RequestBody TestModel model)
+    public ResponseEntity<Device> addDevice(@RequestBody AddDeviceModel model)
     {
         return ResponseEntity
                 .status(200)
-                .body("Device added?");
+                .body(new Device(1234, "kitchen?"));
     }
 
     @ApiOperation(value = "Update existing user device")
@@ -30,11 +30,11 @@ public class AccountDevicesAPI {
             @ApiResponse(code = 200, message = "Successfully updated a device"),
     })
     @PutMapping
-    public ResponseEntity<String> updateDevice(@RequestBody TestModel model)
+    public ResponseEntity<String> updateDevice(@RequestBody UpdateDeviceModel model)
     {
         return ResponseEntity
                 .status(200)
-                .body("Device updated?");
+                .body("");
     }
 
     @ApiOperation(value = "Get user devices by userId")
@@ -42,10 +42,10 @@ public class AccountDevicesAPI {
             @ApiResponse(code = 200, message = "Successfully retrieved account devices"),
     })
     @GetMapping
-    public ResponseEntity<String> getAllUserDevices(@RequestParam(name = "userId") String userId)
+    public ResponseEntity<Device> getAllUserDevices(@RequestParam(name = "userId") int userId)
     {
         return ResponseEntity
                 .status(200)
-                .body("Retrieved devices for account " + userId);
+                .body(new Device(userId, "kitchen?"));
     }
 }

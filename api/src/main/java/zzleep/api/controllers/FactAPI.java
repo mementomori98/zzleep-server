@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import zzleep.core.models.Fact;
 import zzleep.core.models.TestModel;
 
 @RestController
@@ -15,15 +16,15 @@ import zzleep.core.models.TestModel;
 @Api(value = "Fact api")
 public class FactAPI {
 
-    @ApiOperation(value = "Get a fact about sleep")
+    @ApiOperation(value = "Get a fact about sleep", response = Fact.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved a fact"),
     })
     @GetMapping
-    public ResponseEntity<String> getFact()
+    public ResponseEntity<Fact> getFact()
     {
         return ResponseEntity
                 .status(200)
-                .body("A Random Fact");
+                .body(new Fact("Sleep fact 01", "Don't eat before you sleep"));
     }
 }

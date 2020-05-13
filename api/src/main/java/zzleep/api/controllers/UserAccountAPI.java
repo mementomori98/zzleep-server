@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import zzleep.core.models.TestModel;
+import zzleep.core.models.*;
 
 @RestController
 @RequestMapping("/user")
@@ -18,11 +18,11 @@ public class UserAccountAPI {
             @ApiResponse(code = 200, message = "Successfully created an account"),
     })
     @PostMapping
-    public ResponseEntity<String> createAccount(@RequestBody TestModel model)
+    public ResponseEntity<User> createAccount(@RequestBody CreateUserModel model)
     {
         return ResponseEntity
                 .status(200)
-                .body("Account created?");
+                .body(new User(1234, "email@gmail.com", "namee"));
     }
 
     @ApiOperation(value = "Update user account")
@@ -30,11 +30,9 @@ public class UserAccountAPI {
             @ApiResponse(code = 200, message = "Successfully updated an account"),
     })
     @PutMapping
-    public ResponseEntity<String> updateAccount(@RequestBody TestModel model)
+    public ResponseEntity updateAccount(@RequestBody UpdateUserModel model)
     {
-        return ResponseEntity
-                .status(200)
-                .body("Account updated?");
+        return ResponseEntity.status(200).body("");
     }
 
     @ApiOperation(value = "Update user password")
@@ -42,22 +40,20 @@ public class UserAccountAPI {
             @ApiResponse(code = 200, message = "Successfully updated a password"),
     })
     @PutMapping("/password")
-    public ResponseEntity<String> updatePassword(@RequestBody TestModel model)
+    public ResponseEntity<String> updatePassword(@RequestBody UpdatePasswordModel model)
     {
-        return ResponseEntity
-                .status(200)
-                .body("Account password updated?");
+        return ResponseEntity.status(200).body("");
     }
 
-    @ApiOperation(value = "Get user account by Id")
+    @ApiOperation(value = "Get user account by Id", response = User.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved account info"),
     })
     @GetMapping
-    public ResponseEntity<String> updatePassword(@RequestParam(name = "userId") String userId)
+    public ResponseEntity<User> updatePassword(@RequestParam(name = "userId") int userId)
     {
         return ResponseEntity
                 .status(200)
-                .body("Retrieved info for acount " + userId);
+                .body(new User(userId, "email@gmail.com", "namee"));
     }
 }

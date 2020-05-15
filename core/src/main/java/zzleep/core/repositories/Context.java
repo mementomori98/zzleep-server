@@ -1,5 +1,6 @@
 package zzleep.core.repositories;
 
+import javax.xml.transform.Result;
 import java.sql.ResultSet;
 import java.util.List;
 
@@ -32,6 +33,14 @@ public interface Context {
         ResultSetExtractor<TType> extractor
     );
 
+    <TType> List<TType> selectComplex(
+        String table,
+        String selector,
+        String condition,
+        String groupBy,
+        ResultSetExtractor<TType> extractor
+    );
+
     /**
      * Select all items from a table
      * @param table the name of the table including the schema (e.g. "datamodels.User")
@@ -53,6 +62,20 @@ public interface Context {
      * @return the single item selected from the list or null if not found, throws 'QueryContainsMultipleElementsException' if multiple items are returned (use conditions that are met 0 or 1 time)
      */
     <TType> TType single(
+        String table,
+        String condition,
+        ResultSetExtractor<TType> extractor
+    );
+
+    /**
+     * Select a single item from a table that meets the specified condition, returns null if not found
+     * @param table the name of the table including the schema (e.g. "datamodels.User")
+     * @param condition the condition to meet (after the where keyword, e.g. "name = 'John Deer'")
+     * @param extractor the lambda expression used to extract a generic type from the ResultSet (e.g. row -> new User(row.getString("name"), row.getString("email")
+     * @param <TType> the type returned by the extractor
+     * @return the first item selected from the list or null if not found
+     */
+    <TType> TType first(
         String table,
         String condition,
         ResultSetExtractor<TType> extractor

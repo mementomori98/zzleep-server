@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 @ApiModel
 public class SleepData extends SleepSession {
+
     @ApiModelProperty
     @JsonSerialize
     @JsonProperty
@@ -38,7 +39,7 @@ public class SleepData extends SleepSession {
     ) {
         double sum = 0;
         List<Double> list = roomConditions.stream().map(mapper).collect(Collectors.toList());
-        for(Double value : list)
+        for (Double value : list)
             sum += value;
         return sum / list.size();
     }

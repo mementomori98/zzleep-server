@@ -47,18 +47,34 @@ public class PostgresContext implements Context {
     @Override
     public <TType> List<TType> select(String table, String condition, ResultSetExtractor<TType> extractor) {
         try {
-            List<TType> list = new ArrayList<>();
-            Statement statement = connection.createStatement();
-            ResultSet query = statement.executeQuery(String.format("select * from %s where %s;", table, condition));
-            while (query.next())
-                list.add(extractor.extract(query));
-            return list;
+            return select(String.format("select * from %s where %s;", table, condition), extractor);
         } catch (Exception e) {
             logger.error(String.format("Error when selecting from: %s where %s",
                 table, condition), e.toString());
             throw new QueryFailedException();
         }
 
+    }
+
+    @Override
+    public <TType> List<TType> selectComplex(String table, String selector, String condition, String groupBy, ResultSetExtractor<TType> extractor) {
+        try {
+            return select(String.format("select %s from %s where %s group by %s", selector, table, condition, groupBy), extractor);
+        }
+        catch (Exception e) {
+            logger.error(String.format("Error when selecting %s from %s where %s group by %s",
+                selector, table, condition), e.toString());
+            throw new QueryFailedException();
+        }
+    }
+
+    private <TType> List<TType> select(String queryString, ResultSetExtractor<TType> extractor) throws Exception {
+        List<TType> list = new ArrayList<>();
+        Statement statement = connection.createStatement();
+        ResultSet query = statement.executeQuery(queryString);
+        while (query.next())
+            list.add(extractor.extract(query));
+        return list;
     }
 
     @Override
@@ -77,6 +93,20 @@ public class PostgresContext implements Context {
             return result;
         } catch (Exception e) {
             logger.error(String.format("Error when selecting single from %s where %s",
+                table, condition), e.toString());
+            throw new QueryFailedException();
+        }
+    }
+
+    @Override
+    public <TType> TType first(String table, String condition, ResultSetExtractor<TType> extractor) {
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet query = statement.executeQuery(String.format("select * from %s where %s;", table, condition));
+            if (!query.next()) return null;
+            return extractor.extract(query);
+        } catch (Exception e) {
+            logger.error(String.format("Error when selecting first from %s where %s",
                 table, condition), e.toString());
             throw new QueryFailedException();
         }

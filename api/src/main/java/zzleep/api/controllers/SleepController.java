@@ -22,12 +22,11 @@ public class SleepController {
         this.sleepRepository = sleepRepository;
     }
 
-    @RequestMapping("/startTracking/{deviceId}")
     @ApiOperation(value = "Start sleep tracking", response = Sleep.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully started tracking the room conditions"),
     })
-    @PostMapping
+    @PostMapping("/startTracking/{deviceId}")
     public ResponseEntity<Sleep> startTracking(@PathVariable(value="deviceId") String deviceId)
     {
         Sleep sleep;
@@ -44,12 +43,11 @@ public class SleepController {
         }
     }
 
-    @RequestMapping("/stopTracking/{deviceId}")
     @ApiOperation(value = "Stop sleep tracking", response = Sleep.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully started tracking the room conditions"),
     })
-    @PutMapping
+    @PutMapping("/stopTracking/{deviceId}")
     public ResponseEntity<Sleep> stopTracking(@PathVariable(value="deviceId") String deviceId)
     {
         Sleep sleep;
@@ -66,17 +64,16 @@ public class SleepController {
         }
     }
 
-    @RequestMapping("/{sleepId}/{rating}")
     @ApiOperation(value = "Stop sleep tracking", response = Sleep.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully started tracking the room conditions"),
     })
-    @PutMapping
-    public ResponseEntity<Sleep> setRating(@PathVariable(value="sleepId") String sleepid, @PathVariable(value="rating") int rating)
+    @PutMapping("/{sleepId}/{rating}")
+    public ResponseEntity<Sleep> setRating(@PathVariable(value="sleepId") String sleepId, @PathVariable(value="rating") int rating)
     {
         Sleep sleep;
         try {
-            sleep = sleepRepository.rateSleep(sleepid, rating);
+            sleep = sleepRepository.rateSleep(sleepId, rating);
             return ResponseEntity
                     .status(200)
                     .body(sleep);

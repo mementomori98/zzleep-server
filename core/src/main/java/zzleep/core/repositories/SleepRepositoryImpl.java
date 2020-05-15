@@ -1,11 +1,13 @@
 package zzleep.core.repositories;
 
 import javassist.NotFoundException;
+import org.springframework.stereotype.Component;
 import zzleep.core.models.Sleep;
 import zzleep.core.models.TestModel;
 
 import java.time.LocalDateTime;
 
+@Component
 public class SleepRepositoryImpl implements SleepRepository {
     private static final String TABLE_NAME = "sleep";
     private static final String COL_SLEEP_ID = "sleepId";

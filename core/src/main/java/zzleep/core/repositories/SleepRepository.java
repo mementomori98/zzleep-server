@@ -4,7 +4,6 @@ import javassist.NotFoundException;
 import org.springframework.stereotype.Component;
 import zzleep.core.models.Sleep;
 
-@Component
 public interface SleepRepository {
     Sleep rateSleep(String sleepId, int rating) throws SleepNotFoundException;
     Sleep startTracking(String deviceId) throws SleepNotStoppedException;

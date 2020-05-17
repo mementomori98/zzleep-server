@@ -16,7 +16,7 @@ public class SleepSession {
     @ApiModelProperty
     @JsonSerialize
     @JsonProperty("deviceId")
-    private final int deviceId;
+    private final String deviceId;
     @ApiModelProperty
     @JsonSerialize
     @JsonProperty("timeStart")
@@ -32,21 +32,21 @@ public class SleepSession {
     @ApiModelProperty
     @JsonSerialize
     @JsonProperty("averageCo2")
-    private final int averageCo2;
+    private final double averageCo2;
     @ApiModelProperty
     @JsonSerialize
     @JsonProperty("averageHumidity")
-    private final int averageHumidity;
+    private final double averageHumidity;
     @ApiModelProperty
     @JsonSerialize
     @JsonProperty("averageSound")
-    private final int averageSound;
+    private final double averageSound;
     @ApiModelProperty
     @JsonSerialize
     @JsonProperty("averageTemperature")
-    private final int averageTemperature;
+    private final double averageTemperature;
 
-    public SleepSession(int sleepId, int deviceId, LocalDateTime timeStart, LocalDateTime timeFinish, int rating, int averageCo2, int averageHumidity, int averageSound, int averageTemperature) {
+    public SleepSession(int sleepId, String deviceId, LocalDateTime timeStart, LocalDateTime timeFinish, int rating, double averageCo2, double averageHumidity, double averageSound, double averageTemperature) {
         this.sleepId = sleepId;
         this.deviceId = deviceId;
         this.timeStart = timeStart;
@@ -62,7 +62,7 @@ public class SleepSession {
         return sleepId;
     }
 
-    public int getDeviceId() {
+    public String getDeviceId() {
         return deviceId;
     }
 
@@ -78,19 +78,19 @@ public class SleepSession {
         return rating;
     }
 
-    public int getAverageCo2() {
+    public double getAverageCo2() {
         return averageCo2;
     }
 
-    public int getAverageHumidity() {
+    public double getAverageHumidity() {
         return averageHumidity;
     }
 
-    public int getAverageSound() {
+    public double getAverageSound() {
         return averageSound;
     }
 
-    public int getAverageTemperature() {
+    public double getAverageTemperature() {
         return averageTemperature;
     }
 }

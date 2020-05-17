@@ -15,7 +15,7 @@ public class SleepData extends SleepSession {
     @JsonProperty
     private List<RoomCondition> roomConditions;
 
-    public SleepData(int sleepId, int deviceId, LocalDateTime timeStart, LocalDateTime timeFinish, int rating, int averageCo2, int averageHumidity, int averageSound, int averageTemperature, List<RoomCondition> roomConditions) {
+    public SleepData(int sleepId, String deviceId, LocalDateTime timeStart, LocalDateTime timeFinish, int rating, double averageCo2, double averageHumidity, double averageSound, double averageTemperature, List<RoomCondition> roomConditions) {
         super(sleepId, deviceId, timeStart, timeFinish, rating, averageCo2, averageHumidity, averageSound, averageTemperature);
         this.roomConditions = roomConditions;
     }

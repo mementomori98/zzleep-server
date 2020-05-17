@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Random;
 
 @RestController
-@RequestMapping("/api/roomCondition")
+@RequestMapping("/api/roomConditions")
 @Api(value = "Room condition api")
 public class RoomConditionAPI {
 

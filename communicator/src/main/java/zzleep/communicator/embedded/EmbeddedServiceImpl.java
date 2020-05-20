@@ -25,7 +25,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 
-public class EmbeddedServiceImpl implements EmbeddedService, Listener {
+public class EmbeddedServiceImpl implements EmbeddedService, Listener{
 
     private DatabaseService dbService;
     private WebSocket socket;

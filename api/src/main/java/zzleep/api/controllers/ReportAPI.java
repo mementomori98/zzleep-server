@@ -7,10 +7,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import zzleep.core.models.Interval;
-import zzleep.core.models.IntervalReport;
-import zzleep.core.models.SleepData;
-import zzleep.core.models.SleepSession;
+import zzleep.core.models.*;
 import zzleep.core.repositories.WarehouseRepository;
 
 import java.time.LocalDate;
@@ -35,7 +32,7 @@ public class ReportAPI extends ControllerBase {
         @ApiResponse(code = 200, message = "Successfully retrieved a report"),
     })
     @GetMapping("/{deviceId}")
-    public ResponseEntity getReport(
+    public ResponseEntity<IntervalReport> getReport(
         @PathVariable(name = "deviceId")
             String deviceId,
         @RequestParam(name = "dateStart", defaultValue = "1970-01-01")
@@ -57,11 +54,11 @@ public class ReportAPI extends ControllerBase {
         @ApiResponse(code = 404, message = NOT_FOUND_MESSAGE)
     })
     @GetMapping("/sleeps/{sleepId}")
-    public ResponseEntity getSleepData(
+    public ResponseEntity<SleepData> getSleepData(
         @PathVariable(name = "sleepId") int sleepId
     ) {
         SleepData data = warehouseRepository.getSleepData(sleepId);
-        return data == null ? notFound(NOT_FOUND_MESSAGE) : success(data);
+        return data == null ? notFound() : success(data);
     }
 
     @ApiOperation(value = "Get the ideal room conditions for a device (room)")
@@ -69,7 +66,7 @@ public class ReportAPI extends ControllerBase {
         @ApiResponse(code = 200, message = "The ideal room conditions have been successfully retrieved")
     })
     @GetMapping("/ideal/{deviceId}")
-    public ResponseEntity getIdealRoomConditions(
+    public ResponseEntity<RoomCondition> getIdealRoomConditions(
         @PathVariable(value = "deviceId") String deviceId
     ) {
         return success(

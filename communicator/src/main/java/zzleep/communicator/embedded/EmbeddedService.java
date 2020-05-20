@@ -1,9 +1,7 @@
 package zzleep.communicator.embedded;
 
 
-import models.CurrentData;
-
-import java.net.http.WebSocket;
+import zzleep.communicator.models.CurrentData;
 
 public interface EmbeddedService extends Runnable{
     void receive(CurrentData data);

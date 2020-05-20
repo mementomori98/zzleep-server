@@ -1,7 +1,7 @@
 package zzleep.communicator.databaseService;
 
-import models.Command;
-import models.CurrentData;
+import zzleep.communicator.models.Command;
+import zzleep.communicator.models.CurrentData;
 
 import java.util.ArrayList;
 

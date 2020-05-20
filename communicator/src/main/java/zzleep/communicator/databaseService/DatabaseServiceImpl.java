@@ -1,19 +1,23 @@
 package zzleep.communicator.databaseService;
 
-import models.Command;
-import models.CurrentData;
+import zzleep.communicator.models.Command;
+import zzleep.communicator.models.CurrentData;
+import org.springframework.stereotype.Component;
 import zzleep.communicator.repository.DatabaseContext;
-import zzleep.communicator.repository.DatabaseContextImpl;
+import zzleep.core.repositories.Context;
 
 import java.util.ArrayList;
 
+
+@Component
 public class DatabaseServiceImpl implements DatabaseService{
 
     private DatabaseContext dbContext;
+    private Context context;
 
-    public DatabaseServiceImpl()
+    public DatabaseServiceImpl(Context context)
     {
-        this.dbContext = new DatabaseContextImpl();
+        this.context = context;
     }
 
     @Override

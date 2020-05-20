@@ -12,7 +12,7 @@ import zzleep.core.repositories.SleepRepository;
 import zzleep.core.repositories.TestRepository;
 
 @RestController
-@RequestMapping("/sleep")
+@RequestMapping("/api/sleeps")
 @Api(value = "User sleep api")
 public class SleepController {
 

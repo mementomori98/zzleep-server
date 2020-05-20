@@ -1,17 +1,19 @@
 package zzleep.core.repositories;
 
+import org.springframework.stereotype.Component;
 import zzleep.core.models.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Component
 public class WarehouseRepositoryImpl implements WarehouseRepository {
 
     private static final String TABLE_NAME =
         "dw.factRoomConditions " +
-            "inner join dimDevice on factRoomConditions.deviceKey = dimDevice.deviceKey " +
-            "inner join dimRating on factRoomConditions.ratingKey = dimRating.ratingKey " +
-            "inner join dimSleep on factRoomConditions.sleepKey = dimSleep.sleepKey";
+            "inner join dw.dimDevice on factRoomConditions.deviceKey = dimDevice.deviceKey " +
+            "inner join dw.dimRating on factRoomConditions.ratingKey = dimRating.ratingKey " +
+            "inner join dw.dimSleep on factRoomConditions.sleepKey = dimSleep.sleepKey";
 
     private static final String COL_SLEEP_ID = "sleepId";
     private static final String COL_TIMESTAMP = "timeRecorded";
@@ -41,7 +43,7 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
             COL_TEMPERATURE, COL_AVERAGE_TEMPERATURE
         );
 
-    private static final String SLEEP_SESSION_GROUPER = "";
+    private static final String SLEEP_SESSION_GROUPER = String.format("%s, %s, %s", COL_SLEEP_ID, COL_DEVICE_ID, COL_RATING);
 
     private static final Context.ResultSetExtractor<RoomCondition> roomConditionExtractor = row -> new RoomCondition(
         row.getInt(COL_SLEEP_ID),
@@ -80,17 +82,26 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
             roomConditionExtractor
         );
         if (roomConditions.isEmpty()) return null;
-        SleepSession session = context.selectComplex(
+        List<SleepSession> query = context.selectComplex(
             TABLE_NAME, SLEEP_SESSION_SELECTOR,
             String.format("%s = %d", COL_SLEEP_ID, sleepId),
             SLEEP_SESSION_GROUPER,
-            sleepSessionExtractor).get(0);
+            sleepSessionExtractor
+        );
+        if (query.isEmpty()) return null;
+        SleepSession session = query.get(0);
         return new SleepData(sleepId, session.getDeviceId(), session.getTimeStart(), session.getTimeFinish(), session.getRating(), roomConditions);
     }
 
     @Override
     public IntervalReport getReport(String deviceId, Interval interval) {
-        return null;
+        List<SleepSession> query = context.selectComplex(
+          TABLE_NAME, SLEEP_SESSION_SELECTOR,
+            String.format("%s = '%s'", COL_DEVICE_ID, deviceId),
+            SLEEP_SESSION_GROUPER,
+            sleepSessionExtractor
+        );
+        return new IntervalReport(query);
     }
 
     @Override

@@ -63,7 +63,7 @@ public class PostgresContext implements Context {
         }
         catch (Exception e) {
             logger.error(String.format("Error when selecting %s from %s where %s group by %s",
-                selector, table, condition), e.toString());
+                selector, table, condition, groupBy), e.toString());
             throw new QueryFailedException();
         }
     }

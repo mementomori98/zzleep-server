@@ -1,21 +1,22 @@
 package zzleep.core.models;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class Interval {
-    private final Date start;
-    private final Date end;
+    private final LocalDate start;
+    private final LocalDate end;
 
-    public Interval(Date start, Date end) {
+    public Interval(LocalDate start, LocalDate end) {
         this.start = start;
         this.end = end;
     }
 
-    public Date getStart() {
+    public LocalDate getStart() {
         return start;
     }
 
-    public Date getEnd() {
+    public LocalDate getEnd() {
         return end;
     }
 }

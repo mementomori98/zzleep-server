@@ -65,10 +65,11 @@ public class SleepSession {
         double averageSound,
         double averageTemperature
     ) {
+
         this.sleepId = sleepId;
         this.deviceId = deviceId;
         this.timeStart = timeStart;
-        this.timeFinish = timeFinish;
+        this.timeFinish = timeFinish;git ac
         this.rating = rating;
         this.averageCo2 = averageCo2;
         this.averageHumidity = averageHumidity;

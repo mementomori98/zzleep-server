@@ -13,14 +13,14 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="api" target="1.8" />
-      <module name="communicator" target="1.8" />
+      <module name="communicator" target="11" />
       <module name="core" target="1.8" />
       <module name="zzleep" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="communicator" options="-parameters" />
+      <module name="communicator" options="" />
     </option>
   </component>
 </project>

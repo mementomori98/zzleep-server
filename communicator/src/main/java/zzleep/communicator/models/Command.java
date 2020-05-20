@@ -1,4 +1,4 @@
-package models;
+package zzleep.communicator.models;
 
 public class Command {
 

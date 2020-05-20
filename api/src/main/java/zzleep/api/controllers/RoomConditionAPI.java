@@ -16,6 +16,7 @@ import java.util.Random;
 @Api(value = "Room condition api")
 public class RoomConditionAPI {
 
+
     @ApiOperation(value = "Get current room condition")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved current room condition"),

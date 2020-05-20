@@ -2,13 +2,13 @@ package zzleep.communicator.embedded;
 
 import com.google.gson.Gson;
 
-import models.Command;
-import models.CurrentData;
-import models.DownLinkMessage;
-import models.UpLinkMessage;
+import zzleep.communicator.models.Command;
+import zzleep.communicator.models.CurrentData;
+import zzleep.communicator.models.DownLinkMessage;
+import zzleep.communicator.models.UpLinkMessage;
 
+import org.springframework.stereotype.Component;
 import zzleep.communicator.databaseService.DatabaseService;
-import zzleep.communicator.databaseService.DatabaseServiceImpl;
 
 
 import java.net.URI;
@@ -24,16 +24,15 @@ import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
-
+@Component
 public class EmbeddedServiceImpl implements EmbeddedService, Listener{
 
     private DatabaseService dbService;
     private WebSocket socket;
     private final Gson gson = new Gson();
 
-    public EmbeddedServiceImpl() {
-
-        dbService = new DatabaseServiceImpl();
+    public EmbeddedServiceImpl(DatabaseService dbService) {
+        this.dbService = dbService;
 
 
         HttpClient client = HttpClient.newHttpClient();

@@ -32,6 +32,8 @@ public interface Context {
         ResultSetExtractor<TType> extractor
     );
 
+    <TType> List<TType> selectExcept(String firstTable, String firstCondition, String secondTable, String secondCondition,ResultSetExtractor<TType> extractor);
+
     /**
      * Select all items from a table
      * @param table the name of the table including the schema (e.g. "datamodels.User")

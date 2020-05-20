@@ -62,6 +62,24 @@ public class PostgresContext implements Context {
     }
 
     @Override
+    public <TType> List<TType> selectExcept(String firstTable, String firstCondition, String secondTable, String secondCondition, ResultSetExtractor<TType> extractor)
+    {
+        try {
+            List<TType> list = new ArrayList<>();
+            Statement statement = connection.createStatement();
+            String first_select = String.format("select * from %s where %s", firstTable, firstCondition);
+            String second_select = String.format("select * from %s where %s", secondTable, secondCondition);
+            ResultSet query = statement.executeQuery(String.format("(%s) except (%s)", first_select, second_select));
+            while (query.next())
+                list.add(extractor.extract(query));
+            return list;
+        } catch (Exception e) {
+            logger.error(String.format("Error when trying to select with except from  '%s' and '%s' ", firstTable, secondTable), e.toString());
+            throw new QueryFailedException();
+        }
+    }
+
+    @Override
     public <TType> List<TType> selectAll(String table, ResultSetExtractor<TType> extractor) {
         return select(table, "true", extractor);
     }

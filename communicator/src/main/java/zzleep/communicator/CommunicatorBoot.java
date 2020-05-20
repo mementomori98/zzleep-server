@@ -20,10 +20,15 @@ public class CommunicatorBoot implements CommandLineRunner
     }
 
     private EmbeddedService embeddedService;
+
     @Override
     public void run(String... args) throws Exception {
         System.out.println("Hello World");
 
+        while(true)
+        {
+            Thread.sleep(300000);
+        }
 
 
     }

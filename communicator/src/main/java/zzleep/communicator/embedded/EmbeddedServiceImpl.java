@@ -9,6 +9,7 @@ import zzleep.communicator.models.UpLinkMessage;
 
 import org.springframework.stereotype.Component;
 import zzleep.communicator.databaseService.DatabaseService;
+import zzleep.core.repositories.SleepRepository;
 
 
 import java.net.URI;
@@ -42,8 +43,8 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener{
         this.socket = ws.join();
     }
 
-
-    public void onError​(WebSocket webSocket, Throwable error) {
+    @Override
+    public void onError(WebSocket webSocket, Throwable error) {
         System.out.println("A " + error.getCause() + " exception was thrown.");
         System.out.println("Message: " + error.getLocalizedMessage());
 
@@ -56,7 +57,7 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener{
         webSocket.abort();
     }
 
-    //onClose()
+    @Override
     public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
         System.out.println("WebSocket closed!");
         System.out.println("Status:" + statusCode + " Reason: " + reason);
@@ -81,10 +82,11 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener{
     }
 
     private void onStart() {
-        onProgress();
+       // onProgress();
 
         Thread progressThread = new Thread(this);
-        progressThread.run();
+        progressThread.setDaemon(false);
+        progressThread.start();
 
     }
 
@@ -104,8 +106,8 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener{
 
     }
 
-
-    public CompletableFuture<WebSocket> sendText(CharSequence data, boolean last) {
+    //@Override
+    public CompletableFuture<WebSocket> sendText(CharSequence data, boolean last){
 
         socket.sendText(data, true);
         System.out.println("sentTest completed");
@@ -118,7 +120,7 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener{
     public void run() {
 
         while (true) {
-            onProgress();
+            //onProgress();
             try {
                 Thread.sleep(300000);//5min
             } catch (InterruptedException e) {
@@ -128,26 +130,23 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener{
     }
 
 
-    //onText()
-    public CompletionStage<?> onText​(WebSocket webSocket, CharSequence data, boolean last) {
+    @Override
+    public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last)  {
         System.out.println(data);
         CurrentData currentData = processData(data);
-        receive(currentData);
+        //receive(currentData);
         webSocket.request(1);
-
-        // TODO: 5/13/2020 understand CompletionStage
         return new CompletableFuture().completedFuture("onText() completed.").thenAccept(System.out::println);
     }
 
     @Override
-    public void receive(CurrentData data) {
+    public void receive(CurrentData data)  {
 
         dbService.putDataInDatabase(data);
 
     }
 
 
-    // TODO: 5/13/2020 Transform the Json telegram in CurrentData object format;
     private CurrentData processData(CharSequence data) {
         String messageString = data.toString();
         UpLinkMessage message = gson.fromJson(messageString, UpLinkMessage.class);
@@ -156,21 +155,24 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener{
         CurrentData currentData = new CurrentData();
         currentData.setSource(message.getEUI()); //source
 
-        LocalDateTime dateTime = LocalDateTime.ofEpochSecond(message.getTs(), 0, ZoneOffset.UTC);
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        String timestamp = df.format(dateTime);
-        currentData.setTimeStamp(timestamp);//timestamp
+//        LocalDateTime dateTime = LocalDateTime.ofEpochSecond(message.getTs(), 0, ZoneOffset.UTC);
+//        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+//        String timestamp = df.format(dateTime);
+//        currentData.setTimeStamp(timestamp);//timestamp
+
+        System.out.println("Data: "+ message.getData());
+
 
         // TODO: 5/13/2020 transform binary data in actual sensor data
-
+        //first temperature,humidity, co2,  sound last
+        //each one 2 bytes
+        //67394520
         System.out.println(currentData.toString());
 
 
         return currentData;
     }
 
-
-    // TODO: 5/13/2020 Create Json telegram
 
     private CharSequence processCommand(Command command) {
 
@@ -181,7 +183,6 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener{
         sb.append(hexString2);
 
         String data = sb.toString();
-        // TODO: 5/19/2020 Ask IB if we could get the EUI before the connection to store it already in DB
         DownLinkMessage message = new DownLinkMessage(command.getDestination(), true, data);
         String json = gson.toJson(message);
         return json;

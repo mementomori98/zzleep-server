@@ -1,73 +1,104 @@
 package zzleep.core.repositories;
 
-import org.springframework.stereotype.Component;
-import zzleep.core.settings.DataConfig;
-
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.ResultSet;
 import java.util.List;
 
-@Component
-public class Context {
+public interface Context {
 
-    private Connection connection;
+    /**
+     * Example: context.insert("User", "name, email, age", "'John', 'john@example.com', 23");
+     * @param table the name of the table you'd like to insert into (e.g. "RoomCondition")
+     * @param columns comma-separated list of column names (e.g. "name, email")
+     * @param values sql-specific list of values (e.g. "'John', 'Deer', 32") - note the single quotation on strings)
+     */
+    <TType> TType insert(
+        String table,
+        String columns,
+        String values,
+        ResultSetExtractor<TType> extractor
+    );
 
-    private static Context instance = new Context();
+    /**
+     * Select a list of items that meet the specified condition
+     * @param table the name of the table including the schema (e.g. "datamodels.User")
+     * @param condition the condition to meet (after the where keyword, e.g. "name like '%John%'")
+     * @param extractor the lambda expression used to extract a generic type from the ResultSet (e.g. row -> new User(row.getString("name"), row.getString("email")
+     * @param <TType> the type returned by the extractor
+     * @return the list of items returned by the query
+     */
+    <TType> List<TType> select(
+        String table,
+        String condition,
+        ResultSetExtractor<TType> extractor
+    );
 
-    private Context() {
-        try {
-            Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection(DataConfig.getUrl(), DataConfig.getUser(), DataConfig.getPassword());
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
+    /**
+     * Select all items from a table
+     * @param table the name of the table including the schema (e.g. "datamodels.User")
+     * @param extractor the lambda expression used to extract a generic type from the ResultSet (e.g. row -> new User(row.getString("name"), row.getString("email")
+     * @param <TType> the type returned by the extractor
+     * @return the list of items returned by the query
+     */
+    <TType> List<TType> selectAll(
+        String table,
+        ResultSetExtractor<TType> extractor
+    );
+
+    /**
+     * Select a single item from a table that meets the specified condition, returns null if not found
+     * @param table the name of the table including the schema (e.g. "datamodels.User")
+     * @param condition the condition to meet (after the where keyword, e.g. "name = 'John Deer'")
+     * @param extractor the lambda expression used to extract a generic type from the ResultSet (e.g. row -> new User(row.getString("name"), row.getString("email")
+     * @param <TType> the type returned by the extractor
+     * @return the single item selected from the list or null if not found, throws 'QueryContainsMultipleElementsException' if multiple items are returned (use conditions that are met 0 or 1 time)
+     */
+    <TType> TType single(
+        String table,
+        String condition,
+        ResultSetExtractor<TType> extractor
+    );
+
+    /**
+     * @param table the name of the table including the schema (e.g. "datamodels.User")
+     * @param fieldsWithValues the fields to update (after the set keyword, e.g. "name = 'John', age = 32")
+     * @param condition the condition to meet (after the where keyword, e.g. "name = 'Smith'")
+     */
+    <TType> TType update(
+        String table,
+        String fieldsWithValues,
+        String condition,
+        ResultSetExtractor<TType> extractor
+    );
+
+    /**
+     * Be careful, this can be used to wipe the whole table if condition is set to e.g. "true"
+     * @param table the name of the table including schema (e.g. "datamodels.User")
+     * @param condition the condition to meet (after the where keyword, e.g. "name = 'Smith'")
+     */
+    void delete(
+        String table,
+        String condition
+    );
+
+    /**
+     * Intended to be used as a lambda expression to simplify constructing a data model from a ResultSet
+     * E.g. row -> new User(
+     *     row.getString("name"),
+     *     row.getString("email"),
+     *     row.getInt("age")
+     * )
+     * @param <TType> the return-type of the lambda, implied
+     */
+    interface ResultSetExtractor<TType> {
+        TType extract(ResultSet resultSet) throws Exception;
     }
 
-    public static Context getInstance() {
-        return instance;
+    class QueryFailedException extends RuntimeException {
     }
 
-    public DataResponse insert(String table, String columns, String values) {
-        String sql = String.format("set search_path = 'zzleep';insert into %s (%s) values (%s);", table, columns, values);
-        try {
-            connection.createStatement().execute(sql);
-            return DataResponse.OK;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return DataResponse.ERROR;
-        }
+    class QueryEmptyException extends RuntimeException {
     }
 
-    public <TType> List<TType> select(
-            String tableName,
-            String condition,
-            ResultSetExtractor<TType> extractor
-    ) {
-        List<TType> result = new ArrayList<>();
-        String sql = String.format("select * from %s where %s;", tableName, condition);
-        try {
-            Statement statement = connection.createStatement();
-            statement.execute("set search_path = 'zzleep';");
-            ResultSet resultSet = connection.createStatement().executeQuery(sql);
-            while (resultSet.next())
-                result.add(extractor.extract(resultSet));
-            return result;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return new ArrayList<>();
-        }
+    class QueryContainsMultipleElementsException extends RuntimeException {
     }
-
-    public <TType> List<TType> select(
-            String tableName,
-            ResultSetExtractor<TType> extractor
-    ) {
-        return select(tableName, "1 = 1", extractor);
-    }
-
-
-    public interface ResultSetExtractor<TType> {
-        TType extract(ResultSet resultSet) throws SQLException;
-    }
-
 }

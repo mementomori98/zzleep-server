@@ -1,24 +1,29 @@
 package zzleep.api.controllers;
 
 import io.swagger.annotations.*;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import zzleep.core.services.TestService;
+import org.springframework.web.bind.annotation.*;
+import zzleep.core.logging.Logger;
+import zzleep.core.repositories.TestRepository;
 import zzleep.core.models.TestModel;
+import zzleep.core.models.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
 @Api(value = "Test api")
 public class TestController {
 
-    private final TestService testService;
+    private final TestRepository testRepository;
+    private final Logger logger;
 
-    public TestController(TestService testService) {
-        this.testService = testService;
+    public TestController(
+        TestRepository testRepository, Logger logger
+    ) {
+        this.testRepository = testRepository;
+        this.logger = logger;
     }
 
     @ApiOperation(value = "Get a TestModel object", response = TestModel.class)
@@ -27,11 +32,40 @@ public class TestController {
             @ApiResponse(code = 500, message = "A server error occured"),
     })
     @GetMapping
-    public ResponseEntity<TestModel> get()
+    public ResponseEntity<List<TestModel>> getAll(@RequestParam(defaultValue = "") String message)
     {
         return ResponseEntity
                 .status(200)
-                .body(testService.get());
+                .body(testRepository.getAll(message));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TestModel> get(@PathVariable int id) {
+        return ResponseEntity
+            .status(200)
+            .body(testRepository.get(id));
+    }
+
+    @PutMapping
+    public ResponseEntity<TestModel> update(@RequestBody TestModel model) {
+        return ResponseEntity
+            .status(200)
+            .body(testRepository.update(model));
+    }
+
+    @PostMapping
+    public ResponseEntity<TestModel> create(@RequestBody TestModel model) {
+        return ResponseEntity
+            .status(200)
+            .body(testRepository.add(model));
+    }
+
+    @DeleteMapping
+    public ResponseEntity delete(@RequestParam int id) {
+        testRepository.delete(id);
+        return ResponseEntity
+            .status(200)
+            .build();
     }
 
 }

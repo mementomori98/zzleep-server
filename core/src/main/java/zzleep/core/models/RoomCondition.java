@@ -67,7 +67,7 @@ public final class RoomCondition {
         return humidity;
     }
 
-    public RoomCondition roomConditionCopy(){
+    public RoomCondition roomConditionCopy() {
         return new RoomCondition(this.sleepId, this.timestamp, this.temperature, this.co2, this.sound, this.humidity);
     }
 }

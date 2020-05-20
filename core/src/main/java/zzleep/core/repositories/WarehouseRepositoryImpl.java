@@ -34,14 +34,27 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
     private static final String SLEEP_SESSION_SELECTOR =
         String.format("%s, %s, min(%s) as %s, max(%s) as %s, %s, avg(%s) as %s, avg(%s) as %s, avg(%s) as %s, avg(%s) as %s",
             COL_SLEEP_ID, COL_DEVICE_ID,
-            COL_TIMESTAMP, COL_TIME_START,
-            COL_TIMESTAMP, COL_TIME_FINISH,
+            COL_TIMESTAMP, COL_TIME_START, // TODO get database field instead
+            COL_TIMESTAMP, COL_TIME_FINISH, // TODO get database field instead
             COL_RATING,
             COL_CO2, COL_AVERAGE_CO2,
             COL_HUMIDITY, COL_AVERAGE_HUMIDITY,
             COL_SOUND, COL_AVERAGE_SOUND,
             COL_TEMPERATURE, COL_AVERAGE_TEMPERATURE
         );
+
+    private static final String IDEAL_ROOM_CONDITION_SELECTOR =
+        String.format(
+            "-1 as %s, timestamp '%s' as %s, " +
+            "trunc(cast(sum(%s * %s) as decimal) / sum(%s), 2) as %s, " +
+            "trunc(cast(sum(%s * %s) as decimal) / sum(%s), 2) as %s, " +
+            "trunc(cast(sum(%s * %s) as decimal) / sum(%s), 2) as %s, " +
+            "trunc(cast(sum(%s * %s) as decimal) / sum(%s), 2) as %s",
+        COL_SLEEP_ID, "1970-01-01 00:00:00.000000", COL_TIMESTAMP,
+        COL_RATING, COL_CO2, COL_RATING, COL_CO2,
+        COL_RATING, COL_HUMIDITY, COL_RATING, COL_HUMIDITY,
+        COL_RATING, COL_SOUND, COL_RATING, COL_SOUND,
+        COL_RATING, COL_TEMPERATURE, COL_RATING, COL_TEMPERATURE);
 
     private static final String SLEEP_SESSION_GROUPER = String.format("%s, %s, %s", COL_SLEEP_ID, COL_DEVICE_ID, COL_RATING);
 
@@ -106,6 +119,14 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
 
     @Override
     public RoomCondition getIdealRoomCondition(String deviceId) {
-        return null;
+        List<RoomCondition> query = context.selectComplex(
+            TABLE_NAME, IDEAL_ROOM_CONDITION_SELECTOR,
+            String.format("%s = '%s'", COL_DEVICE_ID, deviceId),
+            COL_DEVICE_ID, // not needed, but necessary for method param
+            roomConditionExtractor
+        );
+        RoomCondition ofTheJedi = query.get(0);
+
+        return ofTheJedi;
     }
 }

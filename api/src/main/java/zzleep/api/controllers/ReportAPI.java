@@ -64,4 +64,17 @@ public class ReportAPI extends ControllerBase {
         return data == null ? notFound(NOT_FOUND_MESSAGE) : success(data);
     }
 
+    @ApiOperation(value = "Get the ideal room conditions for a device (room)")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "The ideal room conditions have been successfully retrieved")
+    })
+    @GetMapping("/ideal/{deviceId}")
+    public ResponseEntity getIdealRoomConditions(
+        @PathVariable(value = "deviceId") String deviceId
+    ) {
+        return success(
+            warehouseRepository.getIdealRoomCondition(deviceId)
+        );
+    }
+
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @ApiModel
@@ -19,6 +20,6 @@ public final class IntervalReport {
     }
 
     public List<SleepSession> getSleeps() {
-        return sleeps;
+        return new ArrayList<>(sleeps);
     }
 }

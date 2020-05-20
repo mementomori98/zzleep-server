@@ -13,40 +13,59 @@ public class SleepSession {
     @JsonSerialize
     @JsonProperty("sleepId")
     private final int sleepId;
+
     @ApiModelProperty
     @JsonSerialize
     @JsonProperty("deviceId")
     private final String deviceId;
+
     @ApiModelProperty
     @JsonSerialize
     @JsonProperty("timeStart")
     private final LocalDateTime timeStart;
+
     @ApiModelProperty
     @JsonSerialize
     @JsonProperty("timeFinish")
     private final LocalDateTime timeFinish;
+
     @ApiModelProperty
     @JsonSerialize
     @JsonProperty("rating")
     private final int rating;
+
     @ApiModelProperty
     @JsonSerialize
     @JsonProperty("averageCo2")
     private final double averageCo2;
+
     @ApiModelProperty
     @JsonSerialize
     @JsonProperty("averageHumidity")
     private final double averageHumidity;
+
     @ApiModelProperty
     @JsonSerialize
     @JsonProperty("averageSound")
     private final double averageSound;
+
     @ApiModelProperty
     @JsonSerialize
     @JsonProperty("averageTemperature")
     private final double averageTemperature;
 
-    public SleepSession(int sleepId, String deviceId, LocalDateTime timeStart, LocalDateTime timeFinish, int rating, double averageCo2, double averageHumidity, double averageSound, double averageTemperature) {
+    public SleepSession(
+        int sleepId,
+        String deviceId,
+        LocalDateTime timeStart,
+        LocalDateTime timeFinish,
+        int rating,
+        double averageCo2,
+        double averageHumidity,
+        double averageSound,
+        double averageTemperature
+    ) {
+
         this.sleepId = sleepId;
         this.deviceId = deviceId;
         this.timeStart = timeStart;

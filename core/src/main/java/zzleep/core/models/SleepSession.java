@@ -69,7 +69,7 @@ public class SleepSession {
         this.sleepId = sleepId;
         this.deviceId = deviceId;
         this.timeStart = timeStart;
-        this.timeFinish = timeFinish;git ac
+        this.timeFinish = timeFinish;
         this.rating = rating;
         this.averageCo2 = averageCo2;
         this.averageHumidity = averageHumidity;

@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "Wrapper model for facts & tips")
 public final class Fact {
+
     @ApiModelProperty(notes = "The title of the given fact", example = "Sleep well 069")
     @JsonSerialize
     @JsonProperty("title")

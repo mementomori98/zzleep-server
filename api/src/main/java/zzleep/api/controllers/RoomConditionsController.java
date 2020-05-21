@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Random;
 
 @RestController
-@RequestMapping("/api/roomConditions")
+@RequestMapping("/api/room-conditions")
 @Api(tags = {"Room Conditions"}, description = " ")
 public class RoomConditionsController {
 

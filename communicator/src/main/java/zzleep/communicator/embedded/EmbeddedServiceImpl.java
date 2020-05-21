@@ -1,5 +1,7 @@
 package zzleep.communicator.embedded;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import com.google.gson.Gson;
 
 import zzleep.communicator.models.Command;
@@ -18,14 +20,14 @@ import java.net.http.WebSocket.Listener;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 @Component
-public class EmbeddedServiceImpl implements EmbeddedService, Listener{
+public class EmbeddedServiceImpl implements EmbeddedService, Listener {
 
     private DatabaseService dbService;
     private WebSocket socket;
@@ -42,30 +44,33 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener{
         this.socket = ws.join();
     }
 
-
-    public void onError​(WebSocket webSocket, Throwable error) {
+    @Override
+    public void onError(WebSocket webSocket, Throwable error) {
         System.out.println("A " + error.getCause() + " exception was thrown.");
         System.out.println("Message: " + error.getLocalizedMessage());
 
-//        HttpClient client = HttpClient.newHttpClient();
-//        CompletableFuture<WebSocket> ws = client.newWebSocketBuilder()
-//                .buildAsync(URI.create("wss://iotnet.teracom.dk/app?token=vnoSwQAAABFpb3RuZXQudGVyYWNvbS5ka5CGv5WoQH5B19isf4NMr3s="), this);
-//
-//        this.socket = ws.join();
+        HttpClient client = HttpClient.newHttpClient();
+        CompletableFuture<WebSocket> ws = client.newWebSocketBuilder()
+                .buildAsync(URI.create("wss://iotnet.teracom.dk/app?token=vnoSwQAAABFpb3RuZXQudGVyYWNvbS5ka5CGv5WoQH5B19isf4NMr3s="), this);
+
+        this.socket = ws.join();
 
         webSocket.abort();
+        System.out.println("onError completed");
     }
 
-    //onClose()
+    @Override
     public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
         System.out.println("WebSocket closed!");
         System.out.println("Status:" + statusCode + " Reason: " + reason);
 
-//        HttpClient client = HttpClient.newHttpClient();
-//        CompletableFuture<WebSocket> ws = client.newWebSocketBuilder()
-//                .buildAsync(URI.create("wss://iotnet.teracom.dk/app?token=vnoSwQAAABFpb3RuZXQudGVyYWNvbS5ka5CGv5WoQH5B19isf4NMr3s="), this);
-//
-//        this.socket = ws.join();
+        HttpClient client = HttpClient.newHttpClient();
+        CompletableFuture<WebSocket> ws = client.newWebSocketBuilder()
+                .buildAsync(URI.create("wss://iotnet.teracom.dk/app?token=vnoSwQAAABFpb3RuZXQudGVyYWNvbS5ka5CGv5WoQH5B19isf4NMr3s="), this);
+
+        this.socket = ws.join();
+
+        webSocket.abort();
 
         return new CompletableFuture().completedFuture("onClose() completed.").thenAccept(System.out::println);
     }
@@ -81,10 +86,11 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener{
     }
 
     private void onStart() {
-        onProgress();
+        // onProgress();
 
         Thread progressThread = new Thread(this);
-        progressThread.run();
+        progressThread.setDaemon(false);
+        progressThread.start();
 
     }
 
@@ -104,7 +110,7 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener{
 
     }
 
-
+    //@Override
     public CompletableFuture<WebSocket> sendText(CharSequence data, boolean last) {
 
         socket.sendText(data, true);
@@ -118,7 +124,7 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener{
     public void run() {
 
         while (true) {
-            onProgress();
+            //onProgress();
             try {
                 Thread.sleep(300000);//5min
             } catch (InterruptedException e) {
@@ -128,14 +134,12 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener{
     }
 
 
-    //onText()
-    public CompletionStage<?> onText​(WebSocket webSocket, CharSequence data, boolean last) {
+    @Override
+    public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
         System.out.println(data);
         CurrentData currentData = processData(data);
         receive(currentData);
         webSocket.request(1);
-
-        // TODO: 5/13/2020 understand CompletionStage
         return new CompletableFuture().completedFuture("onText() completed.").thenAccept(System.out::println);
     }
 
@@ -147,30 +151,57 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener{
     }
 
 
-    // TODO: 5/13/2020 Transform the Json telegram in CurrentData object format;
     private CurrentData processData(CharSequence data) {
         String messageString = data.toString();
         UpLinkMessage message = gson.fromJson(messageString, UpLinkMessage.class);
         System.out.println(message.toString());
 
+        //source
         CurrentData currentData = new CurrentData();
-        currentData.setSource(message.getEUI()); //source
+        currentData.setSource(message.getEUI());
 
-        LocalDateTime dateTime = LocalDateTime.ofEpochSecond(message.getTs(), 0, ZoneOffset.UTC);
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        String timestamp = df.format(dateTime);
-        currentData.setTimeStamp(timestamp);//timestamp
+        //timestamp
+        long timestampS = message.getTs();
+        Date date = new Date(timestampS);
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC")); // TODO: 5/21/2020 2020-05-21 09:03:22 instead of 11:03:22 check with UTC+02:00
+        String formatted = format.format(date);
+        System.out.println("First try of converting date");
+        System.out.println(formatted);
 
-        // TODO: 5/13/2020 transform binary data in actual sensor data
+//        ZonedDateTime dateTime = Instant.ofEpochSecond(timestampS).atZone(ZoneId.of("+01:00"));
+//        String formatted2 = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+//        System.out.println("Second try of converting date");
+//        System.out.println(formatted2);
 
+        //data
+        Iterable<String> result = Splitter.fixedLength(4).split(message.getData());
+        String[] parts = Iterables.toArray(result, String.class);
+
+        String humSHex = parts[0];
+        String tempSHex = parts[1];
+
+        int hum = Integer.parseInt(humSHex, 16);
+        int temp = Integer.parseInt(tempSHex,16);
+        int co2 = 0;
+        int sound = 0;
+
+
+//        LocalDateTime dateTime = LocalDateTime.ofEpochSecond(message.getTs(), 0, ZoneOffset.UTC);
+//        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+//        String timestamp = df.format(dateTime);
+//        currentData.setTimeStamp(timestamp);//timestamp
+        currentData.setTimeStamp(formatted);
+        currentData.setHumidityData((double)hum);
+        currentData.setTemperatureData((double)temp);
+        currentData.setCo2Data(250.0); // TODO: 5/21/2020  changes
+        currentData.setSoundData(0.0);
         System.out.println(currentData.toString());
 
 
         return currentData;
     }
 
-
-    // TODO: 5/13/2020 Create Json telegram
 
     private CharSequence processCommand(Command command) {
 
@@ -181,7 +212,6 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener{
         sb.append(hexString2);
 
         String data = sb.toString();
-        // TODO: 5/19/2020 Ask IB if we could get the EUI before the connection to store it already in DB
         DownLinkMessage message = new DownLinkMessage(command.getDestination(), true, data);
         String json = gson.toJson(message);
         return json;

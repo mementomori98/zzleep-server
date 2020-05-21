@@ -18,7 +18,7 @@
       <module name="communicator" target="11" />
       <module name="communicator (1)" target="11" />
       <module name="core" target="1.8" />
-      <module name="etl" target="11" />
+      <module name="etl" target="1.8" />
       <module name="zzleep" target="1.8" />
       <module name="zzleep (1)" target="1.7" />
     </bytecodeTargetLevel>

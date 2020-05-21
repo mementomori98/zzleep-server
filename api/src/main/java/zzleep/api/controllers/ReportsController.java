@@ -18,12 +18,12 @@ import java.util.Random;
 
 @RestController
 @RequestMapping("/api/reports")
-@Api(value = "Report api")
-public class ReportAPI extends ControllerBase {
+@Api(tags = {"Reports"}, description = " ")
+public class ReportsController extends ControllerBase {
 
     private final WarehouseRepository warehouseRepository;
 
-    public ReportAPI(WarehouseRepository warehouseRepository) {
+    public ReportsController(WarehouseRepository warehouseRepository) {
         this.warehouseRepository = warehouseRepository;
     }
 

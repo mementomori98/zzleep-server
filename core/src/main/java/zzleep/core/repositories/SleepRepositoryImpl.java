@@ -1,9 +1,7 @@
 package zzleep.core.repositories;
 
-import javassist.NotFoundException;
 import org.springframework.stereotype.Component;
 import zzleep.core.models.Sleep;
-import zzleep.core.models.TestModel;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

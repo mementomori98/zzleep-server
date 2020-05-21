@@ -4,21 +4,19 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import javassist.NotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import zzleep.core.models.*;
 import zzleep.core.repositories.SleepRepository;
-import zzleep.core.repositories.TestRepository;
 
 @RestController
-@RequestMapping("/api/sleeps")
-@Api(value = "User sleep api")
-public class SleepController {
+@RequestMapping("/api/tracking")
+@Api(tags = {"Tracking"}, description = " ")
+public class TrackingController {
 
     private final SleepRepository sleepRepository;
 
-    public SleepController(SleepRepository sleepRepository) {
+    public TrackingController(SleepRepository sleepRepository) {
         this.sleepRepository = sleepRepository;
     }
 
@@ -26,7 +24,7 @@ public class SleepController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully started tracking the room conditions"),
     })
-    @PostMapping("/startTracking/{deviceId}")
+    @PostMapping("/start/{deviceId}")
     public ResponseEntity<Sleep> startTracking(@PathVariable(value="deviceId") String deviceId)
     {
         Sleep sleep;
@@ -47,7 +45,7 @@ public class SleepController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully started tracking the room conditions"),
     })
-    @PutMapping("/stopTracking/{deviceId}")
+    @PutMapping("/stop/{deviceId}")
     public ResponseEntity<Sleep> stopTracking(@PathVariable(value="deviceId") String deviceId)
     {
         Sleep sleep;
@@ -64,9 +62,9 @@ public class SleepController {
         }
     }
 
-    @ApiOperation(value = "Stop sleep tracking", response = Sleep.class)
+    @ApiOperation(value = "Rate sleep", response = Sleep.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully started tracking the room conditions"),
+            @ApiResponse(code = 200, message = "Successfully rated sleep"),
     })
     @PutMapping("/{sleepId}/{rating}")
     public ResponseEntity<Sleep> setRating(@PathVariable(value="sleepId") String sleepId, @PathVariable(value="rating") int rating)

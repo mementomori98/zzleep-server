@@ -10,19 +10,19 @@ public final class Device {
     @ApiModelProperty(notes = "The device Id", example = "1234")
     @JsonSerialize
     @JsonProperty("deviceId")
-    private final int deviceId;
+    private final String deviceId;
 
     @ApiModelProperty(notes = "The device/room name(?)", example = "Kitchen")
     @JsonSerialize
     @JsonProperty("name")
     private final String name;
 
-    public Device(int deviceId, String name) {
+    public Device(String deviceId, String name) {
         this.deviceId = deviceId;
         this.name = name;
     }
 
-    public int getDeviceId() {
+    public String getDeviceId() {
         return deviceId;
     }
 

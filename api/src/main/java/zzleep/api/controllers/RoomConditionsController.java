@@ -5,7 +5,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import zzleep.core.models.RoomCondition;
 
 import java.time.LocalDateTime;
@@ -13,17 +16,16 @@ import java.util.Random;
 
 @RestController
 @RequestMapping("/api/roomConditions")
-@Api(value = "RoomConditions API")
+@Api(tags = {"Room Conditions"}, description = " ")
 public class RoomConditionsController {
 
 
     @ApiOperation(value = "Get current room condition")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully retrieved current room condition"),
+        @ApiResponse(code = 200, message = "Successfully retrieved current room condition"),
     })
     @GetMapping("/{deviceId}")
-    public ResponseEntity<RoomCondition> getReport(@PathVariable(name = "deviceId") String deviceId)
-    {
+    public ResponseEntity<RoomCondition> getReport(@PathVariable(name = "deviceId") String deviceId) {
         Random random = new Random();
         RoomCondition dummy = new RoomCondition(
             random.nextInt(100),
@@ -34,7 +36,7 @@ public class RoomConditionsController {
             random.nextDouble() * 100
         );
         return ResponseEntity
-                .status(200)
-                .body(dummy);
+            .status(200)
+            .body(dummy);
     }
 }

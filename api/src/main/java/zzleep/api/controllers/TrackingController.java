@@ -11,7 +11,7 @@ import zzleep.core.repositories.SleepRepository;
 
 @RestController
 @RequestMapping("/api/sleeps")
-@Api(value = "Tracking API")
+@Api(tags = {"Tracking"}, description = " ")
 public class TrackingController {
 
     private final SleepRepository sleepRepository;

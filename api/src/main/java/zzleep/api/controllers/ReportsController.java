@@ -27,7 +27,7 @@ public class ReportsController extends ControllerBase {
         this.warehouseRepository = warehouseRepository;
     }
 
-    @ApiOperation(value = "Get a report on sleep")
+    @ApiOperation(value = "Get a report on sleep", response = IntervalReport.class)
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successfully retrieved a report"),
     })
@@ -48,7 +48,7 @@ public class ReportsController extends ControllerBase {
             .body(report);
     }
 
-    @ApiOperation(value = "Get data for a sleep")
+    @ApiOperation(value = "Get data for a sleep", response = SleepData.class)
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "The sleep data has been successfully retrieved"),
         @ApiResponse(code = 404, message = NOT_FOUND_MESSAGE)
@@ -61,7 +61,7 @@ public class ReportsController extends ControllerBase {
         return data == null ? notFound() : success(data);
     }
 
-    @ApiOperation(value = "Get the ideal room conditions for a device (room)")
+    @ApiOperation(value = "Get the ideal room conditions for a device (room)", response = RoomCondition.class)
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "The ideal room conditions have been successfully retrieved")
     })

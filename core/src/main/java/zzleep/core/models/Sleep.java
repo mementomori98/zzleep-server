@@ -10,25 +10,30 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-@ApiModel(description = "Model for sleep")
+@ApiModel(description = "A model representing a sleep")
 public class Sleep {
-    @ApiModelProperty
+
+    @ApiModelProperty(example = "2")
     @JsonSerialize
     @JsonProperty("sleepId")
     private int sleepId;
-    @ApiModelProperty
+
+    @ApiModelProperty(example = "device2")
     @JsonSerialize
     @JsonProperty("deviceId")
     private String deviceId;
-    @ApiModelProperty
+
+    @ApiModelProperty(example = "2020-05-21T13:48:16.141Z")
     @JsonSerialize
     @JsonProperty("dateTimeStart")
     private LocalDateTime dateTimeStart;
-    @ApiModelProperty
+
+    @ApiModelProperty(example = "2020-06-21T13:48:16.141Z")
     @JsonSerialize
     @JsonProperty("dateTimeFinish")
     private LocalDateTime dateTimeFinish;
-    @ApiModelProperty
+
+    @ApiModelProperty(example = "3")
     @JsonSerialize
     @JsonProperty("rating")
     private int rating;

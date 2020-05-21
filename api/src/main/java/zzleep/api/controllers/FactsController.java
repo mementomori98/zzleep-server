@@ -35,7 +35,7 @@ public class FactsController extends ControllerBase {
         return success(factRepository.get(factId));
     }
 
-    @ApiOperation(value = "Get all facts", response = Fact.class)
+    @ApiOperation(value = "Get all facts", response = Fact[].class)
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successfully retrieved all facts")
     })

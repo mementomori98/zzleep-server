@@ -5,20 +5,20 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(description = "Wrapper model for facts & tips")
+@ApiModel(description = "Holds data of a fact about sleep")
 public final class Fact {
 
-    @ApiModelProperty(notes = "The id of the given fact", example = "10")
+    @ApiModelProperty(example = "12")
     @JsonSerialize
     @JsonProperty("id")
     private final int id;
 
-    @ApiModelProperty(notes = "The title of the given fact", example = "Sleep well 069")
+    @ApiModelProperty(example = "Eating before going to bed")
     @JsonSerialize
     @JsonProperty("title")
     private final String title;
 
-    @ApiModelProperty(notes = "The content of the given fact", example = "Never eat before going to sleep as this dra...")
+    @ApiModelProperty(example = "Never eat before going to sleep.")
     @JsonSerialize
     @JsonProperty("content")
     private final String content;

@@ -7,29 +7,35 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.time.LocalDateTime;
 
-@ApiModel(description = "Wrapper model for room condition at a certain time")
+@ApiModel(description = "Represents the sleeping environment at a given time")
 public final class RoomCondition {
-    @ApiModelProperty
+
+    @ApiModelProperty(example = "3")
     @JsonSerialize
     @JsonProperty("sleepId")
     private final int sleepId;
-    @ApiModelProperty(notes = "Timestamp of data provided")
+
+    @ApiModelProperty(example = "2020-05-21T13:48:16.141Z")
     @JsonSerialize
     @JsonProperty("timestamp")
     private final LocalDateTime timestamp;
-    @ApiModelProperty(notes = "Temperature in the room")
+
+    @ApiModelProperty(example = "32.42", notes = "Represented in Celsius, rounded to 2 decimal digits")
     @JsonSerialize
     @JsonProperty("temperature")
     private final double temperature;
-    @ApiModelProperty(notes = "CO2 levels in the room")
+
+    @ApiModelProperty(notes = "Represented in ppm, rounded to 2 decimal digits", example = "553")
     @JsonSerialize
     @JsonProperty("co2")
     private final double co2;
-    @ApiModelProperty(notes = "Sound state in the room")
+
+    @ApiModelProperty(notes = "Represented in dB, rounded to 2 decimal digits", example = "42.16")
     @JsonSerialize
     @JsonProperty("sound")
     private final double sound;
-    @ApiModelProperty(notes = "Humidity % of the room")
+
+    @ApiModelProperty(notes = "Represented in %, rounded to 2 decimal digits", example = "42.27")
     @JsonSerialize
     @JsonProperty("humidity")
     private final double humidity;

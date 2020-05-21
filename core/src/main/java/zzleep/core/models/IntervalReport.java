@@ -8,18 +8,19 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-@ApiModel
+@ApiModel(description = "Summarizes data for sleepSessions in a given time period")
 public final class IntervalReport {
+
     @ApiModelProperty
     @JsonSerialize
-    @JsonProperty("sleeps")
-    private final List<SleepSession> sleeps;
+    @JsonProperty("sleepSessions")
+    private final List<SleepSession> sleepSessions;
 
-    public IntervalReport(List<SleepSession> sleeps) {
-        this.sleeps = sleeps;
+    public IntervalReport(List<SleepSession> sleepSessions) {
+        this.sleepSessions = sleepSessions;
     }
 
-    public List<SleepSession> getSleeps() {
-        return new ArrayList<>(sleeps);
+    public List<SleepSession> getSleepSessions() {
+        return new ArrayList<>(sleepSessions);
     }
 }

@@ -9,47 +9,47 @@ import java.time.LocalDateTime;
 
 @ApiModel(description = "Wrapper model for sleep session")
 public class SleepSession {
-    @ApiModelProperty
+    @ApiModelProperty(example = "5")
     @JsonSerialize
     @JsonProperty("sleepId")
     private final int sleepId;
 
-    @ApiModelProperty
+    @ApiModelProperty(example = "device1")
     @JsonSerialize
     @JsonProperty("deviceId")
     private final String deviceId;
 
-    @ApiModelProperty
+    @ApiModelProperty(example = "2020-02-27T22:40:03.887Z")
     @JsonSerialize
     @JsonProperty("timeStart")
     private final LocalDateTime timeStart;
 
-    @ApiModelProperty
+    @ApiModelProperty(example = "2020-02-28T07:20:00.247Z")
     @JsonSerialize
     @JsonProperty("timeFinish")
     private final LocalDateTime timeFinish;
 
-    @ApiModelProperty
+    @ApiModelProperty(example = "4")
     @JsonSerialize
     @JsonProperty("rating")
     private final int rating;
 
-    @ApiModelProperty
+    @ApiModelProperty(notes = "Value is represented in ppm, rounded to 2 decimal digits", example = "521.42")
     @JsonSerialize
     @JsonProperty("averageCo2")
     private final double averageCo2;
 
-    @ApiModelProperty
+    @ApiModelProperty(notes = "Value is represented in percentage, rounded to 2 decimal digits", example = "54.32")
     @JsonSerialize
     @JsonProperty("averageHumidity")
     private final double averageHumidity;
 
-    @ApiModelProperty
+    @ApiModelProperty(notes = "Value is represented in dB, rounded to 2 decimal digits", example = "45.12")
     @JsonSerialize
     @JsonProperty("averageSound")
     private final double averageSound;
 
-    @ApiModelProperty
+    @ApiModelProperty(notes = "Value is represented in Celsius, rounded to 2 decimal digits", example = "22.02")
     @JsonSerialize
     @JsonProperty("averageTemperature")
     private final double averageTemperature;

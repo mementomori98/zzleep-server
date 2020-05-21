@@ -20,7 +20,7 @@ import java.util.Random;
 public class RoomConditionsController {
 
 
-    @ApiOperation(value = "Get current room condition")
+    @ApiOperation(value = "Get current room condition", response = RoomCondition.class)
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successfully retrieved current room condition"),
     })

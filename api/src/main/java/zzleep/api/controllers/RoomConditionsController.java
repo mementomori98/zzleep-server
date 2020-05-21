@@ -13,8 +13,8 @@ import java.util.Random;
 
 @RestController
 @RequestMapping("/api/roomConditions")
-@Api(value = "Room condition api")
-public class RoomConditionAPI {
+@Api(value = "RoomConditions API")
+public class RoomConditionsController {
 
 
     @ApiOperation(value = "Get current room condition")

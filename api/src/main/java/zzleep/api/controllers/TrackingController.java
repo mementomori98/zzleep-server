@@ -4,21 +4,19 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import javassist.NotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import zzleep.core.models.*;
 import zzleep.core.repositories.SleepRepository;
-import zzleep.core.repositories.TestRepository;
 
 @RestController
 @RequestMapping("/api/sleeps")
-@Api(value = "User sleep api")
-public class SleepController {
+@Api(value = "Tracking API")
+public class TrackingController {
 
     private final SleepRepository sleepRepository;
 
-    public SleepController(SleepRepository sleepRepository) {
+    public TrackingController(SleepRepository sleepRepository) {
         this.sleepRepository = sleepRepository;
     }
 

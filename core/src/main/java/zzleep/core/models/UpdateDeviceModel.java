@@ -10,7 +10,7 @@ public class UpdateDeviceModel {
     @ApiModelProperty(notes = "The Id of the device that's being updated", example = "5555")
     @JsonSerialize
     @JsonProperty("deviceId")
-    private int deviceId;
+    private String deviceId;
 
     @ApiModelProperty(notes = "The new(?) device/room name(?)", example = "Kitchen")
     @JsonSerialize
@@ -18,5 +18,13 @@ public class UpdateDeviceModel {
     private String name;
 
     public UpdateDeviceModel() {
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public String getName() {
+        return name;
     }
 }

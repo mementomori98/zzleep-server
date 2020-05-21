@@ -10,12 +10,12 @@ public class AddDeviceModel {
     @ApiModelProperty(notes = "The user account Id", example = "1234")
     @JsonSerialize
     @JsonProperty("userId")
-    private int userId;
+    private String userId;
 
     @ApiModelProperty(notes = "The Id of the device that's being added", example = "5555")
     @JsonSerialize
     @JsonProperty("deviceId")
-    private int deviceId;
+    private String deviceId;
 
     @ApiModelProperty(notes = "The device/room name(?)", example = "Kitchen")
     @JsonSerialize
@@ -23,5 +23,17 @@ public class AddDeviceModel {
     private String name;
 
     public AddDeviceModel() {
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public String getName() {
+        return name;
     }
 }

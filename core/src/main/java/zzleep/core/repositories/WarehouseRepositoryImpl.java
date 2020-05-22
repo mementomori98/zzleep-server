@@ -58,26 +58,9 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
 
     private static final String SLEEP_SESSION_GROUPER = String.format("%s, %s, %s", COL_SLEEP_ID, COL_DEVICE_ID, COL_RATING);
 
-    private static final Context.ResultSetExtractor<RoomCondition> roomConditionExtractor = row -> new RoomCondition(
-        row.getInt(COL_SLEEP_ID),
-        row.getObject(COL_TIMESTAMP, LocalDateTime.class),
-        row.getInt(COL_TEMPERATURE),
-        row.getInt(COL_CO2),
-        row.getDouble(COL_SOUND),
-        row.getDouble(COL_HUMIDITY)
-    );
+    private static final Context.ResultSetExtractor<RoomCondition> roomConditionExtractor = ExtractorFactory.getDWRoomConditionExtractor();
 
-    private static final Context.ResultSetExtractor<SleepSession> sleepSessionExtractor = row -> new SleepSession(
-        row.getInt(COL_SLEEP_ID),
-        row.getString(COL_DEVICE_ID),
-        row.getObject(COL_TIME_START, LocalDateTime.class),
-        row.getObject(COL_TIME_FINISH, LocalDateTime.class),
-        row.getInt(COL_RATING),
-        row.getDouble(COL_AVERAGE_CO2),
-        row.getDouble(COL_AVERAGE_HUMIDITY),
-        row.getDouble(COL_AVERAGE_SOUND),
-        row.getDouble(COL_AVERAGE_TEMPERATURE)
-    );
+    private static final Context.ResultSetExtractor<SleepSession> sleepSessionExtractor = ExtractorFactory.getSleepSessionExtractor();
 
     private final Context context;
 
@@ -97,7 +80,7 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
         if (roomConditions.isEmpty()) return null;
         List<SleepSession> query = context.selectComplex(
             TABLE_NAME, SLEEP_SESSION_SELECTOR,
-            String.format("%s = %d", COL_SLEEP_ID, sleepId),
+            String.format("%s = '%d'", COL_SLEEP_ID, sleepId),
             SLEEP_SESSION_GROUPER,
             sleepSessionExtractor
         );
@@ -125,8 +108,10 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
             COL_DEVICE_ID, // not needed, but necessary for method param
             roomConditionExtractor
         );
-        RoomCondition ofTheJedi = query.get(0);
 
-        return ofTheJedi;
+        if(query.size() != 0)
+            return query.get(0);
+        else
+            return null;
     }
 }

@@ -17,8 +17,7 @@ public class SleepRepositoryImpl implements SleepRepository {
 
     private Context context;
 
-    private static final Context.ResultSetExtractor<Sleep> extractor = row ->
-        new Sleep(row.getInt(COL_SLEEP_ID), row.getString(COL_DEVICE_ID), row.getObject(COL_START_TIME, LocalDateTime.class), row.getObject(COL_FINISH_TIME, LocalDateTime.class), row.getInt(COL_RATING));
+    private static final Context.ResultSetExtractor<Sleep> extractor = ExtractorFactory.getSleepExtractor();
 
     public SleepRepositoryImpl(Context context) {
         this.context = context;
@@ -56,7 +55,7 @@ public class SleepRepositoryImpl implements SleepRepository {
 
         return sleep != null;
     }
-
+    
     @Override
     public Sleep rateSleep(String sleepId, int rating) throws SleepNotFoundException {
         Sleep sleep = context.single(TABLE_NAME, String.format("%s = '%s'", COL_SLEEP_ID, sleepId), extractor);

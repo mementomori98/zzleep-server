@@ -33,14 +33,14 @@ public class SleepData extends SleepSession {
         return roomConditions;
     }
 
-    private static double calculateAverage(
-        Function<RoomCondition, Double> mapper,
+    private static <TType extends Number> double calculateAverage(
+        Function<RoomCondition, TType> mapper,
         List<RoomCondition> roomConditions
     ) {
         double sum = 0;
-        List<Double> list = roomConditions.stream().map(mapper).collect(Collectors.toList());
-        for (Double value : list)
-            sum += value;
+        List<TType> list = roomConditions.stream().map(mapper).collect(Collectors.toList());
+        for (TType value : list)
+            sum += value.doubleValue();
         return sum / list.size();
     }
 }

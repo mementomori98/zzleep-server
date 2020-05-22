@@ -18,12 +18,7 @@ import java.util.Random;
 @RestController
 @RequestMapping("/api/room-conditions")
 @Api(tags = {"Room Conditions"}, description = " ")
-public class RoomConditionsController extends ControllerBase {
-
-    private static int[] temperatures = {26, 27, 27, 26};
-    private static int[] humidities = {45, 45, 46, 45};
-    private static int count = 0;
-
+public class RoomConditionsController {
     private final RoomConditionsRepository repository;
 
     public RoomConditionsController(RoomConditionsRepository repository) {
@@ -36,31 +31,34 @@ public class RoomConditionsController extends ControllerBase {
     })
     @GetMapping("/{deviceId}")
     public ResponseEntity<RoomCondition> getReport(@PathVariable(name = "deviceId") String deviceId) {
-        RoomCondition rc = new RoomCondition(
-            1, LocalDateTime.now(),
-            temperatures[count],
-            250, 70,
-            humidities[count]
-        );
-        count = (count + 1) % 4;
-        return success(rc);
-        // try{
-        //     rc = repository.getCurrentData(deviceId);
-        //     return ResponseEntity
-        //             .status(200)
-        //             .body(rc);
-        // }
-        // catch(RoomConditionsRepository.SleepNotFoundException ex)
-        // {
-        //     return ResponseEntity
-        //             .status(404)
-        //             .body(null);
-        // }
-        // catch(RoomConditionsRepository.NoDataException ex)
-        // {
-        //     return ResponseEntity
-        //             .status(200)
-        //             .body(null);
-        // }
+        RoomCondition rc;
+        try{
+            rc = repository.getCurrentData(deviceId);
+            return ResponseEntity
+                    .status(200)
+                    .body(rc);
+        }
+        catch(RoomConditionsRepository.SleepNotFoundException ex)
+        {
+            return ResponseEntity
+                    .status(404)
+                    .body(null);
+        }
+        catch(RoomConditionsRepository.NoDataException ex)
+        {
+            return ResponseEntity
+                    .status(200)
+                    .body(null);
+        }
+        /*Random random = new Random();
+        RoomCondition dummy = new RoomCondition(
+            random.nextInt(100),
+            LocalDateTime.now(),
+            random.nextInt() * 15 + 15,
+            random.nextInt() * 200 + 400,
+            random.nextDouble() * 50 + 20,
+            random.nextDouble() * 100
+        );*/
+
     }
 }

@@ -1,5 +1,6 @@
 package zzleep.core.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModel;
@@ -18,6 +19,7 @@ public final class RoomCondition {
     @ApiModelProperty(example = "2020-05-21T13:48:16.141Z")
     @JsonSerialize
     @JsonProperty("timestamp")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime timestamp;
 
     @ApiModelProperty(example = "32.42", notes = "Represented in Celsius, rounded to 2 decimal digits")

@@ -1,4 +1,4 @@
-package zzleep.communicator.databaseService;
+package zzleep.communicator.repository;
 
 
 import org.junit.BeforeClass;
@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class DatabaseServiceImplTest {
+public class PersistenceRepositoryImplTest {
 
-    private static DatabaseServiceImpl dbService;
+    private static PersistenceRepositoryImpl dbService;
 
     @BeforeClass
     public static void setUp()
@@ -26,7 +26,7 @@ public class DatabaseServiceImplTest {
         RestTemplateBuilder restTemplate =  new RestTemplateBuilder();
         Logger logger = new LoggerImpl(restTemplate);
         Context context = new PostgresContext(logger);
-        dbService = new DatabaseServiceImpl(context);
+        dbService = new PersistenceRepositoryImpl(context);
     }
 
     @Test

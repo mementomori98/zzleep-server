@@ -1,13 +1,12 @@
-package zzleep.communicator.databaseService;
+package zzleep.communicator.repository;
 
 import zzleep.communicator.models.Command;
 import zzleep.communicator.models.CurrentData;
-import zzleep.core.repositories.SleepRepository;
 
 import java.util.ArrayList;
 
 
-public interface DatabaseService {
+public interface PersistenceRepository {
     void putDataInDatabase(CurrentData data) ;
     ArrayList<Command> getUpdates();
 }

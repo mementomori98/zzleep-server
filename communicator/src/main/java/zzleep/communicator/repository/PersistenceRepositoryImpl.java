@@ -1,4 +1,4 @@
-package zzleep.communicator.databaseService;
+package zzleep.communicator.repository;
 
 import org.springframework.web.client.HttpClientErrorException;
 import zzleep.communicator.models.Command;
@@ -12,7 +12,7 @@ import java.util.List;
 
 
 @Component
-public class DatabaseServiceImpl implements DatabaseService{
+public class PersistenceRepositoryImpl implements PersistenceRepository {
     private static final String SLEEP_TABLE = "datamodels.sleep";
     private static final String ACTIVE_SLEEP_TABLE ="datamodels.activesleeps";
     private static final String ROOM_C_TABLE = "datamodels.roomConditions";
@@ -25,7 +25,6 @@ public class DatabaseServiceImpl implements DatabaseService{
     private static final String COL_SOUND = "sound";
     private static final String COL_HUMIDITY = "humidity";
     private static final String COL_FINISH_TIME = "datetimeend";
-    private static final String JOIN_S = "join datamodels.device on sleep.deviceid = deviceid"; ////////////
     private static final String JOIN_AS = "join datamodels.activesleeps on sleep.sleepid = activesleeps.sleepid ";
     private static final String JOIN_EXCEPT = "left outer join datamodels.activesleeps on sleep.sleepid = activesleeps.sleepid";
 
@@ -34,7 +33,7 @@ public class DatabaseServiceImpl implements DatabaseService{
     private static final Context.ResultSetExtractor<String> sleepId_extractor = row-> ""+row.getInt(COL_SLEEP_ID);
     private static final Context.ResultSetExtractor<String> deviceId_extractor = row-> ""+row.getString(COL_DEVICE_ID);
 
-    public DatabaseServiceImpl(Context context)
+    public PersistenceRepositoryImpl(Context context)
     {
         this.context = context;
     }
@@ -52,8 +51,6 @@ public class DatabaseServiceImpl implements DatabaseService{
         }catch(HttpClientErrorException e)
         {
             System.out.println("You are trying to introduce invalid format data ");
-            System.out.println("or");
-            System.out.println("Something else");
         }
 
 
@@ -100,7 +97,7 @@ public class DatabaseServiceImpl implements DatabaseService{
         return new ArrayList<String>();
     }
 
-    public ArrayList<String> getStoppedSleeps() {
+    ArrayList<String> getStoppedSleeps() {
 
         List<String> sleep_Ids = context.select(SLEEP_TABLE +" "+ JOIN_AS, String.format("%s is not null", COL_FINISH_TIME), sleepId_extractor);
         for (String sleep_id:sleep_Ids) {
@@ -113,7 +110,7 @@ public class DatabaseServiceImpl implements DatabaseService{
 
 
 
-    public ArrayList<String> getActiveSleeps() {
+    ArrayList<String> getActiveSleeps() {
 
         List<String> sleep_Ids = context.selectExcept(SLEEP_TABLE +" "+JOIN_EXCEPT, String.format("%s is null", COL_FINISH_TIME),
                 SLEEP_TABLE +" "+ JOIN_EXCEPT, String.format("%s is not null ", COL_ACTIVES_ID), sleepId_extractor);
@@ -124,7 +121,7 @@ public class DatabaseServiceImpl implements DatabaseService{
         return getSources(sleep_Ids);
     }
 
-    public ArrayList<String> getSources(List<String> sleep_Ids) {
+    ArrayList<String> getSources(List<String> sleep_Ids) {
         ArrayList<String> sources = new ArrayList<>();
 
         for (String sleep_id:sleep_Ids) {
@@ -135,8 +132,6 @@ public class DatabaseServiceImpl implements DatabaseService{
             }catch(HttpClientErrorException e)
             {
                 System.out.println("You are trying to retrieve a device for a non existing or incorrect format of sleepId");
-                System.out.println("or");
-                System.out.println("Something else");
             }
 
         }

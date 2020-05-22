@@ -15,11 +15,11 @@ public class PreferencesController {
     //         @ApiResponse(code = 200, message = "Successfully retrieved preferences"),
     // })
     @GetMapping
-    public ResponseEntity<Preferences> getPreferences(@RequestParam(name = "devId") int deviceId)
+    public ResponseEntity<Preferences> getPreferences(@RequestParam(name = "devId") String deviceId)
     {
         return ResponseEntity
                 .status(200)
-                .body(new Preferences(deviceId, true, 10, 10, 10, 10.0, 10.0));
+                .body(new Preferences(deviceId, true, 10, 10, 10, 10, 10));
     }
 
     // @ApiOperation(value = "Update user preferences")

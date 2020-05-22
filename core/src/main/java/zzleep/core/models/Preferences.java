@@ -10,7 +10,7 @@ public final class Preferences {
     @ApiModelProperty(notes = "The device Id of which preferences are given", example = "1234")
     @JsonSerialize
     @JsonProperty("deviceId")
-    private final int deviceId;
+    private final String deviceId;
 
     @ApiModelProperty
     @JsonSerialize
@@ -25,24 +25,24 @@ public final class Preferences {
     @ApiModelProperty(notes = "Minimum tolerable amount of humidity", example = "69420")
     @JsonSerialize
     @JsonProperty("humidityMin")
-    private final int humidityMin;
+    private final double humidityMin;
 
     @ApiModelProperty(notes = "Maximum tolerable amount of humidty", example = "69420")
     @JsonSerialize
     @JsonProperty("humidityMax")
-    private final int humidityMax;
+    private final double humidityMax;
 
     @ApiModelProperty(notes = "Lowest point of tolerable temperature", example = "15.0")
     @JsonSerialize
     @JsonProperty("temperatureMin")
-    private final double temperatureMin;
+    private final int temperatureMin;
 
     @ApiModelProperty(notes = "Highest point of tolerable temperature", example = "25.0")
     @JsonSerialize
     @JsonProperty("temperatureMax")
-    private final double temperatureMax;
+    private final int temperatureMax;
 
-    public Preferences(int deviceId, boolean regulationEnabled, int co2Max, int humidityMin, int humidityMax, double temperatureMin, double temperatureMax) {
+    public Preferences(String deviceId, boolean regulationEnabled, int co2Max, double humidityMin, double humidityMax, int temperatureMin, int temperatureMax) {
         this.deviceId = deviceId;
         this.regulationEnabled = regulationEnabled;
         this.co2Max = co2Max;
@@ -52,7 +52,7 @@ public final class Preferences {
         this.temperatureMax = temperatureMax;
     }
 
-    public int getDeviceId() {
+    public String getDeviceId() {
         return deviceId;
     }
 
@@ -64,11 +64,11 @@ public final class Preferences {
         return co2Max;
     }
 
-    public int getHumidityMin() {
+    public double getHumidityMin() {
         return humidityMin;
     }
 
-    public int getHumidityMax() {
+    public double getHumidityMax() {
         return humidityMax;
     }
 

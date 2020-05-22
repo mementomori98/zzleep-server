@@ -93,4 +93,25 @@ public class ExtractorFactory {
     public static Context.ResultSetExtractor<SleepSession> getSleepSessionExtractor() {
         return sleepSessionExtractor;
     }
+
+    //dw room conditions
+    private static final String COL_SLEEP_ID = "sleepId";
+    private static final String COL_TIMESTAMP = "timeRecorded";
+    private static final String COL_TEMPERATURE = "temperatureLevel";
+    private static final String COL_HUMIDITY = "humidityLevel";
+    private static final String COL_SOUND = "soundLevel";
+    private static final String COL_CO2 = "co2Level";
+
+    private static final Context.ResultSetExtractor<RoomCondition> dwRoomConditionExtractor = row -> new RoomCondition(
+            row.getInt(COL_SLEEP_ID),
+            row.getObject(COL_TIMESTAMP, LocalDateTime.class),
+            row.getInt(COL_TEMPERATURE),
+            row.getInt(COL_CO2),
+            row.getDouble(COL_SOUND),
+            row.getDouble(COL_HUMIDITY)
+    );
+
+    public static Context.ResultSetExtractor<RoomCondition> getDWRoomConditionExtractor() {
+        return dwRoomConditionExtractor;
+    }
 }

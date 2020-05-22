@@ -61,8 +61,8 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
     private static final Context.ResultSetExtractor<RoomCondition> roomConditionExtractor = row -> new RoomCondition(
         row.getInt(COL_SLEEP_ID),
         row.getObject(COL_TIMESTAMP, LocalDateTime.class),
-        row.getDouble(COL_TEMPERATURE),
-        row.getDouble(COL_CO2),
+        row.getInt(COL_TEMPERATURE),
+        row.getInt(COL_CO2),
         row.getDouble(COL_SOUND),
         row.getDouble(COL_HUMIDITY)
     );

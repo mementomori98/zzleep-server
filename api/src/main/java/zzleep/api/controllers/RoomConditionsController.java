@@ -30,8 +30,8 @@ public class RoomConditionsController {
         RoomCondition dummy = new RoomCondition(
             random.nextInt(100),
             LocalDateTime.now(),
-            random.nextDouble() * 15 + 15,
-            random.nextDouble() * 200 + 400,
+            random.nextInt() * 15 + 15,
+            random.nextInt() * 200 + 400,
             random.nextDouble() * 50 + 20,
             random.nextDouble() * 100
         );

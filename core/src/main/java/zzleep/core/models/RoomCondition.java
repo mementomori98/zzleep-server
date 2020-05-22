@@ -25,12 +25,12 @@ public final class RoomCondition {
     @ApiModelProperty(example = "32.42", notes = "Represented in Celsius, rounded to 2 decimal digits")
     @JsonSerialize
     @JsonProperty("temperature")
-    private final double temperature;
+    private final int temperature;
 
     @ApiModelProperty(notes = "Represented in ppm, rounded to 2 decimal digits", example = "553")
     @JsonSerialize
     @JsonProperty("co2")
-    private final double co2;
+    private final int co2;
 
     @ApiModelProperty(notes = "Represented in dB, rounded to 2 decimal digits", example = "42.16")
     @JsonSerialize
@@ -42,7 +42,7 @@ public final class RoomCondition {
     @JsonProperty("humidity")
     private final double humidity;
 
-    public RoomCondition(int sleepId, LocalDateTime timestamp, double temperature, double co2, double sound, double humidity) {
+    public RoomCondition(int sleepId, LocalDateTime timestamp, int temperature, int co2, double sound, double humidity) {
         this.sleepId = sleepId;
         this.timestamp = timestamp;
         this.temperature = temperature;
@@ -59,11 +59,11 @@ public final class RoomCondition {
         return timestamp;
     }
 
-    public double getTemperature() {
+    public int getTemperature() {
         return temperature;
     }
 
-    public double getCo2() {
+    public int getCo2() {
         return co2;
     }
 

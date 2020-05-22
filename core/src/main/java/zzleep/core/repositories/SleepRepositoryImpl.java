@@ -18,7 +18,7 @@ public class SleepRepositoryImpl implements SleepRepository {
     private Context context;
 
     private static final Context.ResultSetExtractor<Sleep> extractor = row ->
-            new Sleep(row.getInt(COL_SLEEP_ID), row.getString(COL_DEVICE_ID), row.getObject(COL_START_TIME, LocalDateTime.class), row.getObject(COL_FINISH_TIME, LocalDateTime.class), row.getInt(COL_RATING));
+        new Sleep(row.getInt(COL_SLEEP_ID), row.getString(COL_DEVICE_ID), row.getObject(COL_START_TIME, LocalDateTime.class), row.getObject(COL_FINISH_TIME, LocalDateTime.class), row.getInt(COL_RATING));
 
     public SleepRepositoryImpl(Context context) {
         this.context = context;
@@ -27,11 +27,9 @@ public class SleepRepositoryImpl implements SleepRepository {
     @Override
     public Sleep startTracking(String deviceId) throws SleepNotStoppedException {
         Sleep sleep = context.single(TABLE_NAME, String.format("%s = '%s' and %s is null", COL_DEVICE_ID, deviceId, COL_FINISH_TIME), extractor);
-        if(sleep != null)
-        {
+        if (sleep != null) {
             throw new SleepNotStoppedException();
-        }
-        else
+        } else
             sleep = context.insert(TABLE_NAME, String.format("%s, %s", COL_DEVICE_ID, COL_START_TIME), String.format("'%s', '%s'", deviceId, dateToString(LocalDateTime.now())), extractor);
         return sleep;
     }
@@ -39,27 +37,37 @@ public class SleepRepositoryImpl implements SleepRepository {
     @Override
     public Sleep stopTracking(String deviceId) throws SleepNotStartedException {
         Sleep sleep = context.single(TABLE_NAME, String.format("%s = '%s' and %s is null", COL_DEVICE_ID, deviceId, COL_FINISH_TIME), extractor);
-        if(sleep == null)
-        {
+        if (sleep == null) {
             throw new SleepNotStartedException();
-        }
-        else sleep = context.update(TABLE_NAME, String.format("%s = '%s'", COL_FINISH_TIME, dateToString(LocalDateTime.now())), String.format("%s = '%s'", COL_SLEEP_ID, sleep.getSleepId()), extractor);
+        } else
+            sleep = context.update(TABLE_NAME, String.format("%s = '%s'", COL_FINISH_TIME, dateToString(LocalDateTime.now())), String.format("%s = '%s'", COL_SLEEP_ID, sleep.getSleepId()), extractor);
         return sleep;
+    }
+
+    @Override
+    public boolean isTracking(String deviceId) {
+        Sleep sleep = context.single(
+            TABLE_NAME,
+            String.format(
+                "%s = '%s' and %s is null",
+                COL_DEVICE_ID, deviceId, COL_FINISH_TIME),
+            extractor
+        );
+
+        return sleep != null;
     }
 
     @Override
     public Sleep rateSleep(String sleepId, int rating) throws SleepNotFoundException {
         Sleep sleep = context.single(TABLE_NAME, String.format("%s = '%s'", COL_SLEEP_ID, sleepId), extractor);
-        if(sleep == null)
-        {
+        if (sleep == null) {
             throw new SleepNotFoundException();
-        }
-        else sleep = context.update(TABLE_NAME, String.format("%s = '%d'", COL_RATING, rating), String.format("%s = '%s'", COL_SLEEP_ID, sleep.getSleepId()), extractor);
+        } else
+            sleep = context.update(TABLE_NAME, String.format("%s = '%d'", COL_RATING, rating), String.format("%s = '%s'", COL_SLEEP_ID, sleep.getSleepId()), extractor);
         return sleep;
     }
 
-    private String dateToString(LocalDateTime date)
-    {
+    private String dateToString(LocalDateTime date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return date.format(formatter);
     }

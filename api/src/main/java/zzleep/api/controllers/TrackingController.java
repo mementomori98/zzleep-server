@@ -12,7 +12,7 @@ import zzleep.core.repositories.SleepRepository;
 @RestController
 @RequestMapping("/api/tracking")
 @Api(tags = {"Tracking"}, description = " ")
-public class TrackingController {
+public class TrackingController extends ControllerBase {
 
     private final SleepRepository sleepRepository;
 
@@ -81,5 +81,10 @@ public class TrackingController {
                     .status(404)
                     .body(null);
         }
+    }
+
+    @GetMapping("/{deviceId}")
+    public ResponseEntity<Boolean> isTracking(@PathVariable(value = "deviceId") String deviceId) {
+        return success(sleepRepository.isTracking(deviceId));
     }
 }

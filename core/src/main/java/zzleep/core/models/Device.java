@@ -17,9 +17,12 @@ public final class Device {
     @JsonProperty("name")
     private final String name;
 
-    public Device(String deviceId, String name) {
+    private final String userId;
+
+    public Device(String deviceId, String name, String userId) {
         this.deviceId = deviceId;
         this.name = name;
+        this.userId = userId;
     }
 
     public String getDeviceId() {
@@ -28,5 +31,9 @@ public final class Device {
 
     public String getName() {
         return name;
+    }
+
+    public String getUserId() {
+        return userId;
     }
 }

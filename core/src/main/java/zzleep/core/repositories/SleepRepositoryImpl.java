@@ -55,7 +55,7 @@ public class SleepRepositoryImpl implements SleepRepository {
 
         return sleep != null;
     }
-    
+
     @Override
     public Sleep rateSleep(String sleepId, int rating) throws SleepNotFoundException {
         Sleep sleep = context.single(TABLE_NAME, String.format("%s = '%s'", COL_SLEEP_ID, sleepId), extractor);

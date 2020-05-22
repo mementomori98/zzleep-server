@@ -83,6 +83,10 @@ public class TrackingController extends ControllerBase {
         }
     }
 
+    @ApiOperation(value = "Get whether a device is currently tracking", response = Boolean.class)
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successfully retrieved tracking state"),
+    })
     @GetMapping("/{deviceId}")
     public ResponseEntity<Boolean> isTracking(@PathVariable(value = "deviceId") String deviceId) {
         return success(sleepRepository.isTracking(deviceId));

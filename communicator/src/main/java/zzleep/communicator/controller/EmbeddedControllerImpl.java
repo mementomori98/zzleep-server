@@ -1,4 +1,4 @@
-package zzleep.communicator.embedded;
+package zzleep.communicator.controller;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
@@ -10,7 +10,7 @@ import zzleep.communicator.models.DownLinkMessage;
 import zzleep.communicator.models.UpLinkMessage;
 
 import org.springframework.stereotype.Component;
-import zzleep.communicator.databaseService.DatabaseService;
+import zzleep.communicator.repository.PersistenceRepository;
 
 
 import java.net.URI;
@@ -26,15 +26,17 @@ import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
-@Component
-public class EmbeddedServiceImpl implements EmbeddedService, Listener {
+import org.apache.commons.codec.binary.Hex;
 
-    private DatabaseService dbService;
+@Component
+public class EmbeddedControllerImpl implements EmbeddedController, Listener {
+
+    private PersistenceRepository repository;
     private WebSocket socket;
     private final Gson gson = new Gson();
 
-    public EmbeddedServiceImpl(DatabaseService dbService) {
-        this.dbService = dbService;
+    public EmbeddedControllerImpl(PersistenceRepository dbService) {
+        this.repository = dbService;
 
 
         HttpClient client = HttpClient.newHttpClient();
@@ -86,7 +88,7 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener {
     }
 
     private void onStart() {
-        // onProgress();
+        onProgress();
 
         Thread progressThread = new Thread(this);
         progressThread.setDaemon(false);
@@ -96,7 +98,7 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener {
 
     private void onProgress() {
 
-        ArrayList<Command> commands = dbService.getUpdates();
+        ArrayList<Command> commands = repository.getUpdates();
 
         for (Command command : commands) {
             send(command);
@@ -104,7 +106,8 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener {
 
     }
 
-    private void send(Command command) {
+    //@Override
+    public void send(Command command) {
         CharSequence charSequence = processCommand(command);
         sendText(charSequence, true);
 
@@ -114,6 +117,8 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener {
     public CompletableFuture<WebSocket> sendText(CharSequence data, boolean last) {
 
         socket.sendText(data, true);
+        socket.request(1);
+
         System.out.println("sentTest completed");
 
         return new CompletableFuture().newIncompleteFuture().thenAccept(System.out::println);
@@ -124,7 +129,7 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener {
     public void run() {
 
         while (true) {
-            //onProgress();
+            onProgress();
             try {
                 Thread.sleep(300000);//5min
             } catch (InterruptedException e) {
@@ -137,8 +142,14 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener {
     @Override
     public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
         System.out.println(data);
-        CurrentData currentData = processData(data);
-        receive(currentData);
+        String s = data.toString();
+        UpLinkMessage message = gson.fromJson(s, UpLinkMessage.class);
+        if(message.getCmd().equals("rx"))
+        {
+            CurrentData currentData = processData(data);
+            receive(currentData);
+        }
+
         webSocket.request(1);
         return new CompletableFuture().completedFuture("onText() completed.").thenAccept(System.out::println);
     }
@@ -146,7 +157,7 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener {
     @Override
     public void receive(CurrentData data) {
 
-        dbService.putDataInDatabase(data);
+        repository.putDataInDatabase(data);
 
     }
 
@@ -181,8 +192,10 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener {
         String humSHex = parts[0];
         String tempSHex = parts[1];
 
-        int hum = Integer.parseInt(humSHex, 16);
-        int temp = Integer.parseInt(tempSHex,16);
+        int temp = Integer.parseInt(humSHex, 16);
+        int tempR = temp/10;
+        int hum = Integer.parseInt(tempSHex,16);
+        int humR = hum/10;
         int co2 = 0;
         int sound = 0;
 
@@ -192,10 +205,10 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener {
 //        String timestamp = df.format(dateTime);
 //        currentData.setTimeStamp(timestamp);//timestamp
         currentData.setTimeStamp(formatted);
-        currentData.setHumidityData((double)hum);
-        currentData.setTemperatureData((double)temp);
+        currentData.setHumidityData((double)humR);
+        currentData.setTemperatureData((double)tempR);
         currentData.setCo2Data(250.0); // TODO: 5/21/2020  changes
-        currentData.setSoundData(0.0);
+        currentData.setSoundData(50.0);
         System.out.println(currentData.toString());
 
 
@@ -205,18 +218,12 @@ public class EmbeddedServiceImpl implements EmbeddedService, Listener {
 
     private CharSequence processCommand(Command command) {
 
-        StringBuffer sb = new StringBuffer();
-        String hexString = Integer.toHexString(command.getCommandID());
-        sb.append(hexString);
-        String hexString2 = Integer.toHexString(command.getValue());
-        sb.append(hexString2);
+        String data=""+command.getCommandID()+command.getValue();
+        String hex =  Hex.encodeHexString(data.getBytes());
 
-        String data = sb.toString();
         DownLinkMessage message = new DownLinkMessage(command.getDestination(), true, data);
         String json = gson.toJson(message);
         return json;
-        //D1, D0, V1, V0
-
 
     }
 

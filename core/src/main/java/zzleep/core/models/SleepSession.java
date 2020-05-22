@@ -1,5 +1,6 @@
 package zzleep.core.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModel;
@@ -22,11 +23,13 @@ public class SleepSession {
     @ApiModelProperty(example = "2020-02-27T22:40:03.887Z")
     @JsonSerialize
     @JsonProperty("timeStart")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime timeStart;
 
     @ApiModelProperty(example = "2020-02-28T07:20:00.247Z")
     @JsonSerialize
     @JsonProperty("timeFinish")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime timeFinish;
 
     @ApiModelProperty(example = "4")

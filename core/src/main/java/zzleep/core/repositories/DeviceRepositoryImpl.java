@@ -18,11 +18,7 @@ public class DeviceRepositoryImpl implements DeviceRepository {
     private static String COL_USER_ID = "userId";
     private static String COL_ROOM_NAME = "roomName";
 
-    private static Context.ResultSetExtractor<Device> extractor = row -> new Device(
-        row.getString(COL_ID),
-        row.getString(COL_ROOM_NAME),
-        row.getString(COL_USER_ID)
-    );
+    private static Context.ResultSetExtractor<Device> extractor = ExtractorFactory.getDeviceExtractor();
 
     public DeviceRepositoryImpl(Context context) {
         this.context = context;

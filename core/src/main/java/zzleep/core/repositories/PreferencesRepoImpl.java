@@ -1,6 +1,7 @@
 package zzleep.core.repositories;
 
 import org.springframework.stereotype.Component;
+import zzleep.core.models.Device;
 import zzleep.core.models.Preferences;
 import zzleep.core.models.Sleep;
 
@@ -17,9 +18,13 @@ public class PreferencesRepoImpl implements PreferencesRepository {
     private static final String COL_TEMPERATURE_MIN= "temperatureMin";
     private static final String COL_TEMPERATURE_MAX= "temperatureMax";
 
+    private static String DEVICE_TABLE_NAME = "datamodels.device";
+    private static String DEVICE_COL_ID = "deviceId";
+
     private Context context;
 
     private Context.ResultSetExtractor<Preferences> preferencesExtractor = ExtractorFactory.getPreferencesExtractor();
+    private Context.ResultSetExtractor<Device> deviceExtractor = ExtractorFactory.getDeviceExtractor();
 
     public PreferencesRepoImpl(Context context) {
         this.context = context;
@@ -27,9 +32,9 @@ public class PreferencesRepoImpl implements PreferencesRepository {
 
     @Override
     public Preferences setPreferences(Preferences preferences) {
-        //checks if device exists
-        //if not, throw exception + return null
-        //if yes:
+        Device device = context.single(DEVICE_TABLE_NAME, String.format("%s = '%s'", DEVICE_COL_ID, preferences.getDeviceId()), deviceExtractor);
+        if(device == null)
+            return null;
         Preferences pref = context.single(TABLE_NAME, String.format("%s = '%s'", COL_DEVICE_ID, preferences.getDeviceId()), preferencesExtractor);
         if(pref == null)
         {

@@ -61,12 +61,12 @@ public class ReportsController extends ControllerBase {
         return data == null ? notFound() : success(data);
     }
 
-    @ApiOperation(value = "Get the ideal room conditions for a device (room)", response = RoomCondition.class)
+    @ApiOperation(value = "Get the ideal room conditions for a device (room)", response = IdealRoomConditions.class)
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "The ideal room conditions have been successfully retrieved")
     })
     @GetMapping("/ideal/{deviceId}")
-    public ResponseEntity<RoomCondition> getIdealRoomConditions(
+    public ResponseEntity<IdealRoomConditions> getIdealRoomConditions(
         @PathVariable(value = "deviceId") String deviceId
     ) {
         return success(

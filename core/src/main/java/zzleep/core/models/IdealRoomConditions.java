@@ -5,58 +5,50 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(description = "Wrapper model for ideal room conditions")
+@ApiModel(description = "Holds data that represents the ideal room conditions")
 public final class IdealRoomConditions {
-    @ApiModelProperty
-    @JsonSerialize
-    @JsonProperty("maxCo2")
-    private final int maxCo2;
 
-    @ApiModelProperty
+    @ApiModelProperty(notes = "Unit is ppm", example = "552")
     @JsonSerialize
-    @JsonProperty("minHumidity")
-    private final double minHumidity;
+    @JsonProperty("co2")
+    private final double co2;
 
-    @ApiModelProperty
+    @ApiModelProperty(notes = "Unit is dB", example = "45")
     @JsonSerialize
-    @JsonProperty("maxHumidity")
-    private final double maxHumidity;
+    @JsonProperty("sound")
+    private final double sound;
 
-    @ApiModelProperty
+    @ApiModelProperty (notes = "Unit is %", example = "60")
     @JsonSerialize
-    @JsonProperty("minTemperature")
-    private final double minTemperature;
+    @JsonProperty("humidity")
+    private final double humidity;
 
-    @ApiModelProperty
+
+    @ApiModelProperty(notes = "Unit is degrees Celsius", example = "21")
     @JsonSerialize
-    @JsonProperty("maxTemperature")
-    private final double maxTemperature;
+    @JsonProperty("temperature")
+    private final double temperature;
 
-    public IdealRoomConditions(int maxCo2, double minHumidity, double maxHumidity, double minTemperature, double maxTemperature) {
-        this.maxCo2 = maxCo2;
-        this.minHumidity = minHumidity;
-        this.maxHumidity = maxHumidity;
-        this.minTemperature = minTemperature;
-        this.maxTemperature = maxTemperature;
+    public IdealRoomConditions(double co2, double sound, double humidity, double temperature) {
+        this.co2 = co2;
+        this.sound = sound;
+        this.humidity = humidity;
+        this.temperature = temperature;
     }
 
-    public int getMaxCo2() {
-        return maxCo2;
+    public double getCo2() {
+        return co2;
     }
 
-    public double getMinHumidity() {
-        return minHumidity;
+    public double getSound() {
+        return sound;
     }
 
-    public double getMaxHumidity() {
-        return maxHumidity;
+    public double getHumidity() {
+        return humidity;
     }
 
-    public double getMinTemperature() {
-        return minTemperature;
-    }
-
-    public double getMaxTemperature() {
-        return maxTemperature;
+    public double getTemperature() {
+        return temperature;
     }
 }

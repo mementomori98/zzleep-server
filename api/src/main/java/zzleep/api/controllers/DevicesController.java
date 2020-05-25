@@ -43,7 +43,7 @@ public class DevicesController extends ControllerBase {
         );
     }
 
-    @ApiOperation(value = "Update existing device")
+    @ApiOperation(value = "Update existing device", response = Device.class)
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successfully updated device"),
         @ApiResponse(code = 403, message = "This device does not belong to this user"),
@@ -59,7 +59,7 @@ public class DevicesController extends ControllerBase {
         );
     }
 
-    @ApiOperation(value = "Get devices by userId")
+    @ApiOperation(value = "Get devices by userId", response = Device[].class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved devices"),
     })
@@ -71,7 +71,7 @@ public class DevicesController extends ControllerBase {
         );
     }
 
-    @ApiOperation(value = "Get a device")
+    @ApiOperation(value = "Get a device", response = Device.class)
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successfully retrieved device"),
         @ApiResponse(code = 403, message = "The device is not connected to this user"),
@@ -86,7 +86,7 @@ public class DevicesController extends ControllerBase {
         return success(device);
     }
 
-    @ApiOperation(value = "Remove a device from user")
+    @ApiOperation(value = "Remove a device from user", response = Void.class)
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "The device has been removed from the user"),
         @ApiResponse(code = 403, message = "The device is not associated with this user"),

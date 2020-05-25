@@ -112,6 +112,12 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
         if(query.size() != 0)
             return query.get(0);
         else
-            return null;
+            return new RoomCondition(
+                -1, LocalDateTime.MIN,
+                21,
+                600,
+                50,
+                50
+            );
     }
 }

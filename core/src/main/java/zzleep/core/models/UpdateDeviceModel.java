@@ -5,14 +5,14 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(description = "Model for updating existing device in users account")
+@ApiModel(description = "Holds data necessary to update a device")
 public class UpdateDeviceModel {
-    @ApiModelProperty(notes = "The Id of the device that's being updated", example = "5555")
+    @ApiModelProperty(example = "device1")
     @JsonSerialize
     @JsonProperty("deviceId")
     private String deviceId;
 
-    @ApiModelProperty(notes = "The new(?) device/room name(?)", example = "Kitchen")
+    @ApiModelProperty(example = "Parents' bedroom")
     @JsonSerialize
     @JsonProperty("name")
     private String name;

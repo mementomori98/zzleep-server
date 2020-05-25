@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/devices")
-@Api(tags = {"Tracking"}, description = " ")
+@Api(tags = {"Devices"}, description = " ")
 public class DevicesController extends ControllerBase {
 
     private final DeviceRepository deviceRepository;
@@ -93,7 +93,7 @@ public class DevicesController extends ControllerBase {
         @ApiResponse(code = 404, message = "The device was not found")
     })
     @DeleteMapping("/{deviceId}")
-    public ResponseEntity remove(@PathVariable(value = "deviceId") String deviceId) {
+    public ResponseEntity<Void> remove(@PathVariable(value = "deviceId") String deviceId) {
         String userId = "user1"; // TODO firebase
         Device device = deviceRepository.getById(deviceId);
         if (device == null) return notFound();

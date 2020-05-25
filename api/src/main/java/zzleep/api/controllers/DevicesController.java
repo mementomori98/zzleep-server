@@ -1,17 +1,22 @@
 package zzleep.api.controllers;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import zzleep.core.models.AddDeviceModel;
 import zzleep.core.models.Device;
+import zzleep.core.models.RemoveDeviceModel;
 import zzleep.core.models.UpdateDeviceModel;
 import zzleep.core.repositories.DeviceRepository;
 
 import java.util.List;
 
-// @RestController
-// @RequestMapping("/devices")
-// @Api(value = "Devices Controller")
+@RestController
+@RequestMapping("/api/devices")
+@Api(tags = {"Tracking"}, description = " ")
 public class DevicesController extends ControllerBase {
 
     private final DeviceRepository deviceRepository;
@@ -20,24 +25,29 @@ public class DevicesController extends ControllerBase {
         this.deviceRepository = deviceRepository;
     }
 
-    // @ApiOperation(value = "Add a device to the user", response = Device.class)
-    // @ApiResponses(value = {
-    //         @ApiResponse(code = 200, message = "Successfully added a device"),
-    // })
+    @ApiOperation(value = "Connect a device to a user", response = Device.class)
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successfully connected device"),
+        @ApiResponse(code = 403, message = "This device is already associated with another user"),
+        @ApiResponse(code = 406, message = "This device is already associated with this user")
+    })
     @PostMapping
     public ResponseEntity<Device> addDevice(@RequestBody AddDeviceModel model) {
-        // TODO model.deviceId = user from firebase
+        // TODO model.userId = user from firebase
         if (deviceRepository.hasUser(model.getDeviceId()))
             return custom(403);
+        if (deviceRepository.getById(model.getDeviceId()).getUserId().equals(model.getUserId()))
+            return custom(406);
         return success(
             deviceRepository.update(model)
         );
     }
 
-    // @ApiOperation(value = "Update existing device")
-    // @ApiResponses(value = {
-    //         @ApiResponse(code = 200, message = "Successfully updated device"),
-    // })
+    @ApiOperation(value = "Update existing device")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successfully updated device"),
+        @ApiResponse(code = 403, message = "This device does not belong to this user"),
+    })
     @PutMapping
     public ResponseEntity<Device> updateDevice(@RequestBody UpdateDeviceModel model) {
         Device device = deviceRepository.getById(model.getDeviceId());
@@ -49,10 +59,10 @@ public class DevicesController extends ControllerBase {
         );
     }
 
-    // @ApiOperation(value = "Get devices by userId")
-    // @ApiResponses(value = {
-    //         @ApiResponse(code = 200, message = "Successfully retrieved devices"),
-    // })
+    @ApiOperation(value = "Get devices by userId")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved devices"),
+    })
     @GetMapping
     public ResponseEntity<List<Device>> getAllUserDevices() {
         String userId = ""; // TODO firebase
@@ -61,6 +71,12 @@ public class DevicesController extends ControllerBase {
         );
     }
 
+    @ApiOperation(value = "Get a device")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successfully retrieved device"),
+        @ApiResponse(code = 403, message = "The device is not connected to this user"),
+        @ApiResponse(code = 404, message = "The device was not found")
+    })
     @GetMapping("/{deviceId}")
     public ResponseEntity<Device> getById(@PathVariable(value = "deviceId") String deviceId) {
         String userId = ""; // TODO firebase
@@ -68,5 +84,21 @@ public class DevicesController extends ControllerBase {
         if (device == null) return notFound();
         if (!userId.equals(device.getUserId())) return custom(403);
         return success(device);
+    }
+
+    @ApiOperation(value = "Remove a device from user")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "The device has been removed from the user"),
+        @ApiResponse(code = 403, message = "The device is not associated with this user"),
+        @ApiResponse(code = 404, message = "The device was not found")
+    })
+    @DeleteMapping("/{deviceId}")
+    public ResponseEntity remove(@PathVariable(value = "deviceId") String deviceId) {
+        String userId = ""; // TODO firebase
+        Device device = deviceRepository.getById(deviceId);
+        if (device == null) return notFound();
+        if (!userId.equals(device.getUserId())) return custom(403);
+        deviceRepository.update(new RemoveDeviceModel(deviceId));
+        return success();
     }
 }

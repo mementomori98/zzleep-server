@@ -1,10 +1,18 @@
 package zzleep.api.controllers;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public abstract class ControllerBase {
 
     protected static final String NOT_FOUND_MESSAGE = "The resource could not be found";
+
+    protected String userId() {
+        return SecurityContextHolder
+            .getContext()
+            .getAuthentication()
+            .getName();
+    }
 
     protected <TType> ResponseEntity<TType> custom(int status) {
         return custom(status, null);

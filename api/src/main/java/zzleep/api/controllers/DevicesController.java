@@ -33,11 +33,11 @@ public class DevicesController extends ControllerBase {
     })
     @PostMapping
     public ResponseEntity<Device> addDevice(@RequestBody AddDeviceModel model) {
-        // TODO model.userId = user from firebase
+        // TODO firebase user id
+        if (model.getUserId().equals(deviceRepository.getById(model.getDeviceId()).getUserId()))
+            return custom(406);
         if (deviceRepository.hasUser(model.getDeviceId()))
             return custom(403);
-        if (deviceRepository.getById(model.getDeviceId()).getUserId().equals(model.getUserId()))
-            return custom(406);
         return success(
             deviceRepository.update(model)
         );
@@ -48,10 +48,10 @@ public class DevicesController extends ControllerBase {
         @ApiResponse(code = 200, message = "Successfully updated device"),
         @ApiResponse(code = 403, message = "This device does not belong to this user"),
     })
-    @PutMapping
+    @PatchMapping
     public ResponseEntity<Device> updateDevice(@RequestBody UpdateDeviceModel model) {
         Device device = deviceRepository.getById(model.getDeviceId());
-        String userId = ""; // TODO firebase
+        String userId = "user1"; // TODO firebase
         if (device.getUserId() == null) return custom(403);
         if (!device.getUserId().equals(userId)) return custom(403);
         return success(
@@ -65,7 +65,7 @@ public class DevicesController extends ControllerBase {
     })
     @GetMapping
     public ResponseEntity<List<Device>> getAllUserDevices() {
-        String userId = ""; // TODO firebase
+        String userId = "user1"; // TODO firebase
         return success(
             deviceRepository.getAllByUserId(userId)
         );
@@ -79,7 +79,7 @@ public class DevicesController extends ControllerBase {
     })
     @GetMapping("/{deviceId}")
     public ResponseEntity<Device> getById(@PathVariable(value = "deviceId") String deviceId) {
-        String userId = ""; // TODO firebase
+        String userId = "user1"; // TODO firebase
         Device device = deviceRepository.getById(deviceId);
         if (device == null) return notFound();
         if (!userId.equals(device.getUserId())) return custom(403);
@@ -94,7 +94,7 @@ public class DevicesController extends ControllerBase {
     })
     @DeleteMapping("/{deviceId}")
     public ResponseEntity remove(@PathVariable(value = "deviceId") String deviceId) {
-        String userId = ""; // TODO firebase
+        String userId = "user1"; // TODO firebase
         Device device = deviceRepository.getById(deviceId);
         if (device == null) return notFound();
         if (!userId.equals(device.getUserId())) return custom(403);

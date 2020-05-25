@@ -73,7 +73,7 @@ public class DeviceRepositoryImpl implements DeviceRepository {
     @Override
     public boolean hasUser(String deviceId) {
         Device device = getById(deviceId);
-        return device.getUserId() == null ||
-                device.getUserId().isEmpty();
+        return device.getUserId() != null &&
+                !device.getUserId().isEmpty();
     }
 }

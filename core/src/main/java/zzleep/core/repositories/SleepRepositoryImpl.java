@@ -1,6 +1,7 @@
 package zzleep.core.repositories;
 
 import org.springframework.stereotype.Component;
+import zzleep.core.models.Device;
 import zzleep.core.models.Sleep;
 
 import java.time.LocalDateTime;
@@ -15,16 +16,24 @@ public class SleepRepositoryImpl implements SleepRepository {
     private static final String COL_FINISH_TIME = "dateTimeEnd";
     private static final String COL_RATING = "rating";
 
+    private static String DEVICE_TABLE_NAME = "datamodels.device";
+    private static String DEVICE_COL_ID = "deviceId";
+
     private Context context;
 
     private static final Context.ResultSetExtractor<Sleep> extractor = ExtractorFactory.getSleepExtractor();
+    private static final Context.ResultSetExtractor<Device> deviceExtractor = ExtractorFactory.getDeviceExtractor();
 
     public SleepRepositoryImpl(Context context) {
         this.context = context;
     }
 
     @Override
-    public Sleep startTracking(String deviceId) throws SleepNotStoppedException {
+    public Sleep startTracking(String deviceId) throws SleepNotStoppedException, DeviceNotFoundException {
+        if(!checkDeviceExists(deviceId))
+        {
+            throw new DeviceNotFoundException();
+        }
         Sleep sleep = context.single(TABLE_NAME, String.format("%s = '%s' and %s is null", COL_DEVICE_ID, deviceId, COL_FINISH_TIME), extractor);
         if (sleep != null) {
             throw new SleepNotStoppedException();
@@ -34,7 +43,16 @@ public class SleepRepositoryImpl implements SleepRepository {
     }
 
     @Override
-    public Sleep stopTracking(String deviceId) throws SleepNotStartedException {
+    public Sleep stopTracking(String deviceId) throws SleepNotStartedException, DeviceNotFoundException {
+        if(!checkDeviceExists(deviceId))
+        {
+            throw new DeviceNotFoundException();
+        }
+        Device device = context.single(DEVICE_TABLE_NAME, String.format("%s = '%s'", DEVICE_COL_ID, deviceId), deviceExtractor);
+        if(device == null)
+        {
+            throw new DeviceNotFoundException();
+        }
         Sleep sleep = context.single(TABLE_NAME, String.format("%s = '%s' and %s is null", COL_DEVICE_ID, deviceId, COL_FINISH_TIME), extractor);
         if (sleep == null) {
             throw new SleepNotStartedException();
@@ -45,6 +63,10 @@ public class SleepRepositoryImpl implements SleepRepository {
 
     @Override
     public boolean isTracking(String deviceId) {
+        if(!checkDeviceExists(deviceId))
+        {
+            return false;
+        }
         Sleep sleep = context.single(
             TABLE_NAME,
             String.format(
@@ -69,5 +91,15 @@ public class SleepRepositoryImpl implements SleepRepository {
     private String dateToString(LocalDateTime date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return date.format(formatter);
+    }
+
+    private boolean checkDeviceExists(String deviceId)
+    {
+        Device device = context.single(DEVICE_TABLE_NAME, String.format("%s = '%s'", DEVICE_COL_ID, deviceId), deviceExtractor);
+        if(device == null)
+        {
+            return false;
+        }
+        return true;
     }
 }

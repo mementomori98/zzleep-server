@@ -114,4 +114,19 @@ public class ExtractorFactory {
     public static Context.ResultSetExtractor<RoomCondition> getDWRoomConditionExtractor() {
         return dwRoomConditionExtractor;
     }
+
+    //device
+    private static String DEVICE_COL_ID = "deviceId";
+    private static String DEVICE_COL_USER_ID = "userId";
+    private static String DEVICE_COL_ROOM_NAME = "roomName";
+
+    private static Context.ResultSetExtractor<Device> deviceExtractor = row -> new Device(
+            row.getString(DEVICE_COL_ID),
+            row.getString(DEVICE_COL_ROOM_NAME),
+            row.getString(DEVICE_COL_USER_ID)
+    );
+
+    public static Context.ResultSetExtractor<Device> getDeviceExtractor() {
+        return deviceExtractor;
+    }
 }

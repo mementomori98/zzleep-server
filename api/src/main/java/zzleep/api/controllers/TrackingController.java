@@ -38,6 +38,11 @@ public class TrackingController extends ControllerBase {
             return ResponseEntity
                     .status(409)
                     .body(null);
+        }catch(SleepRepository.DeviceNotFoundException ex)
+        {
+            return ResponseEntity
+                    .status(404)
+                    .body(null);
         }
     }
 
@@ -54,7 +59,7 @@ public class TrackingController extends ControllerBase {
             return ResponseEntity
                     .status(200)
                     .body(sleep);
-        }catch(SleepRepository.SleepNotStartedException ex)
+        }catch(SleepRepository.SleepNotStartedException | SleepRepository.DeviceNotFoundException ex)
         {
             return ResponseEntity
                     .status(404)

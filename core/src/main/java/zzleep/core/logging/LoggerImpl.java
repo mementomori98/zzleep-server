@@ -110,8 +110,8 @@ public class LoggerImpl implements Logger {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON));
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
-        ResponseEntity<String> value = restTemplate.postForEntity(url, entity, String.class);
-        value.getStatusCode();
+//        ResponseEntity<String> value = restTemplate.postForEntity(url, entity, String.class);
+ //       value.getStatusCode();
     }
 
     private String toJson(Object obj) {

@@ -10,37 +10,37 @@ public final class Preferences {
     @ApiModelProperty(notes = "The device Id of which preferences are given", example = "1234")
     @JsonSerialize
     @JsonProperty("deviceId")
-    private final String deviceId;
+    private String deviceId;
 
     @ApiModelProperty
     @JsonSerialize
     @JsonProperty("regulationEnabled")
-    private final boolean regulationEnabled;
+    private boolean regulationEnabled;
 
     @ApiModelProperty(notes = "Maximum tolerable amount of CO2 allowed", example = "69420")
     @JsonSerialize
     @JsonProperty("co2Max")
-    private final int co2Max;
+    private int co2Max;
 
     @ApiModelProperty(notes = "Minimum tolerable amount of humidity", example = "69420")
     @JsonSerialize
     @JsonProperty("humidityMin")
-    private final double humidityMin;
+    private double humidityMin;
 
     @ApiModelProperty(notes = "Maximum tolerable amount of humidty", example = "69420")
     @JsonSerialize
     @JsonProperty("humidityMax")
-    private final double humidityMax;
+    private double humidityMax;
 
     @ApiModelProperty(notes = "Lowest point of tolerable temperature", example = "15.0")
     @JsonSerialize
     @JsonProperty("temperatureMin")
-    private final int temperatureMin;
+    private int temperatureMin;
 
     @ApiModelProperty(notes = "Highest point of tolerable temperature", example = "25.0")
     @JsonSerialize
     @JsonProperty("temperatureMax")
-    private final int temperatureMax;
+    private int temperatureMax;
 
     public Preferences(String deviceId, boolean regulationEnabled, int co2Max, double humidityMin, double humidityMax, int temperatureMin, int temperatureMax) {
         this.deviceId = deviceId;
@@ -50,6 +50,9 @@ public final class Preferences {
         this.humidityMax = humidityMax;
         this.temperatureMin = temperatureMin;
         this.temperatureMax = temperatureMax;
+    }
+
+    public Preferences() {
     }
 
     public String getDeviceId() {
@@ -72,11 +75,11 @@ public final class Preferences {
         return humidityMax;
     }
 
-    public double getTemperatureMin() {
+    public int getTemperatureMin() {
         return temperatureMin;
     }
 
-    public double getTemperatureMax() {
+    public int getTemperatureMax() {
         return temperatureMax;
     }
 }

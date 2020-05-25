@@ -21,6 +21,9 @@ public class PreferencesRepoImpl implements PreferencesRepository {
 
     private Context.ResultSetExtractor<Preferences> preferencesExtractor = ExtractorFactory.getPreferencesExtractor();
 
+    public PreferencesRepoImpl(Context context) {
+        this.context = context;
+    }
 
     @Override
     public Preferences setPreferences(Preferences preferences) {
@@ -52,18 +55,18 @@ public class PreferencesRepoImpl implements PreferencesRepository {
         }
         else {
             context.update(TABLE_NAME,
-                    String.format("%s = '%s', %s = '%s, %s = '%s, %s = '%s, %s = '%s, %s = '%s'",
+                    String.format("%s = '%s', %s = '%s', %s = '%s', %s = '%s', %s = '%s', %s = '%s'",
                             COL_REGULATIONS_ENABLED,
-                            COL_CO2_MAX,
-                            COL_HUMIDITY_MIN,
-                            COL_HUMIDITY_MAX,
-                            COL_TEMPERATURE_MIN,
-                            COL_TEMPERATURE_MAX,
                             preferences.isRegulationEnabled(),
+                            COL_CO2_MAX,
                             preferences.getCo2Max(),
+                            COL_HUMIDITY_MIN,
                             preferences.getHumidityMin(),
+                            COL_HUMIDITY_MAX,
                             preferences.getHumidityMax(),
+                            COL_TEMPERATURE_MIN,
                             preferences.getTemperatureMin(),
+                            COL_TEMPERATURE_MAX,
                             preferences.getTemperatureMax()),
                     String.format("%s = '%s'", COL_DEVICE_ID, preferences.getDeviceId()),
                     preferencesExtractor);

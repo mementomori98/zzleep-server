@@ -3,7 +3,6 @@ package zzleep.core.repositories;
 import org.springframework.stereotype.Component;
 import zzleep.core.models.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -46,15 +45,15 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
     private static final String IDEAL_ROOM_CONDITION_SELECTOR =
         String.format(
             "-1 as %s, timestamp '%s' as %s, " +
-            "trunc(cast(sum(%s * %s) as decimal) / sum(%s), 2) as %s, " +
-            "trunc(cast(sum(%s * %s) as decimal) / sum(%s), 2) as %s, " +
-            "trunc(cast(sum(%s * %s) as decimal) / sum(%s), 2) as %s, " +
-            "trunc(cast(sum(%s * %s) as decimal) / sum(%s), 2) as %s",
-        COL_SLEEP_ID, "1970-01-01 00:00:00.000000", COL_TIMESTAMP,
-        COL_RATING, COL_CO2, COL_RATING, COL_CO2,
-        COL_RATING, COL_HUMIDITY, COL_RATING, COL_HUMIDITY,
-        COL_RATING, COL_SOUND, COL_RATING, COL_SOUND,
-        COL_RATING, COL_TEMPERATURE, COL_RATING, COL_TEMPERATURE);
+                "trunc(cast(sum(%s * %s) as decimal) / sum(%s), 2) as %s, " +
+                "trunc(cast(sum(%s * %s) as decimal) / sum(%s), 2) as %s, " +
+                "trunc(cast(sum(%s * %s) as decimal) / sum(%s), 2) as %s, " +
+                "trunc(cast(sum(%s * %s) as decimal) / sum(%s), 2) as %s",
+            COL_SLEEP_ID, "1970-01-01 00:00:00.000000", COL_TIMESTAMP,
+            COL_RATING, COL_CO2, COL_RATING, COL_CO2,
+            COL_RATING, COL_HUMIDITY, COL_RATING, COL_HUMIDITY,
+            COL_RATING, COL_SOUND, COL_RATING, COL_SOUND,
+            COL_RATING, COL_TEMPERATURE, COL_RATING, COL_TEMPERATURE);
 
     private static final String SLEEP_SESSION_GROUPER = String.format("%s, %s, %s", COL_SLEEP_ID, COL_DEVICE_ID, COL_RATING);
 
@@ -92,7 +91,7 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
     @Override
     public IntervalReport getReport(String deviceId, Interval interval) {
         List<SleepSession> query = context.selectComplex(
-          TABLE_NAME, SLEEP_SESSION_SELECTOR,
+            TABLE_NAME, SLEEP_SESSION_SELECTOR,
             String.format("%s = '%s'", COL_DEVICE_ID, deviceId),
             SLEEP_SESSION_GROUPER,
             sleepSessionExtractor
@@ -101,7 +100,7 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
     }
 
     @Override
-    public RoomCondition getIdealRoomCondition(String deviceId) {
+    public IdealRoomConditions getIdealRoomCondition(String deviceId) {
         List<RoomCondition> query = context.selectComplex(
             TABLE_NAME, IDEAL_ROOM_CONDITION_SELECTOR,
             String.format("%s = '%s'", COL_DEVICE_ID, deviceId),
@@ -109,9 +108,20 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
             roomConditionExtractor
         );
 
-        if(query.size() != 0)
-            return query.get(0);
-        else
-            return null;
+        if (query.size() != 0) {
+            RoomCondition ideal = query.get(0);
+            return new IdealRoomConditions(
+                ideal.getCo2(),
+                ideal.getSound(),
+                ideal.getHumidity(),
+                ideal.getTemperature()
+            );
+        }
+        return new IdealRoomConditions(
+            21,
+            600,
+            50,
+            50
+        );
     }
 }

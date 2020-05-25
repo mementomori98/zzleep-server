@@ -25,8 +25,8 @@ public class PreferencesController {
             @ApiResponse(code = 200, message = "Successfully retrieved preferences"),
             @ApiResponse(code = 404, message = "Something went wrong")
     })
-    @GetMapping
-    public ResponseEntity<Preferences> getPreferences(@RequestParam(name = "devId") String deviceId)
+    @GetMapping("/{deviceId}")
+    public ResponseEntity<Preferences> getPreferences(@PathVariable(name = "deviceId") String deviceId)
     {
         Preferences pref = preferencesRepository.getPreferences(deviceId);
         if(pref != null)

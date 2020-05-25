@@ -25,6 +25,10 @@ public abstract class ControllerBase {
         return custom(200, body);
     }
 
+    protected <TType> ResponseEntity<TType> success() {
+        return custom(200);
+    }
+
     protected <TType> ResponseEntity<TType> notFound() {
         return custom(404);
     }

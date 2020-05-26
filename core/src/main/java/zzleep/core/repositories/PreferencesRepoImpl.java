@@ -5,22 +5,11 @@ import zzleep.core.models.Device;
 import zzleep.core.models.Preferences;
 import zzleep.core.models.Sleep;
 
+import javax.xml.crypto.Data;
 import java.time.LocalDateTime;
 
 @Component
 public class PreferencesRepoImpl implements PreferencesRepository {
-    private static final String TABLE_NAME = "datamodels.preferences";
-    private static final String COL_DEVICE_ID = "deviceId";
-    private static final String COL_REGULATIONS_ENABLED= "regulationEnabled";
-    private static final String COL_CO2_MAX= "co2max";
-    private static final String COL_HUMIDITY_MIN= "humidityMin";
-    private static final String COL_HUMIDITY_MAX= "humidityMax";
-    private static final String COL_TEMPERATURE_MIN= "temperatureMin";
-    private static final String COL_TEMPERATURE_MAX= "temperatureMax";
-
-    private static String DEVICE_TABLE_NAME = "datamodels.device";
-    private static String DEVICE_COL_ID = "deviceId";
-
     private Context context;
 
     private Context.ResultSetExtractor<Preferences> preferencesExtractor = ExtractorFactory.getPreferencesExtractor();
@@ -31,22 +20,24 @@ public class PreferencesRepoImpl implements PreferencesRepository {
     }
 
     @Override
-    public Preferences setPreferences(Preferences preferences) {
-        Device device = context.single(DEVICE_TABLE_NAME, String.format("%s = '%s'", DEVICE_COL_ID, preferences.getDeviceId()), deviceExtractor);
+    public Preferences setPreferences(Preferences preferences) throws InvalidValuesException {
+        if(preferences.getTemperatureMin() > preferences.getTemperatureMax() || preferences.getHumidityMin() > preferences.getHumidityMax())
+            throw new InvalidValuesException();
+        Device device = context.single(DatabaseConstants.DEVICE_TABLE_NAME, String.format("%s = '%s'", DatabaseConstants.DEVICE_COL_ID, preferences.getDeviceId()), deviceExtractor);
         if(device == null)
             return null;
-        Preferences pref = context.single(TABLE_NAME, String.format("%s = '%s'", COL_DEVICE_ID, preferences.getDeviceId()), preferencesExtractor);
+        Preferences pref = context.single(DatabaseConstants.PREFERENCES_TABLE_NAME, String.format("%s = '%s'", DatabaseConstants.PREFERENCES_COL_DEVICE_ID, preferences.getDeviceId()), preferencesExtractor);
         if(pref == null)
         {
-            context.insert(TABLE_NAME,
+            context.insert(DatabaseConstants.PREFERENCES_TABLE_NAME,
                     String.format("%s, %s, %s, %s, %s, %s, %s",
-                            COL_DEVICE_ID,
-                            COL_REGULATIONS_ENABLED,
-                            COL_CO2_MAX,
-                            COL_HUMIDITY_MIN,
-                            COL_HUMIDITY_MAX,
-                            COL_TEMPERATURE_MIN,
-                            COL_TEMPERATURE_MAX),
+                            DatabaseConstants.PREFERENCES_COL_DEVICE_ID,
+                            DatabaseConstants.PREFERENCES_COL_REGULATIONS_ENABLED,
+                            DatabaseConstants.PREFERENCES_COL_CO2_MAX,
+                            DatabaseConstants.PREFERENCES_COL_HUMIDITY_MIN,
+                            DatabaseConstants.PREFERENCES_COL_HUMIDITY_MAX,
+                            DatabaseConstants.PREFERENCES_COL_TEMPERATURE_MIN,
+                            DatabaseConstants.PREFERENCES_COL_TEMPERATURE_MAX),
                     String.format( "'%s', '%s', '%s', '%s', '%s', '%s', '%s'",
                             preferences.getDeviceId(),
                             preferences.isRegulationEnabled(),
@@ -59,21 +50,21 @@ public class PreferencesRepoImpl implements PreferencesRepository {
             return preferences;
         }
         else {
-            context.update(TABLE_NAME,
+            context.update(DatabaseConstants.PREFERENCES_TABLE_NAME,
                     String.format("%s = '%s', %s = '%s', %s = '%s', %s = '%s', %s = '%s', %s = '%s'",
-                            COL_REGULATIONS_ENABLED,
+                            DatabaseConstants.PREFERENCES_COL_REGULATIONS_ENABLED,
                             preferences.isRegulationEnabled(),
-                            COL_CO2_MAX,
+                            DatabaseConstants.PREFERENCES_COL_CO2_MAX,
                             preferences.getCo2Max(),
-                            COL_HUMIDITY_MIN,
+                            DatabaseConstants.PREFERENCES_COL_HUMIDITY_MIN,
                             preferences.getHumidityMin(),
-                            COL_HUMIDITY_MAX,
+                            DatabaseConstants.PREFERENCES_COL_HUMIDITY_MAX,
                             preferences.getHumidityMax(),
-                            COL_TEMPERATURE_MIN,
+                            DatabaseConstants.PREFERENCES_COL_TEMPERATURE_MIN,
                             preferences.getTemperatureMin(),
-                            COL_TEMPERATURE_MAX,
+                            DatabaseConstants.PREFERENCES_COL_TEMPERATURE_MAX,
                             preferences.getTemperatureMax()),
-                    String.format("%s = '%s'", COL_DEVICE_ID, preferences.getDeviceId()),
+                    String.format("%s = '%s'", DatabaseConstants.PREFERENCES_COL_DEVICE_ID, preferences.getDeviceId()),
                     preferencesExtractor);
             return preferences;
         }
@@ -81,6 +72,6 @@ public class PreferencesRepoImpl implements PreferencesRepository {
 
     @Override
     public Preferences getPreferences(String deviceId) {
-        return context.single(TABLE_NAME, String.format("%s = '%s'", COL_DEVICE_ID, deviceId), preferencesExtractor);
+        return context.single(DatabaseConstants.PREFERENCES_TABLE_NAME, String.format("%s = '%s'", DatabaseConstants.PREFERENCES_COL_DEVICE_ID, deviceId), preferencesExtractor);
     }
 }

@@ -39,14 +39,22 @@ public class PreferencesController {
     @ApiOperation(value = "Update user preferences")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully updated preferences"),
-            @ApiResponse(code = 404, message = "Inexistent device")
+            @ApiResponse(code = 404, message = "Inexistent device"),
+            @ApiResponse(code = 400, message = "Invalid values")
     })
     @PutMapping
     public ResponseEntity<Preferences> updateAccount(@RequestBody Preferences model)
     {
-        Preferences pref = preferencesRepository.setPreferences(model);
-        if(pref == null)
-            return ResponseEntity.status(404).body(null);
-        return ResponseEntity.status(200).body(pref);
+        Preferences pref;
+        try{
+            pref = preferencesRepository.setPreferences(model);
+            if(pref != null)
+                return ResponseEntity.status(200).body(pref);
+
+        }catch(PreferencesRepository.InvalidValuesException e)
+        {
+            return ResponseEntity.status(400).body(null);
+        }
+        return ResponseEntity.status(404).body(null);
     }
 }

@@ -31,6 +31,7 @@ public class PreferencesController {
     public ResponseEntity<Preferences> getPreferences(@PathVariable(name = "deviceId") String deviceId)
     {
         Preferences pref = preferencesRepository.getPreferences(deviceId);
+        logger.info("Get preferences", pref);
         if(pref != null)
             return ResponseEntity
                 .status(200)

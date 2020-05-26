@@ -6,8 +6,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import zzleep.core.logging.Logger;
 import zzleep.core.models.Preferences;
-import zzleep.core.models.SetPreferencesModel;
 import zzleep.core.repositories.PreferencesRepository;
 
 @RestController
@@ -15,9 +15,11 @@ import zzleep.core.repositories.PreferencesRepository;
 @Api(value = "Preferences api")
 public class PreferencesController {
     private final PreferencesRepository preferencesRepository;
+    private final Logger logger;
 
-    public PreferencesController(PreferencesRepository preferencesRepository) {
+    public PreferencesController(PreferencesRepository preferencesRepository, Logger logger) {
         this.preferencesRepository = preferencesRepository;
+        this.logger = logger;
     }
 
     @ApiOperation(value = "Get current preferences", response = Preferences.class)
@@ -45,6 +47,7 @@ public class PreferencesController {
     @PutMapping
     public ResponseEntity<Preferences> updateAccount(@RequestBody Preferences model)
     {
+        logger.info("PUT preferences", model);
         Preferences pref;
         try{
             pref = preferencesRepository.setPreferences(model);

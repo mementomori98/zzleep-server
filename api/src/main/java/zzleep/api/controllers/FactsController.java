@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import zzleep.core.logging.Logger;
 import zzleep.core.models.Fact;
 import zzleep.core.repositories.FactRepository;
 
@@ -20,9 +21,11 @@ import java.util.List;
 public class FactsController extends ControllerBase {
 
     private final FactRepository factRepository;
+    private final Logger logger;
 
-    public FactsController(FactRepository factRepository) {
+    public FactsController(FactRepository factRepository, Logger logger) {
         this.factRepository = factRepository;
+        this.logger = logger;
     }
 
     @ApiOperation(value = "Get a random fact", response = Fact.class)

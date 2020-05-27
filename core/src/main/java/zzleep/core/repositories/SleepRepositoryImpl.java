@@ -4,20 +4,12 @@ import org.springframework.stereotype.Component;
 import zzleep.core.models.Device;
 import zzleep.core.models.Sleep;
 
+import javax.xml.crypto.Data;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Component
 public class SleepRepositoryImpl implements SleepRepository {
-    private static final String TABLE_NAME = "datamodels.sleep";
-    private static final String COL_SLEEP_ID = "sleepId";
-    private static final String COL_DEVICE_ID = "deviceId";
-    private static final String COL_START_TIME = "dateTimeStart";
-    private static final String COL_FINISH_TIME = "dateTimeEnd";
-    private static final String COL_RATING = "rating";
-
-    private static String DEVICE_TABLE_NAME = "datamodels.device";
-    private static String DEVICE_COL_ID = "deviceId";
 
     private Context context;
 
@@ -34,11 +26,11 @@ public class SleepRepositoryImpl implements SleepRepository {
         {
             throw new DeviceNotFoundException();
         }
-        Sleep sleep = context.single(TABLE_NAME, String.format("%s = '%s' and %s is null", COL_DEVICE_ID, deviceId, COL_FINISH_TIME), extractor);
+        Sleep sleep = context.single(DatabaseConstants.SLEEP_TABLE_NAME, String.format("%s = '%s' and %s is null", DatabaseConstants.SLEEP_COL_DEVICE_ID, deviceId, DatabaseConstants.SLEEP_COL_FINISH_TIME), extractor);
         if (sleep != null) {
             throw new SleepNotStoppedException();
         } else
-            sleep = context.insert(TABLE_NAME, String.format("%s, %s", COL_DEVICE_ID, COL_START_TIME), String.format("'%s', '%s'", deviceId, dateToString(LocalDateTime.now())), extractor);
+            sleep = context.insert(DatabaseConstants.SLEEP_TABLE_NAME, String.format("%s, %s", DatabaseConstants.SLEEP_COL_DEVICE_ID, DatabaseConstants.SLEEP_COL_START_TIME), String.format("'%s', '%s'", deviceId, dateToString(LocalDateTime.now())), extractor);
         return sleep;
     }
 
@@ -48,16 +40,16 @@ public class SleepRepositoryImpl implements SleepRepository {
         {
             throw new DeviceNotFoundException();
         }
-        Device device = context.single(DEVICE_TABLE_NAME, String.format("%s = '%s'", DEVICE_COL_ID, deviceId), deviceExtractor);
+        Device device = context.single(DatabaseConstants.DEVICE_TABLE_NAME, String.format("%s = '%s'", DatabaseConstants.DEVICE_COL_ID, deviceId), deviceExtractor);
         if(device == null)
         {
             throw new DeviceNotFoundException();
         }
-        Sleep sleep = context.single(TABLE_NAME, String.format("%s = '%s' and %s is null", COL_DEVICE_ID, deviceId, COL_FINISH_TIME), extractor);
+        Sleep sleep = context.single(DatabaseConstants.SLEEP_TABLE_NAME, String.format("%s = '%s' and %s is null", DatabaseConstants.SLEEP_COL_DEVICE_ID, deviceId, DatabaseConstants.SLEEP_COL_FINISH_TIME), extractor);
         if (sleep == null) {
             throw new SleepNotStartedException();
         } else
-            sleep = context.update(TABLE_NAME, String.format("%s = '%s'", COL_FINISH_TIME, dateToString(LocalDateTime.now())), String.format("%s = '%s'", COL_SLEEP_ID, sleep.getSleepId()), extractor);
+            sleep = context.update(DatabaseConstants.SLEEP_TABLE_NAME, String.format("%s = '%s'", DatabaseConstants.SLEEP_COL_FINISH_TIME, dateToString(LocalDateTime.now())), String.format("%s = '%s'", DatabaseConstants.SLEEP_COL_SLEEP_ID, sleep.getSleepId()), extractor);
         return sleep;
     }
 
@@ -68,10 +60,10 @@ public class SleepRepositoryImpl implements SleepRepository {
             return false;
         }
         Sleep sleep = context.single(
-            TABLE_NAME,
+                DatabaseConstants.SLEEP_TABLE_NAME,
             String.format(
                 "%s = '%s' and %s is null",
-                COL_DEVICE_ID, deviceId, COL_FINISH_TIME),
+                    DatabaseConstants.SLEEP_COL_DEVICE_ID, deviceId, DatabaseConstants.SLEEP_COL_FINISH_TIME),
             extractor
         );
 
@@ -80,11 +72,11 @@ public class SleepRepositoryImpl implements SleepRepository {
 
     @Override
     public Sleep rateSleep(String sleepId, int rating) throws SleepNotFoundException {
-        Sleep sleep = context.single(TABLE_NAME, String.format("%s = '%s'", COL_SLEEP_ID, sleepId), extractor);
+        Sleep sleep = context.single(DatabaseConstants.SLEEP_TABLE_NAME, String.format("%s = '%s'", DatabaseConstants.SLEEP_COL_SLEEP_ID, sleepId), extractor);
         if (sleep == null) {
             throw new SleepNotFoundException();
         } else
-            sleep = context.update(TABLE_NAME, String.format("%s = '%d'", COL_RATING, rating), String.format("%s = '%s'", COL_SLEEP_ID, sleep.getSleepId()), extractor);
+            sleep = context.update(DatabaseConstants.SLEEP_TABLE_NAME, String.format("%s = '%d'", DatabaseConstants.SLEEP_COL_RATING, rating), String.format("%s = '%s'", DatabaseConstants.SLEEP_COL_SLEEP_ID, sleep.getSleepId()), extractor);
         return sleep;
     }
 
@@ -95,7 +87,7 @@ public class SleepRepositoryImpl implements SleepRepository {
 
     private boolean checkDeviceExists(String deviceId)
     {
-        Device device = context.single(DEVICE_TABLE_NAME, String.format("%s = '%s'", DEVICE_COL_ID, deviceId), deviceExtractor);
+        Device device = context.single(DatabaseConstants.DEVICE_TABLE_NAME, String.format("%s = '%s'", DatabaseConstants.DEVICE_COL_ID, deviceId), deviceExtractor);
         if(device == null)
         {
             return false;

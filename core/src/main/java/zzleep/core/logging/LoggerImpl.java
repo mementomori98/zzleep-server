@@ -3,10 +3,7 @@ package zzleep.core.logging;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -103,15 +100,15 @@ public class LoggerImpl implements Logger {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        String url = "https://hooks.slack.com/services/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";
+        String url = "https://hooks.slack.com/services/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";
         message = message.replace("\"", "\\\"");
         String body = "{\"text\":\"" + message + "\"}";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON));
         HttpEntity<String> entity = new HttpEntity<>(body, headers);
-//        ResponseEntity<String> value = restTemplate.postForEntity(url, entity, String.class);
- //       value.getStatusCode();
+        ResponseEntity<String> value = restTemplate.postForEntity(url, entity, String.class);
+        HttpStatus stih = value.getStatusCode();
     }
 
     private String toJson(Object obj) {

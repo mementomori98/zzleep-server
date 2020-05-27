@@ -6,17 +6,13 @@ import zzleep.core.models.Device;
 import zzleep.core.models.RemoveDeviceModel;
 import zzleep.core.models.UpdateDeviceModel;
 
+import javax.xml.crypto.Data;
 import java.util.List;
 
 @Component
 public class DeviceRepositoryImpl implements DeviceRepository {
 
     private final Context context;
-
-    private static String TABLE_NAME = "datamodels.device";
-    private static String COL_ID = "deviceId";
-    private static String COL_USER_ID = "userId";
-    private static String COL_ROOM_NAME = "roomName";
 
     private static Context.ResultSetExtractor<Device> extractor = ExtractorFactory.getDeviceExtractor();
 
@@ -26,43 +22,43 @@ public class DeviceRepositoryImpl implements DeviceRepository {
 
     @Override
     public Device update(AddDeviceModel model) {
-        Device ofTheKing = context.update(TABLE_NAME, String.format(
+        Device ofTheKing = context.update(DatabaseConstants.DEVICE_TABLE_NAME, String.format(
             "%s = '%s', %s = '%s'",
-            COL_USER_ID, model.getUserId(), COL_ROOM_NAME, model.getName()),
-            String.format("%s = '%s'", COL_ID, model.getDeviceId()),
+            DatabaseConstants.DEVICE_COL_USER_ID, model.getUserId(), DatabaseConstants.DEVICE_COL_ROOM_NAME, model.getName()),
+            String.format("%s = '%s'", DatabaseConstants.DEVICE_COL_ID, model.getDeviceId()),
             extractor);
         return ofTheKing;
     }
 
     @Override
     public Device update(UpdateDeviceModel model) {
-        Device ofTheKing = context.update(TABLE_NAME, String.format(
+        Device ofTheKing = context.update(DatabaseConstants.DEVICE_TABLE_NAME, String.format(
             "%s = '%s'",
-            COL_ROOM_NAME, model.getName()),
-            String.format("%s = '%s'", COL_ID, model.getDeviceId()),
+                DatabaseConstants.DEVICE_COL_ROOM_NAME, model.getName()),
+            String.format("%s = '%s'", DatabaseConstants.DEVICE_COL_ID, model.getDeviceId()),
             extractor);
         return ofTheKing;
     }
 
     @Override
     public void update(RemoveDeviceModel model) {
-        context.update(TABLE_NAME,
-            String.format("%s = null", COL_USER_ID),
-            String.format("%s = '%s'", COL_ID, model.getDeviceId()),
+        context.update(DatabaseConstants.DEVICE_TABLE_NAME,
+            String.format("%s = null", DatabaseConstants.DEVICE_COL_USER_ID),
+            String.format("%s = '%s'", DatabaseConstants.DEVICE_COL_ID, model.getDeviceId()),
             extractor);
     }
 
     @Override
     public List<Device> getAllByUserId(String userId) {
-        return context.select(TABLE_NAME,
-            String.format("%s = '%s'", COL_USER_ID, userId),
+        return context.select(DatabaseConstants.DEVICE_TABLE_NAME,
+            String.format("%s = '%s'", DatabaseConstants.DEVICE_COL_USER_ID, userId),
             extractor);
     }
 
     @Override
     public Device getById(String deviceId) {
-        return context.single(TABLE_NAME,
-            String.format("%s = '%s'", COL_ID, deviceId),
+        return context.single(DatabaseConstants.DEVICE_TABLE_NAME,
+            String.format("%s = '%s'", DatabaseConstants.DEVICE_COL_ID, deviceId),
             extractor);
     }
 

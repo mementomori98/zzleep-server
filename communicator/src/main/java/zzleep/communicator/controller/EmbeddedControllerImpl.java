@@ -247,6 +247,8 @@ public class EmbeddedControllerImpl implements EmbeddedController, Listener {
 
     private CharSequence processCommand(Command command) {
 
+        //getCommand =  D
+        //getValue = 1
         String data=""+command.getCommandID()+command.getValue();
         String hex =  Hex.encodeHexString(data.getBytes());
 

@@ -20,7 +20,7 @@ public final class Device {
 
     @ApiModelProperty(example = "user1")
     @JsonSerialize
-    @JsonProperty("name")
+    @JsonProperty("userId")
     private String userId;
 
     public Device(String deviceId, String name, String userId) {

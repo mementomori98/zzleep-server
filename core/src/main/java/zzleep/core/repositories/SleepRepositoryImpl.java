@@ -46,6 +46,17 @@ public class SleepRepositoryImpl implements SleepRepository {
         return updateRating(sleepId, rating);
     }
 
+    @Override
+    public Sleep getActiveSleep(String deviceId) {
+        return context.single(
+            DatabaseConstants.SLEEP_TABLE_NAME,
+            String.format("%s = '%s' and %s is null",
+                DatabaseConstants.SLEEP_COL_DEVICE_ID, deviceId,
+                DatabaseConstants.SLEEP_COL_FINISH_TIME),
+            extractor
+        );
+    }
+
     private Sleep createSleep(String deviceId) {
         return context.insert(
             DatabaseConstants.SLEEP_TABLE_NAME,
@@ -54,22 +65,11 @@ public class SleepRepositoryImpl implements SleepRepository {
             extractor
         );
     }
-
     private Sleep getById(int sleepId) {
         return context.single(
             DatabaseConstants.SLEEP_TABLE_NAME,
             String.format("%s = %d", DatabaseConstants.SLEEP_COL_SLEEP_ID, sleepId),
             extractor);
-    }
-
-    private Sleep getActiveSleep(String deviceId) {
-        return context.single(
-            DatabaseConstants.SLEEP_TABLE_NAME,
-            String.format("%s = '%s' and %s is null",
-                DatabaseConstants.SLEEP_COL_DEVICE_ID, deviceId,
-                DatabaseConstants.SLEEP_COL_FINISH_TIME),
-            extractor
-        );
     }
 
     private Sleep updateRating(int sleepId, int rating) {

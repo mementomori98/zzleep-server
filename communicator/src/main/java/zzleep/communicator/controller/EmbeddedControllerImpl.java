@@ -199,23 +199,23 @@ public class EmbeddedControllerImpl implements EmbeddedController, Listener {
         currentData.setSource(message.getEUI());
 
         //timestamp
-//        long timestampS = message.getTs();
-//
-//        LocalDateTime triggerTime =
-//                LocalDateTime.ofInstant(Instant.ofEpochSecond(timestampS), TimeZone
-//                        .getDefault().toZoneId());
-//
-//
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-//        String formatted = formatter.format(triggerTime);
+       long timestampS = message.getTs();
+       LocalDateTime triggerTime =
+                LocalDateTime.ofInstant(Instant.ofEpochMilli(timestampS), TimeZone
+                        .getDefault().toZoneId());
 
 
-        Date date = new Date(message.getTs());
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC+02:00"));
-        String formatted = format.format(date);
-        System.out.println("First try of converting date");
-        System.out.println(formatted);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formatted = formatter.format(triggerTime);
+
+
+
+//        Date date = new Date(message.getTs());
+//        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC+02:00"));
+//        String formatted = format.format(date);
+//        System.out.println("First try of converting date");
+//        System.out.println(formatted);
 
 
         //data
@@ -247,8 +247,6 @@ public class EmbeddedControllerImpl implements EmbeddedController, Listener {
 
     private CharSequence processCommand(Command command) {
 
-        //getCommand =  D
-        //getValue = 1
         String data=""+command.getCommandID()+command.getValue();
         String hex =  Hex.encodeHexString(data.getBytes());
 

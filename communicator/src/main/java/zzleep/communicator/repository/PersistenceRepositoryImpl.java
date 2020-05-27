@@ -156,9 +156,16 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         for (String sleep_id:sleep_Ids) {
 
             context.delete(ACTIVE_SLEEP_TABLE, String.format("%s = %s", COL_SLEEP_ID, sleep_id));
+
         }
 
-        return getSources(sleep_Ids);
+        ArrayList<String> sources = getSources(sleep_Ids);
+
+        // TODO: 5/27/2020 Tell embedded that DO stops also ventilation if on 
+        for (String source:sources) {
+            context.delete(ACTIVE_VENTILATION_TABLE, String.format("%s =%s", COL_DEVICE_ID, source));
+        }
+        return sources;
     }
 
 

@@ -48,4 +48,12 @@ public abstract class ControllerBase {
     protected <TType> ResponseEntity<TType> forbidden() {
         return custom(403);
     }
+
+    protected <TType> ResponseEntity<TType> badRequest() {
+        return custom(400);
+    }
+
+    protected <TType> ResponseEntity<TType> successOrNotFound(TType object) {
+        return object == null ? notFound() : success(object);
+    }
 }

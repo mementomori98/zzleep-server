@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.codec.binary.Hex;
 
@@ -47,6 +48,16 @@ public class EmbeddedControllerImpl implements EmbeddedController, Listener {
                 .buildAsync(URI.create("wss://iotnet.teracom.dk/app?token=vnoSwQAAABFpb3RuZXQudGVyYWNvbS5ka5CGv5WoQH5B19isf4NMr3s="), this);
 
         this.socket = ws.join();
+
+        try {
+            this.socket = ws.get();
+        } catch (InterruptedException e) {
+            System.out.println("Interrupted Exception");
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            System.out.println("Execution Exception");
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -54,14 +65,28 @@ public class EmbeddedControllerImpl implements EmbeddedController, Listener {
         System.out.println("A " + error.getCause() + " exception was thrown.");
         System.out.println("Message: " + error.getLocalizedMessage());
 
+        reinitializeWebSocket(webSocket);
+        System.out.println("onError completed");
+    }
+
+    private void reinitializeWebSocket(WebSocket webSocket) {
         HttpClient client = HttpClient.newHttpClient();
         CompletableFuture<WebSocket> ws = client.newWebSocketBuilder()
                 .buildAsync(URI.create("wss://iotnet.teracom.dk/app?token=vnoSwQAAABFpb3RuZXQudGVyYWNvbS5ka5CGv5WoQH5B19isf4NMr3s="), this);
 
         this.socket = ws.join();
 
+        try {
+            this.socket = ws.get();
+        } catch (InterruptedException e) {
+            System.out.println("Interrupted Exception");
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            System.out.println("Execution Exception");
+            e.printStackTrace();
+        }
+
         webSocket.abort();
-        System.out.println("onError completed");
     }
 
     @Override
@@ -69,13 +94,7 @@ public class EmbeddedControllerImpl implements EmbeddedController, Listener {
         System.out.println("WebSocket closed!");
         System.out.println("Status:" + statusCode + " Reason: " + reason);
 
-        HttpClient client = HttpClient.newHttpClient();
-        CompletableFuture<WebSocket> ws = client.newWebSocketBuilder()
-                .buildAsync(URI.create("wss://iotnet.teracom.dk/app?token=vnoSwQAAABFpb3RuZXQudGVyYWNvbS5ka5CGv5WoQH5B19isf4NMr3s="), this);
-
-        this.socket = ws.join();
-
-        webSocket.abort();
+        reinitializeWebSocket(webSocket);
 
         return new CompletableFuture().completedFuture("onClose() completed.").thenAccept(System.out::println);
     }
@@ -122,7 +141,8 @@ public class EmbeddedControllerImpl implements EmbeddedController, Listener {
         socket.sendText(data, true);
         socket.request(1);
 
-        System.out.println("sentTest completed");
+        System.out.println(data.toString());
+        System.out.println("sentText completed");
 
         return new CompletableFuture().newIncompleteFuture().thenAccept(System.out::println);
     }
@@ -144,14 +164,19 @@ public class EmbeddedControllerImpl implements EmbeddedController, Listener {
 
     @Override
     public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
-        System.out.println(data);
         String s = data.toString();
+        System.out.println(s);
         UpLinkMessage message = gson.fromJson(s, UpLinkMessage.class);
         if(message.getCmd().equals("rx"))
         {
-            CurrentData currentData = processData(data);
+            CurrentData currentData = processData(message);
             receive(currentData);
+
+            Command command = new Command("0004A30B002181EC", 'D', 1);
+            send(command);
         }
+        System.out.println("Text after the whole thing");
+
 
         webSocket.request(1);
         return new CompletableFuture().completedFuture("onText() completed.").thenAccept(System.out::println);
@@ -165,9 +190,8 @@ public class EmbeddedControllerImpl implements EmbeddedController, Listener {
     }
 
 
-    private CurrentData processData(CharSequence data) {
-        String messageString = data.toString();
-        UpLinkMessage message = gson.fromJson(messageString, UpLinkMessage.class);
+    private CurrentData processData(UpLinkMessage message) {
+
         System.out.println(message.toString());
 
         //source
@@ -175,24 +199,23 @@ public class EmbeddedControllerImpl implements EmbeddedController, Listener {
         currentData.setSource(message.getEUI());
 
         //timestamp
-        long timestampS = message.getTs();
-
-        LocalDateTime triggerTime =
-                LocalDateTime.ofInstant(Instant.ofEpochSecond(timestampS), TimeZone
-                        .getDefault().toZoneId());
-
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formatted = formatter.format(triggerTime);
-        System.out.println(formatted);
-
+//        long timestampS = message.getTs();
 //
-//        Date date = new Date(timestampS);
-//        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC+02:00"));
-//        String formatted = format.format(date);
-//        System.out.println("First try of converting date");
-//        System.out.println(formatted);
+//        LocalDateTime triggerTime =
+//                LocalDateTime.ofInstant(Instant.ofEpochSecond(timestampS), TimeZone
+//                        .getDefault().toZoneId());
+//
+//
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        String formatted = formatter.format(triggerTime);
+
+
+        Date date = new Date(message.getTs());
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC+02:00"));
+        String formatted = format.format(date);
+        System.out.println("First try of converting date");
+        System.out.println(formatted);
 
 
         //data

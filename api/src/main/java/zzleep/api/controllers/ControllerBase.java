@@ -44,4 +44,8 @@ public abstract class ControllerBase {
     protected <TType> ResponseEntity<TType> notFound(TType body) {
         return custom(404, body);
     }
+
+    protected <TType> ResponseEntity<TType> forbidden() {
+        return custom(403);
+    }
 }

@@ -11,13 +11,13 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
     private static final String SLEEP_SESSION_SELECTOR =
         String.format("%s, %s, min(%s) as %s, max(%s) as %s, %s, avg(%s) as %s, avg(%s) as %s, avg(%s) as %s, avg(%s) as %s",
             DatabaseConstants.DW_COL_SLEEP_ID, DatabaseConstants.DW_COL_DEVICE_ID,
-                DatabaseConstants.DW_COL_TIMESTAMP, DatabaseConstants.DW_COL_TIME_START,
-                DatabaseConstants.DW_COL_TIMESTAMP, DatabaseConstants.DW_COL_TIME_FINISH,
-                DatabaseConstants.DW_COL_RATING,
-                DatabaseConstants.DW_COL_CO2, DatabaseConstants.DW_COL_AVERAGE_CO2,
-                DatabaseConstants.DW_COL_HUMIDITY, DatabaseConstants.DW_COL_AVERAGE_HUMIDITY,
-                DatabaseConstants.DW_COL_SOUND, DatabaseConstants.DW_COL_AVERAGE_SOUND,
-                DatabaseConstants.DW_COL_TEMPERATURE, DatabaseConstants.DW_COL_AVERAGE_TEMPERATURE
+            DatabaseConstants.DW_COL_TIMESTAMP, DatabaseConstants.DW_COL_TIME_START,
+            DatabaseConstants.DW_COL_TIMESTAMP, DatabaseConstants.DW_COL_TIME_FINISH,
+            DatabaseConstants.DW_COL_RATING,
+            DatabaseConstants.DW_COL_CO2, DatabaseConstants.DW_COL_AVERAGE_CO2,
+            DatabaseConstants.DW_COL_HUMIDITY, DatabaseConstants.DW_COL_AVERAGE_HUMIDITY,
+            DatabaseConstants.DW_COL_SOUND, DatabaseConstants.DW_COL_AVERAGE_SOUND,
+            DatabaseConstants.DW_COL_TEMPERATURE, DatabaseConstants.DW_COL_AVERAGE_TEMPERATURE
         );
 
     private static final String IDEAL_ROOM_CONDITION_SELECTOR =
@@ -27,11 +27,15 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
                 "trunc(cast(sum(%s * %s) as decimal) / sum(%s), 2) as %s, " +
                 "trunc(cast(sum(%s * %s) as decimal) / sum(%s), 2) as %s, " +
                 "trunc(cast(sum(%s * %s) as decimal) / sum(%s), 2) as %s",
-                DatabaseConstants.DW_COL_SLEEP_ID, "1970-01-01 00:00:00.000000", DatabaseConstants.DW_COL_TIMESTAMP,
-                DatabaseConstants.DW_COL_RATING, DatabaseConstants.DW_COL_CO2, DatabaseConstants.DW_COL_RATING, DatabaseConstants.DW_COL_CO2,
-                DatabaseConstants.DW_COL_RATING, DatabaseConstants.DW_COL_HUMIDITY, DatabaseConstants.DW_COL_RATING, DatabaseConstants.DW_COL_HUMIDITY,
-                DatabaseConstants.DW_COL_RATING, DatabaseConstants.DW_COL_SOUND, DatabaseConstants.DW_COL_RATING, DatabaseConstants.DW_COL_SOUND,
-                DatabaseConstants.DW_COL_RATING, DatabaseConstants.DW_COL_TEMPERATURE, DatabaseConstants.DW_COL_RATING, DatabaseConstants.DW_COL_TEMPERATURE);
+            DatabaseConstants.DW_COL_SLEEP_ID, "1970-01-01 00:00:00.000000", DatabaseConstants.DW_COL_TIMESTAMP,
+            DatabaseConstants.DW_COL_RATING, DatabaseConstants.DW_COL_CO2,
+            DatabaseConstants.DW_COL_RATING, DatabaseConstants.DW_COL_CO2,
+            DatabaseConstants.DW_COL_RATING, DatabaseConstants.DW_COL_HUMIDITY,
+            DatabaseConstants.DW_COL_RATING, DatabaseConstants.DW_COL_HUMIDITY,
+            DatabaseConstants.DW_COL_RATING, DatabaseConstants.DW_COL_SOUND,
+            DatabaseConstants.DW_COL_RATING, DatabaseConstants.DW_COL_SOUND,
+            DatabaseConstants.DW_COL_RATING, DatabaseConstants.DW_COL_TEMPERATURE,
+            DatabaseConstants.DW_COL_RATING, DatabaseConstants.DW_COL_TEMPERATURE);
 
     private static final String SLEEP_SESSION_GROUPER = String.format(
         "%s, %s, %s", DatabaseConstants.DW_COL_SLEEP_ID, DatabaseConstants.DW_COL_DEVICE_ID, DatabaseConstants.DW_COL_RATING);
@@ -54,13 +58,20 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
         if (roomConditions.isEmpty()) return null;
         SleepSession session = getSleepSession(sleepId);
         if (session == null) return null;
-        return new SleepData(sleepId, session.getDeviceId(), session.getTimeStart(), session.getTimeFinish(), session.getRating(), roomConditions);
+        return new SleepData(
+            sleepId,
+            session.getDeviceId(),
+            session.getTimeStart(),
+            session.getTimeFinish(),
+            session.getRating(),
+            roomConditions
+        );
     }
 
     @Override
     public IntervalReport getReport(String deviceId, Interval interval) {
         List<SleepSession> query = context.selectComplex(
-                DatabaseConstants.DW_TABLE_NAME, SLEEP_SESSION_SELECTOR,
+            DatabaseConstants.DW_TABLE_NAME, SLEEP_SESSION_SELECTOR,
             String.format("%s = '%s'", DatabaseConstants.DW_COL_DEVICE_ID, deviceId),
             SLEEP_SESSION_GROUPER,
             sleepSessionExtractor
@@ -70,12 +81,7 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
 
     @Override
     public IdealRoomConditions getIdealRoomCondition(String deviceId) {
-        List<RoomCondition> query = context.selectComplex(
-                DatabaseConstants.DW_TABLE_NAME, IDEAL_ROOM_CONDITION_SELECTOR,
-            String.format("%s = '%s'", DatabaseConstants.DW_COL_DEVICE_ID, deviceId),
-                DatabaseConstants.DW_COL_DEVICE_ID, // not needed, but necessary for method param
-            roomConditionExtractor
-        );
+        List<RoomCondition> query = getRoomConditions(deviceId);
 
         if (query.size() != 0) {
             RoomCondition ideal = query.get(0);
@@ -86,6 +92,7 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
                 ideal.getTemperature()
             );
         }
+
         return new IdealRoomConditions(
             21,
             600,
@@ -108,6 +115,15 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
         return context.select(
             DatabaseConstants.DW_TABLE_NAME,
             String.format("%s = %d", DatabaseConstants.DW_COL_SLEEP_ID, sleepId),
+            roomConditionExtractor
+        );
+    }
+
+    private List<RoomCondition> getRoomConditions(String deviceId) {
+        return context.selectComplex(
+            DatabaseConstants.DW_TABLE_NAME, IDEAL_ROOM_CONDITION_SELECTOR,
+            String.format("%s = '%s'", DatabaseConstants.DW_COL_DEVICE_ID, deviceId),
+            null,
             roomConditionExtractor
         );
     }

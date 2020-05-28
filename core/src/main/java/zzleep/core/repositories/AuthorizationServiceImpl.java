@@ -1,5 +1,8 @@
 package zzleep.core.repositories;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class AuthorizationServiceImpl implements AuthorizationService {
 
     private final Context context;

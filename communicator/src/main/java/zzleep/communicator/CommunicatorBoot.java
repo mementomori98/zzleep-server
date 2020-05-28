@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import zzleep.communicator.embedded.EmbeddedService;
+import zzleep.core.etl.EtlProcess;
 
 @SpringBootApplication
 @ComponentScan("zzleep")
@@ -22,9 +23,7 @@ public class CommunicatorBoot implements CommandLineRunner
     private EmbeddedService embeddedService;
     @Override
     public void run(String... args) throws Exception {
+        new Thread(new EtlProcess()).start();
         System.out.println("Hello World");
-
-
-
     }
 }

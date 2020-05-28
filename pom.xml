@@ -58,6 +58,5 @@
     <module>core</module>
     <module>api</module>
     <module>communicator</module>
-    <module>etl</module>
   </modules>
 </project>

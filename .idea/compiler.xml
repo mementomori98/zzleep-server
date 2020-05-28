@@ -10,7 +10,6 @@
         <module name="api" />
         <module name="communicator (1)" />
         <module name="communicator" />
-        <module name="etl" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

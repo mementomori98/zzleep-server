@@ -6,7 +6,6 @@
       <module fileurl="file://$PROJECT_DIR$/communicator/communicator.iml" filepath="$PROJECT_DIR$/communicator/communicator.iml" />
       <module fileurl="file://$PROJECT_DIR$/etl/communicator (1).iml" filepath="$PROJECT_DIR$/etl/communicator (1).iml" />
       <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/etl/etl.iml" filepath="$PROJECT_DIR$/etl/etl.iml" />
       <module fileurl="file://$PROJECT_DIR$/zzleep.iml" filepath="$PROJECT_DIR$/zzleep.iml" />
     </modules>
   </component>

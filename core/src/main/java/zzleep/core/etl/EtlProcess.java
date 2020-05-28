@@ -1,14 +1,14 @@
-package zzleep.etl;
+package zzleep.core.etl;
 
 import java.sql.SQLException;
 import java.util.Calendar;
 
-public class Etl implements Runnable {
+public class EtlProcess implements Runnable {
 
     @Override
     public void run() {
         int year, month, day, hour, minute, second;
-        String queryValues, tableName = "zzleep.etl.Etl";
+        String queryValues, tableName = "etl";
         Jdbc connection = Jdbc.getInstance();
         while(true)
         {
@@ -24,12 +24,14 @@ public class Etl implements Runnable {
 
             try
             {
+                System.out.println(" -- Triggering ETL");
                 connection.insert(tableName, queryValues);
-                System.out.println("posted");
+                System.out.println(" -- ETL Triggered");
             }
             catch (SQLException e)
             {
-                System.out.println(e.getMessage());
+                System.out.println(" -- Failed to trigger ETL");
+                e.printStackTrace();
             }
 
             try {
@@ -37,7 +39,7 @@ public class Etl implements Runnable {
             }
             catch (InterruptedException e)
             {
-                System.out.println(e.getMessage());
+                e.printStackTrace();
             }
         }
     }

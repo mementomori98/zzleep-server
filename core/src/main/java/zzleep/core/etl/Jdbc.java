@@ -1,4 +1,6 @@
-package zzleep.etl;
+package zzleep.core.etl;
+
+import zzleep.core.settings.DataSettings;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,8 +18,8 @@ public class Jdbc {
                 Class.forName("org.postgresql.Driver");
 
                 c = DriverManager
-                        .getConnection("Jdbc:postgresql://ec2-176-34-97-213.eu-west-1.compute.amazonaws.com:5432/d2ka0f2unsn83u",
-                                "oyggsjqtgcdqlh", "c0b9d98e5e08a21f7c5915443f633865809943e6a1132ffcaa2454d1990ba6b6");
+                        .getConnection(DataSettings.getUrl(),
+                                DataSettings.getUser(), DataSettings.getPassword());
             }
             catch (SQLException | ClassNotFoundException e)
             {

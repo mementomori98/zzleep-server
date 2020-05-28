@@ -73,4 +73,11 @@ public class DeviceRepositoryImpl implements DeviceRepository {
     public boolean exists(String deviceId) {
         return getById(deviceId) != null;
     }
+
+    @Override
+    public List<String> getAllAvailableIds() {
+        return context.select(DatabaseConstants.DEVICE_TABLE_NAME,
+            String.format("%s is null or %s = ''", DatabaseConstants.DEVICE_COL_USER_ID, DatabaseConstants.DEVICE_COL_USER_ID),
+            row -> row.getString(DatabaseConstants.DEVICE_COL_ID));
+    }
 }

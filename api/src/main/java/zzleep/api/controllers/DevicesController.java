@@ -103,4 +103,13 @@ public class DevicesController extends ControllerBase {
         deviceRepository.update(new RemoveDeviceModel(deviceId));
         return success();
     }
+
+    @ApiOperation(value = "[DEV] Get all available device IDs")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "The list of available device IDs have been retrieved")
+    })
+    @GetMapping("/available")
+    public ResponseEntity<List<String>> getAvailableDevices() {
+        return success(deviceRepository.getAllAvailableIds());
+    }
 }

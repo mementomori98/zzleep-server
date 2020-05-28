@@ -28,7 +28,9 @@ public class ExtractorFactory {
     private static final Context.ResultSetExtractor<Fact> factsExtractor = row -> new Fact(
         row.getInt(DatabaseConstants.FACT_COL_FACT_ID),
         row.getString(DatabaseConstants.FACT_COL_TITLE),
-        row.getString(DatabaseConstants.FACT_COL_CONTENT)
+        row.getString(DatabaseConstants.FACT_COL_CONTENT),
+            row.getString(DatabaseConstants.FACT_COL_SOURCE_TITLE),
+            row.getString(DatabaseConstants.FACT_COL_SOURCE_URL)
     );
 
     private static final Context.ResultSetExtractor<RoomCondition> roomConditionsExtractor = row -> new RoomCondition(

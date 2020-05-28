@@ -23,10 +23,22 @@ public final class Fact {
     @JsonProperty("content")
     private final String content;
 
-    public Fact(int id, String title, String content) {
+    @ApiModelProperty(example = "Tuck, 2020")
+    @JsonSerialize
+    @JsonProperty("source")
+    private final String source;
+
+    @ApiModelProperty(example = "https://www.tuck.com/rem-sleep/")
+    @JsonSerialize
+    @JsonProperty("sourceUrl")
+    private final String sourceUrl;
+
+    public Fact(int id, String title, String content, String source, String sourceUrl) {
         this.id = id;
         this.title = title;
         this.content = content;
+        this.source = source;
+        this.sourceUrl = sourceUrl;
     }
 
     public int getId() {
@@ -39,5 +51,13 @@ public final class Fact {
 
     public String getContent() {
         return content;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public String getSourceUrl() {
+        return sourceUrl;
     }
 }

@@ -186,13 +186,21 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
 
         for (String sleep_id:sleep_Ids) {
 
-            try{
-                String deviceId = context.single(SLEEP_TABLE, String.format("%s = %s", COL_SLEEP_ID, sleep_id), deviceId_extractor);
-                sources.add(deviceId);
-            }catch(HttpClientErrorException e)
+            if(isInteger(sleep_id))
             {
-                System.out.println("You are trying to retrieve a device for a non existing or incorrect format of sleepId");
+                try{
+                    String deviceId = context.single(SLEEP_TABLE, String.format("%s = %s", COL_SLEEP_ID, sleep_id), deviceId_extractor);
+                    if (deviceId!=null)
+                    {
+                        sources.add(deviceId);
+
+                    }
+                }catch(HttpClientErrorException e)
+                {
+                    System.out.println("You are trying to retrieve a device for a non existing or incorrect format of sleepId");
+                }
             }
+
 
         }
 
@@ -200,4 +208,20 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         return sources;
     }
 
+
+    public static boolean isInteger(String s) {
+        return isInteger(s,10);
+    }
+
+    public static boolean isInteger(String s, int radix) {
+        if(s.isEmpty()) return false;
+        for(int i = 0; i < s.length(); i++) {
+            if(i == 0 && s.charAt(i) == '-') {
+                if(s.length() == 1) return false;
+                else continue;
+            }
+            if(Character.digit(s.charAt(i),radix) < 0) return false;
+        }
+        return true;
+    }
 }

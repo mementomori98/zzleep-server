@@ -234,8 +234,8 @@ public class EmbeddedControllerImpl implements EmbeddedController, Listener {
 
 
         currentData.setTimeStamp(formatted);
-        currentData.setHumidityData((double)humR);
-        currentData.setTemperatureData((double)tempR);
+        currentData.setHumidityData(humR);
+        currentData.setTemperatureData(tempR);
         currentData.setCo2Data(250.0); // TODO: 5/21/2020  changes
         currentData.setSoundData(50.0);
         System.out.println(currentData.toString());

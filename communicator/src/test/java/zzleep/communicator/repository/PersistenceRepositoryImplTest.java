@@ -30,6 +30,18 @@ public class PersistenceRepositoryImplTest {
     }
 
     @Test
+    public void getStartVentilation()
+    {
+
+    }
+
+    @Test
+    public void getStopVentilation()
+    {
+
+    }
+
+    @Test
     public void putDataInDatabase() {
 
         CurrentData data = new CurrentData();

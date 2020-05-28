@@ -102,7 +102,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         return commands;
     }
 
-    private ArrayList<String> getStopVentilation() {
+    ArrayList<String> getStopVentilation() {
 
 
         ArrayList<String> sources = new ArrayList<>();
@@ -127,7 +127,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
 
     }
 
-    private ArrayList<String> getStartVentilation() {
+    ArrayList<String> getStartVentilation() {
 
         ArrayList<String> sources = new ArrayList<>();
         List<String> device_Ids = context.select(PREFERENCE_TABLE +" "+ JOIN_ACTIVE_VENTILATION, String.format("%s is true and %s.%s not in (select %s from %s)", COL_REGULATION_ENABLE, PREFERENCE_TABLE, COL_DEVICE_ID, COL_DEVICE_ID, ACTIVE_VENTILATION_TABLE), deviceId_extractor);

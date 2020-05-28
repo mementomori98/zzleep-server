@@ -37,6 +37,16 @@ public class CommunicatorBoot implements CommandLineRunner
     @Override
     public void run(String... args) throws Exception {
         System.out.println("Hello World");
+// TODO: 5/28/2020 ------------ 
+        int tempL = 270;
+        int humL = 450;
+
+        String tS = Integer.toString(tempL, 16);
+        String hS = Integer.toString(humL, 16);
+
+        System.out.println(tS);
+        System.out.println(hS);
+
 
 //        CurrentData currentData0 = new CurrentData(230.0, 22.0, 48.0, 30.5, "0004A30B002181EC", "2020-05-27 12:09:36");
 //        embeddedController.receive(currentData0);

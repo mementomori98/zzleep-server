@@ -24,6 +24,8 @@ public class DatabaseConstants {
     static final String FACT_COL_FACT_ID = "factId";
     static final String FACT_COL_TITLE = "title";
     static final String FACT_COL_CONTENT = "content";
+    static final String FACT_COL_SOURCE_TITLE = "sourceTitle";
+    static final String FACT_COL_SOURCE_URL = "sourceUrl";
 
     //room conditions
     static final String RC_TABLE_NAME = "datamodels.roomConditions";

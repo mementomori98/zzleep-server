@@ -8,57 +8,48 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import zzleep.core.logging.Logger;
 import zzleep.core.models.Preferences;
+import zzleep.core.repositories.AuthorizationService;
 import zzleep.core.repositories.PreferencesRepository;
 
 @RestController
 @RequestMapping("/api/preferences")
 @Api(value = "Preferences api")
-public class PreferencesController {
-    private final PreferencesRepository preferencesRepository;
-    private final Logger logger;
+public class PreferencesController extends ControllerBase {
 
-    public PreferencesController(PreferencesRepository preferencesRepository, Logger logger) {
+    private final PreferencesRepository preferencesRepository;
+    private final AuthorizationService authService;
+
+    public PreferencesController(PreferencesRepository preferencesRepository, Logger logger, AuthorizationService authService) {
         this.preferencesRepository = preferencesRepository;
-        this.logger = logger;
+        this.authService = authService;
     }
 
     @ApiOperation(value = "Get current preferences", response = Preferences.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully retrieved preferences"),
-            @ApiResponse(code = 404, message = "Something went wrong")
+        @ApiResponse(code = 200, message = "Successfully retrieved preferences"),
+        @ApiResponse(code = 403, message = "This user does not own a device with this ID")
     })
     @GetMapping("/{deviceId}")
-    public ResponseEntity<Preferences> getPreferences(@PathVariable(name = "deviceId") String deviceId)
-    {
-        Preferences pref = preferencesRepository.getPreferences(deviceId);
-        logger.info("Get preferences", pref);
-        if(pref != null)
-            return ResponseEntity
-                .status(200)
-                .body(pref);
-        else return ResponseEntity.status(404).body(null);
+    public ResponseEntity<Preferences> getPreferences(@PathVariable(name = "deviceId") String deviceId) {
+        if (!authService.userHasDevice(userId(), deviceId)) return forbidden();
+        Preferences preferences = preferencesRepository.getPreferences(deviceId);
+        return successOrNotFound(preferences);
     }
 
     @ApiOperation(value = "Update user preferences")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully updated preferences"),
-            @ApiResponse(code = 404, message = "Inexistent device"),
-            @ApiResponse(code = 400, message = "Invalid values")
+        @ApiResponse(code = 200, message = "Successfully updated preferences"),
+        @ApiResponse(code = 400, message = "Invalid values (a min values is greater than a max value)"),
+        @ApiResponse(code = 403, message = "The user does not own a device with this ID")
     })
     @PutMapping
-    public ResponseEntity<Preferences> updateAccount(@RequestBody Preferences model)
-    {
-        logger.info("PUT preferences", model);
-        Preferences pref;
-        try{
-            pref = preferencesRepository.setPreferences(model);
-            if(pref != null)
-                return ResponseEntity.status(200).body(pref);
-
-        }catch(PreferencesRepository.InvalidValuesException e)
-        {
-            return ResponseEntity.status(400).body(null);
+    public ResponseEntity<Preferences> updateAccount(@RequestBody Preferences model) {
+        if (!authService.userHasDevice(userId(), model.getDeviceId())) return forbidden();
+        try {
+            Preferences preferences = preferencesRepository.setPreferences(model);
+            return successOrNotFound(preferences);
+        } catch (PreferencesRepository.InvalidValuesException e) {
+            return badRequest();
         }
-        return ResponseEntity.status(404).body(null);
     }
 }

@@ -82,4 +82,9 @@ public final class Preferences {
     public int getTemperatureMax() {
         return temperatureMax;
     }
+
+    public boolean isValid() {
+        return temperatureMin > temperatureMax ||
+            humidityMin > humidityMax;
+    }
 }

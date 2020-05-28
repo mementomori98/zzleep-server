@@ -72,4 +72,14 @@ public class DatabaseConstants {
     static final String DW_COL_AVERAGE_HUMIDITY = "avgHumidity";
     static final String DW_COL_AVERAGE_TEMPERATURE = "avgTemperature";
     static final String DW_COL_AVERAGE_SOUND = "avgSound";
+
+    // auth
+    static final String AUTH_TABLE_NAME =
+        "datamodels.device " +
+            "join datamodels.sleep on device.deviceId = sleep.deviceId ";
+    static final String AUTH_SELECTOR = "device.userId, device.deviceId, sleep.sleepId";
+    static final String AUTH_USER_ID = "userId";
+    static final String AUTH_DEVICE_ID = "deviceId";
+    static final String AUTH_SLEEP_ID = "sleepId";
+
 }

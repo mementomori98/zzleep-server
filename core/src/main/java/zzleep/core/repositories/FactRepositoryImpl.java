@@ -29,7 +29,11 @@ public class FactRepositoryImpl implements FactRepository {
 
     @Override
     public Fact get(int previousFactId) {
-        List<Fact> available = context.select(DatabaseConstants.FACTS_TABLE_NAME, String.format("%s != %d", DatabaseConstants.FACT_COL_FACT_ID, previousFactId), extractor);
+        List<Fact> available = context.select(
+            DatabaseConstants.FACTS_TABLE_NAME,
+            String.format("%s != %d", DatabaseConstants.FACT_COL_FACT_ID, previousFactId),
+            extractor
+        );
         Random random = new Random();
         return available.get(random.nextInt(available.size()));
     }

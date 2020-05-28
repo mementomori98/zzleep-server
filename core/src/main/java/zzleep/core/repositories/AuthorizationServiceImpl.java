@@ -16,7 +16,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         return !context.selectComplex(
             DatabaseConstants.AUTH_TABLE_NAME,
             DatabaseConstants.AUTH_SELECTOR,
-            String.format("%s = '%s' and %s = '%s'", DatabaseConstants.AUTH_USER_ID, userId, DatabaseConstants.AUTH_DEVICE_ID, deviceId),
+            String.format("%s = '%s' and device.%s = '%s'", DatabaseConstants.AUTH_USER_ID, userId, DatabaseConstants.AUTH_DEVICE_ID, deviceId),
             null,
             ExtractorFactory.getAuthObjectExtractor()
         ).isEmpty();

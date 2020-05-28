@@ -1,5 +1,6 @@
 package zzleep.communicator.repository;
 
+import org.postgresql.util.PSQLException;
 import org.springframework.web.client.HttpClientErrorException;
 import zzleep.communicator.models.Command;
 import zzleep.communicator.models.CurrentData;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Component;
 import zzleep.core.repositories.Context;
 
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +18,14 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
     private static final String SLEEP_TABLE = "datamodels.sleep";
     private static final String ACTIVE_SLEEP_TABLE ="datamodels.activesleeps";
     private static final String ROOM_C_TABLE = "datamodels.roomConditions";
+    private static final String PREFERENCE_TABLE = "datamodels.preferences";
+    private static final String ACTIVE_VENTILATION_TABLE = "datamodels.activeventilation";
+    private static final String COL_REGULATION_ENABLE = "regulationenabled";
+    private static final String JOIN_PREFERENCES = "join datamodels.preferences on co2 < preferences.co2max " +
+                                                    "AND humidity between humiditymin and humiditymax " +
+                                                    "AND temperature between temperaturemin and temperaturemax";
+    private static final String JOIN_ACTIVE_VENTILATION ="join datamodels.activeventilation on preferences.deviceid = activeventilation.deviceid";
+
     private static final String COL_ACTIVES_ID ="activesleeps.sleepid";
     private static final String COL_SLEEP_ID = "sleepid";
     private static final String COL_DEVICE_ID = "deviceid";
@@ -45,16 +55,19 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         {
             String sleepId = context.single(SLEEP_TABLE, String.format("%s is null and %s =%s",COL_FINISH_TIME, COL_DEVICE_ID,"'"+ data.getSource()+"'"), sleepId_extractor);
 
-            String columns = COL_SLEEP_ID+", "+COL_TIMESTAMP+", "+COL_TEMPERATURE+", "+COL_CO2+", "+COL_SOUND+", "+COL_HUMIDITY;
-            String values = sleepId +", "+ "'"+data.getTimeStamp()+"'" +", "+data.getTemperatureData()+", "+data.getCo2Data()+", "+data.getSoundData()+", "+data.getHumidityData();
-            context.insert(ROOM_C_TABLE,columns, values, sleepId_extractor);
+            if(sleepId != null)
+            {
+
+                String columns = COL_SLEEP_ID+", "+COL_TIMESTAMP+", "+COL_TEMPERATURE+", "+COL_CO2+", "+COL_SOUND+", "+COL_HUMIDITY;
+                String values = sleepId +", "+ "'"+data.getTimeStamp()+"'" +", "+data.getTemperatureData()+", "+data.getCo2Data()+", "+data.getSoundData()+", "+data.getHumidityData();
+                context.insert(ROOM_C_TABLE,columns, values, sleepId_extractor);
+            }
+            else
+                System.out.println("ERROR when inserting in the database. SleepId is null");
         }catch(HttpClientErrorException e)
         {
             System.out.println("You are trying to introduce invalid format data ");
         }
-
-
-
 
     }
 
@@ -90,11 +103,51 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
     }
 
     private ArrayList<String> getStopVentilation() {
-        return new ArrayList<String>();
+
+
+        ArrayList<String> sources = new ArrayList<>();
+        List<String> device_Ids = context.select(PREFERENCE_TABLE +" "+ JOIN_ACTIVE_VENTILATION, String.format("%s is true and %s.%s in (select %s from %s)", COL_REGULATION_ENABLE, PREFERENCE_TABLE, COL_DEVICE_ID, COL_DEVICE_ID, ACTIVE_VENTILATION_TABLE), deviceId_extractor);
+
+        for (String id: device_Ids) {
+            String sleep_Id = context.single(SLEEP_TABLE, String.format("%s = %s and %s is null", COL_DEVICE_ID,id,COL_TIMESTAMP ), sleepId_extractor);
+            if(sleep_Id != null)
+            {
+                List<String> sleep_Ids_for_good_room_conditions = context.select(ROOM_C_TABLE + " "+JOIN_PREFERENCES, String.format("%s = %s and %s > now() - '15 minutes'::interval", COL_SLEEP_ID, sleep_Id, COL_TIMESTAMP), sleepId_extractor);
+
+                if(sleep_Ids_for_good_room_conditions.size()>3)
+                {
+                    sources.add(id);
+                    context.delete(ACTIVE_VENTILATION_TABLE, String.format("%s =%s", COL_DEVICE_ID, id));
+                }
+            }
+
+        }
+
+        return sources;
+
     }
 
     private ArrayList<String> getStartVentilation() {
-        return new ArrayList<String>();
+
+        ArrayList<String> sources = new ArrayList<>();
+        List<String> device_Ids = context.select(PREFERENCE_TABLE +" "+ JOIN_ACTIVE_VENTILATION, String.format("%s is true and %s.%s not in (select %s from %s)", COL_REGULATION_ENABLE, PREFERENCE_TABLE, COL_DEVICE_ID, COL_DEVICE_ID, ACTIVE_VENTILATION_TABLE), deviceId_extractor);
+
+        for (String id: device_Ids) {
+           String sleep_Id = context.single(SLEEP_TABLE, String.format("%s = %s and %s is null", COL_DEVICE_ID,id,COL_TIMESTAMP ), sleepId_extractor);
+           if(sleep_Id != null)
+           {
+               List<String> sleep_Ids_for_good_room_conditions = context.select(ROOM_C_TABLE + " "+JOIN_PREFERENCES, String.format("%s = %s and %s > now() - '15 minutes'::interval", COL_SLEEP_ID, sleep_Id, COL_TIMESTAMP), sleepId_extractor);
+
+               if(sleep_Ids_for_good_room_conditions.size()<3)
+               {
+                   sources.add(id);
+                   context.insert(ACTIVE_VENTILATION_TABLE, COL_DEVICE_ID, id, deviceId_extractor);
+               }
+           }
+
+        }
+
+        return sources;
     }
 
     ArrayList<String> getStoppedSleeps() {

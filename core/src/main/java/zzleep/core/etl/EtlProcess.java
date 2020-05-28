@@ -35,7 +35,7 @@ public class EtlProcess implements Runnable {
             }
 
             try {
-                Thread.sleep(43200000);
+                Thread.sleep(30000);
             }
             catch (InterruptedException e)
             {

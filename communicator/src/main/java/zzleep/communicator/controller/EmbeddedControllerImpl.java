@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+import java.util.Random;
 import java.util.TimeZone;
 
 
@@ -125,19 +126,23 @@ public class EmbeddedControllerImpl implements EmbeddedController{
 
         String tempSHex = parts[0];
         String humSHex = parts[1];
+        if (parts.length==4) {
+            String co2Hex = parts[2];
+            String soundHex = parts[3];
+        }
 
         int temp = Integer.parseInt(tempSHex, 16);
         int tempR = temp / 10;
         int hum = Integer.parseInt(humSHex, 16);
         int humR = hum / 10;
-        int co2 = 0;
-        int sound = 0;
+        int co2 = getRandomNumberInRange(400, 600);
+        int sound = getRandomNumberInRange(30, 60);
 
         currentData.setTimeStamp(formatted);
         currentData.setHumidityData(humR);
         currentData.setTemperatureData(tempR);
-        currentData.setCo2Data(250.0); // TODO: 5/21/2020  changes
-        currentData.setSoundData(50.0);
+        currentData.setCo2Data(co2); // TODO: 5/21/2020  changes
+        currentData.setSoundData(sound);
 
         return currentData;
     }
@@ -152,6 +157,16 @@ public class EmbeddedControllerImpl implements EmbeddedController{
         String json = gson.toJson(message);
         return json;
 
+    }
+
+    private static int getRandomNumberInRange(int min, int max) {
+
+        if (min >= max) {
+            throw new IllegalArgumentException("max must be greater than min");
+        }
+
+        Random r = new Random();
+        return r.nextInt((max - min) + 1) + min;
     }
 
 }

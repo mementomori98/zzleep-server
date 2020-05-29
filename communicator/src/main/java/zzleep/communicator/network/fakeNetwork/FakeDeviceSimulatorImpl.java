@@ -85,7 +85,7 @@ public class FakeDeviceSimulatorImpl implements FakeDeviceSimulator, Runnable
 
 
             try {
-                Thread.sleep(2000);//2sec
+                Thread.sleep(10000);//10sec
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -112,8 +112,12 @@ public class FakeDeviceSimulatorImpl implements FakeDeviceSimulator, Runnable
 
         String tS = Integer.toString(tempL, 16);
         String hS = Integer.toString(humL, 16);
+        String co2S = Integer.toString(co2, 16);
+        String soundS = Integer.toString(sound, 16);
         String tSG = padLeftZeros(tS,4);
         String hSG = padLeftZeros(hS, 4);
+        String cSG = padLeftZeros(tS,4);
+        String sSG = padLeftZeros(hS, 4);
 
         r = tSG+hSG;
 

@@ -24,6 +24,7 @@ import java.util.TimeZone;
 
 
 import org.apache.commons.codec.binary.Hex;
+import zzleep.core.logging.Logger;
 
 @Component
 public class EmbeddedControllerImpl implements EmbeddedController{
@@ -31,10 +32,12 @@ public class EmbeddedControllerImpl implements EmbeddedController{
     private PersistenceRepository repository;
     private WebSocketHandler socketHandler;
     private final Gson gson = new Gson();
+    private final Logger logger;
 
-    public EmbeddedControllerImpl(PersistenceRepository dbService) {
+    public EmbeddedControllerImpl(PersistenceRepository dbService, Logger logger) {
         this.repository = dbService;
-        this.socketHandler = new Proxy(this::receiveData);
+        this.logger = logger;
+        this.socketHandler = new Proxy(this::receiveData, logger);
         onStart();
 
     }
@@ -42,7 +45,7 @@ public class EmbeddedControllerImpl implements EmbeddedController{
 
     @Override
     public void send(Command command) {
-        System.out.println(command.toString());
+        logger.info(command.toString());
         CharSequence charSequence = processCommand(command);
         socketHandler.send(charSequence);
 
@@ -91,7 +94,7 @@ public class EmbeddedControllerImpl implements EmbeddedController{
 
     private void receiveData(String s) {
         UpLinkMessage message = gson.fromJson(s, UpLinkMessage.class);
-        System.out.println(message.toString());
+        logger.info(message.toString());
 
         if (message.getCmd().equals("rx")) {
             CurrentData currentData = processData(message);
@@ -99,8 +102,9 @@ public class EmbeddedControllerImpl implements EmbeddedController{
             if (message.getEUI().equals("fake_device1")) {
                currentData.setTemperatureData(new Random().nextDouble() * 3 + 10);
             }
-            System.out.println(currentData.toString());
+            logger.info(currentData.toString());
             receive(currentData);
+
 // TODO: 5/28/2020 eliminate after figuring out the webSocket framework
             Command command = new Command("0004A30B002181EC", 'D', 1);
             send(command);

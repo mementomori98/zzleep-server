@@ -109,7 +109,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         List<String> device_Ids = context.select(PREFERENCE_TABLE +" "+ JOIN_ACTIVE_VENTILATION, String.format("%s is true and %s.%s in (select %s from %s)", COL_REGULATION_ENABLE, PREFERENCE_TABLE, COL_DEVICE_ID, COL_DEVICE_ID, ACTIVE_VENTILATION_TABLE), deviceId_extractor);
 
         for (String id: device_Ids) {
-            String sleep_Id = context.single(SLEEP_TABLE, String.format("%s = %s and %s is null", COL_DEVICE_ID,id,COL_TIMESTAMP ), sleepId_extractor);
+            String sleep_Id = context.single(SLEEP_TABLE, String.format("%s = '%s' and %s is null", COL_DEVICE_ID,id,COL_TIMESTAMP ), sleepId_extractor);
             if(sleep_Id != null)
             {
                 List<String> sleep_Ids_for_good_room_conditions = context.select(ROOM_C_TABLE + " "+JOIN_PREFERENCES, String.format("%s = %s and %s > now() - '15 minutes'::interval", COL_SLEEP_ID, sleep_Id, COL_TIMESTAMP), sleepId_extractor);
@@ -133,7 +133,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         List<String> device_Ids = context.select(PREFERENCE_TABLE +" "+ JOIN_ACTIVE_VENTILATION, String.format("%s is true and %s.%s not in (select %s from %s)", COL_REGULATION_ENABLE, PREFERENCE_TABLE, COL_DEVICE_ID, COL_DEVICE_ID, ACTIVE_VENTILATION_TABLE), deviceId_extractor);
 
         for (String id: device_Ids) {
-           String sleep_Id = context.single(SLEEP_TABLE, String.format("%s = %s and %s is null", COL_DEVICE_ID,id,COL_TIMESTAMP ), sleepId_extractor);
+           String sleep_Id = context.single(SLEEP_TABLE, String.format("%s = '%s' and %s is null", COL_DEVICE_ID,id,COL_TIMESTAMP ), sleepId_extractor);
            if(sleep_Id != null)
            {
                List<String> sleep_Ids_for_good_room_conditions = context.select(ROOM_C_TABLE + " "+JOIN_PREFERENCES, String.format("%s = %s and %s > now() - '15 minutes'::interval", COL_SLEEP_ID, sleep_Id, COL_TIMESTAMP), sleepId_extractor);
@@ -163,7 +163,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
 
         // TODO: 5/27/2020 Tell embedded that DO stops also ventilation if on 
         for (String source:sources) {
-            context.delete(ACTIVE_VENTILATION_TABLE, String.format("%s =%s", COL_DEVICE_ID, source));
+            context.delete(ACTIVE_VENTILATION_TABLE, String.format("%s = '%s'", COL_DEVICE_ID, source));
         }
         return sources;
     }
@@ -172,10 +172,12 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
 
     ArrayList<String> getActiveSleeps() {
 
+        System.out.println("Getting active sleeps...");
         List<String> sleep_Ids = context.selectExcept(SLEEP_TABLE +" "+JOIN_EXCEPT, String.format("%s is null", COL_FINISH_TIME),
                 SLEEP_TABLE +" "+ JOIN_EXCEPT, String.format("%s is not null ", COL_ACTIVES_ID), sleepId_extractor);
 
         for (String sleep_id:sleep_Ids) {
+            System.out.println("Active sleep: ");
             context.insert(ACTIVE_SLEEP_TABLE, COL_SLEEP_ID, sleep_id, sleepId_extractor);
         }
         return getSources(sleep_Ids);

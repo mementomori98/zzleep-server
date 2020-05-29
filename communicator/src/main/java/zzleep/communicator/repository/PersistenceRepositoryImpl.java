@@ -67,11 +67,11 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
             {
                 logger.warn("Warning.SleepId is null");
             }
-                //System.out.println("ERROR when inserting in the database. SleepId is null");
+
         }catch(HttpClientErrorException e)
         {
             logger.error("You are trying to introduce invalid format data ");
-            //System.out.println("You are trying to introduce invalid format data ");
+
         }
 
     }
@@ -203,7 +203,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
                 }catch(HttpClientErrorException e)
                 {
                     logger.error("You are trying to retrieve a device for a non existing or incorrect format of sleepId");
-                    //System.out.println("You are trying to retrieve a device for a non existing or incorrect format of sleepId");
+
                 }
             }
 

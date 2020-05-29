@@ -40,12 +40,11 @@ public class WebSocketImpl implements WebSocketHandler, WebSocket.Listener {
     public void onError(WebSocket webSocket, Throwable error) {
         logger.error("A " + error.getCause() + " exception was thrown.");
         logger.info("Message: " + error.getLocalizedMessage());
-        //System.out.println("A " + error.getCause() + " exception was thrown.");
-        //System.out.println("Message: " + error.getLocalizedMessage());
+
 
         reinitializeWebSocket(webSocket);
         logger.info("onError completed");
-        //System.out.println("onError completed");
+
     }
 
 
@@ -53,8 +52,7 @@ public class WebSocketImpl implements WebSocketHandler, WebSocket.Listener {
     public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
         logger.warn("WebSocket closed!");
         logger.info("Status:" + statusCode + " Reason: " + reason);
-        //System.out.println("WebSocket closed!");
-        //System.out.println("Status:" + statusCode + " Reason: " + reason);
+
 
         reinitializeWebSocket(webSocket);
 

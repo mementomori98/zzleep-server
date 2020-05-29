@@ -54,7 +54,7 @@ public class EmbeddedControllerImpl implements EmbeddedController{
         while (true) {
             onProgress();
             try {
-                Thread.sleep(300000);//5min
+                Thread.sleep(5000);//5min
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

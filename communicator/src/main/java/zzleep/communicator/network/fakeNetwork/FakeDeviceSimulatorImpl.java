@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 
 public class FakeDeviceSimulatorImpl implements FakeDeviceSimulator, Runnable
 {
+    // TODO: 5/28/2020 think about access issues and data corruption 
 
     private ArrayList<String> activateDevices;
     private ArrayList<String> activateVentilation;
@@ -67,7 +68,7 @@ public class FakeDeviceSimulatorImpl implements FakeDeviceSimulator, Runnable
 
         while (true)
         {
-            for (String device:activateDevices)
+            for (String device: new ArrayList<>(activateDevices))
             {
 
                 String s = generateRandomData();
@@ -84,7 +85,7 @@ public class FakeDeviceSimulatorImpl implements FakeDeviceSimulator, Runnable
 
 
             try {
-                Thread.sleep(300000);//5min
+                Thread.sleep(2000);//2sec
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -97,7 +98,7 @@ public class FakeDeviceSimulatorImpl implements FakeDeviceSimulator, Runnable
     private String generateRandomData() {
 
         String r;
-        r ="01100194";
+        //r ="01100194";
 
         // TODO: 5/28/2020 -----------fake
         int temp = getRandomNumberInRange(15,24);
@@ -111,6 +112,10 @@ public class FakeDeviceSimulatorImpl implements FakeDeviceSimulator, Runnable
 
         String tS = Integer.toString(tempL, 16);
         String hS = Integer.toString(humL, 16);
+        String tSG = padLeftZeros(tS,4);
+        String hSG = padLeftZeros(hS, 4);
+
+        r = tSG+hSG;
 
         
 
@@ -125,5 +130,18 @@ public class FakeDeviceSimulatorImpl implements FakeDeviceSimulator, Runnable
 
         Random r = new Random();
         return r.nextInt((max - min) + 1) + min;
+    }
+
+    private String padLeftZeros(String inputString, int length) {
+        if (inputString.length() >= length) {
+            return inputString;
+        }
+        StringBuilder sb = new StringBuilder();
+        while (sb.length() < length - inputString.length()) {
+            sb.append('0');
+        }
+        sb.append(inputString);
+
+        return sb.toString();
     }
 }

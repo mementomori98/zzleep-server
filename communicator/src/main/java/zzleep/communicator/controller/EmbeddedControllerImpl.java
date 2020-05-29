@@ -95,6 +95,10 @@ public class EmbeddedControllerImpl implements EmbeddedController{
 
         if (message.getCmd().equals("rx")) {
             CurrentData currentData = processData(message);
+            // TODO REMOVE THIS, ZOLLY ASKED FOR IT
+            if (message.getEUI().equals("fake_device1")) {
+               currentData.setTemperatureData(new Random().nextDouble() * 3 + 10);
+            }
             System.out.println(currentData.toString());
             receive(currentData);
 // TODO: 5/28/2020 eliminate after figuring out the webSocket framework

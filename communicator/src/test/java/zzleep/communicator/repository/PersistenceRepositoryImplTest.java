@@ -30,6 +30,26 @@ public class PersistenceRepositoryImplTest {
     }
 
     @Test
+    public void getStartVentilation()
+    {
+        ArrayList<String> sources = dbService.getStartVentilation();
+        for (String source:
+             sources) {
+            System.out.println("v1:"+source);
+        }
+    }
+
+    @Test
+    public void getStopVentilation()
+    {
+        ArrayList<String> sources = dbService.getStopVentilation();
+        for (String source:
+                sources) {
+            System.out.println("v0:"+source);
+        }
+    }
+
+    @Test
     public void putDataInDatabase() {
 
         CurrentData data = new CurrentData();

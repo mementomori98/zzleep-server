@@ -102,7 +102,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         return commands;
     }
 
-    private ArrayList<String> getStopVentilation() {
+    ArrayList<String> getStopVentilation() {
 
 
         ArrayList<String> sources = new ArrayList<>();
@@ -127,7 +127,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
 
     }
 
-    private ArrayList<String> getStartVentilation() {
+    ArrayList<String> getStartVentilation() {
 
         ArrayList<String> sources = new ArrayList<>();
         List<String> device_Ids = context.select(PREFERENCE_TABLE +" "+ JOIN_ACTIVE_VENTILATION, String.format("%s is true and %s.%s not in (select %s from %s)", COL_REGULATION_ENABLE, PREFERENCE_TABLE, COL_DEVICE_ID, COL_DEVICE_ID, ACTIVE_VENTILATION_TABLE), deviceId_extractor);
@@ -156,9 +156,16 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         for (String sleep_id:sleep_Ids) {
 
             context.delete(ACTIVE_SLEEP_TABLE, String.format("%s = %s", COL_SLEEP_ID, sleep_id));
+
         }
 
-        return getSources(sleep_Ids);
+        ArrayList<String> sources = getSources(sleep_Ids);
+
+        // TODO: 5/27/2020 Tell embedded that DO stops also ventilation if on 
+        for (String source:sources) {
+            context.delete(ACTIVE_VENTILATION_TABLE, String.format("%s =%s", COL_DEVICE_ID, source));
+        }
+        return sources;
     }
 
 
@@ -179,13 +186,21 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
 
         for (String sleep_id:sleep_Ids) {
 
-            try{
-                String deviceId = context.single(SLEEP_TABLE, String.format("%s = %s", COL_SLEEP_ID, sleep_id), deviceId_extractor);
-                sources.add(deviceId);
-            }catch(HttpClientErrorException e)
+            if(isInteger(sleep_id))
             {
-                System.out.println("You are trying to retrieve a device for a non existing or incorrect format of sleepId");
+                try{
+                    String deviceId = context.single(SLEEP_TABLE, String.format("%s = %s", COL_SLEEP_ID, sleep_id), deviceId_extractor);
+                    if (deviceId!=null)
+                    {
+                        sources.add(deviceId);
+
+                    }
+                }catch(HttpClientErrorException e)
+                {
+                    System.out.println("You are trying to retrieve a device for a non existing or incorrect format of sleepId");
+                }
             }
+
 
         }
 
@@ -193,4 +208,20 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         return sources;
     }
 
+
+    public static boolean isInteger(String s) {
+        return isInteger(s,10);
+    }
+
+    public static boolean isInteger(String s, int radix) {
+        if(s.isEmpty()) return false;
+        for(int i = 0; i < s.length(); i++) {
+            if(i == 0 && s.charAt(i) == '-') {
+                if(s.length() == 1) return false;
+                else continue;
+            }
+            if(Character.digit(s.charAt(i),radix) < 0) return false;
+        }
+        return true;
+    }
 }

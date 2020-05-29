@@ -22,7 +22,7 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
     public Preferences setPreferences(Preferences preferences) throws InvalidValuesException {
         if (!preferences.isValid()) throw new InvalidValuesException();
         if (!deviceRepository.exists(preferences.getDeviceId())) return null;
-        if (exists(preferences.getDeviceId()))
+        if (!exists(preferences.getDeviceId()))
             return create(preferences);
         return update(preferences);
     }

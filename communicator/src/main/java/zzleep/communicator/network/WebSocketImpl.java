@@ -1,7 +1,7 @@
 package zzleep.communicator.network;
 
 
-import org.springframework.stereotype.Component;
+import zzleep.core.logging.Logger;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -15,17 +15,14 @@ public class WebSocketImpl implements WebSocketHandler, WebSocket.Listener {
 
 
     private Consumer<String> listener;
+    private Logger logger;
     private WebSocket socket;
 
-    public WebSocketImpl(Consumer<String> listener) {
+
+    public WebSocketImpl(Consumer<String> listener, Logger logger) {
         this.listener = listener;
-
-
-        HttpClient client = HttpClient.newHttpClient();
-        CompletableFuture<WebSocket> ws = client.newWebSocketBuilder()
-                .buildAsync(URI.create("wss://iotnet.teracom.dk/app?token=vnoSwQAAABFpb3RuZXQudGVyYWNvbS5ka5CGv5WoQH5B19isf4NMr3s="), this);
-
-        this.socket = ws.join();
+        this.logger = logger;
+        reinitializeWebSocket(null);
 
     }
 
@@ -33,7 +30,7 @@ public class WebSocketImpl implements WebSocketHandler, WebSocket.Listener {
     public void onOpen(WebSocket webSocket) {
 
         webSocket.request(1);
-        System.out.println("WebSocket Listener has been opened for requests.");
+        logger.info("WebSocket Listener has been opened for requests.");
 
 
     }
@@ -41,23 +38,27 @@ public class WebSocketImpl implements WebSocketHandler, WebSocket.Listener {
 
     @Override
     public void onError(WebSocket webSocket, Throwable error) {
-        System.out.println("A " + error.getCause() + " exception was thrown.");
-        System.out.println("Message: " + error.getLocalizedMessage());
+        logger.error("A " + error.getCause() + " exception was thrown.");
+        logger.info("Message: " + error.getLocalizedMessage());
+        //System.out.println("A " + error.getCause() + " exception was thrown.");
+        //System.out.println("Message: " + error.getLocalizedMessage());
 
         reinitializeWebSocket(webSocket);
-        System.out.println("onError completed");
+        logger.info("onError completed");
+        //System.out.println("onError completed");
     }
-
 
 
     @Override
     public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
-        System.out.println("WebSocket closed!");
-        System.out.println("Status:" + statusCode + " Reason: " + reason);
+        logger.warn("WebSocket closed!");
+        logger.info("Status:" + statusCode + " Reason: " + reason);
+        //System.out.println("WebSocket closed!");
+        //System.out.println("Status:" + statusCode + " Reason: " + reason);
 
         reinitializeWebSocket(webSocket);
 
-        return new CompletableFuture().completedFuture("onClose() completed.").thenAccept(System.out::println);
+        return new CompletableFuture().completedFuture("onClose() completed.").thenAccept(logger::info);
     }
 
 
@@ -65,11 +66,8 @@ public class WebSocketImpl implements WebSocketHandler, WebSocket.Listener {
     public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
         String s = data.toString();
         listener.accept(s);
-        System.out.println("Text after the whole thing");
-
-
         webSocket.request(1);
-        return new CompletableFuture().completedFuture("onText() completed.").thenAccept(System.out::println);
+        return new CompletableFuture().completedFuture("onText() completed.").thenAccept(logger::info);
     }
 
 
@@ -78,20 +76,24 @@ public class WebSocketImpl implements WebSocketHandler, WebSocket.Listener {
 
         socket.sendText(data, true);
         socket.request(1);
-        System.out.println("sentText completed");
+        logger.info("sentText completed");
 
         return new CompletableFuture().newIncompleteFuture().thenAccept(System.out::println);
     }
 
 
     private void reinitializeWebSocket(WebSocket webSocket) {
+
         HttpClient client = HttpClient.newHttpClient();
         CompletableFuture<WebSocket> ws = client.newWebSocketBuilder()
                 .buildAsync(URI.create("wss://iotnet.teracom.dk/app?token=vnoSwQAAABFpb3RuZXQudGVyYWNvbS5ka5CGv5WoQH5B19isf4NMr3s="), this);
 
         this.socket = ws.join();
 
-        webSocket.abort();
+        if (webSocket != null) {
+            webSocket.abort();
+        }
+
     }
 
 

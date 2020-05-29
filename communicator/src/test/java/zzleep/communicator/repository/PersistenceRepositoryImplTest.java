@@ -26,7 +26,7 @@ public class PersistenceRepositoryImplTest {
         RestTemplateBuilder restTemplate =  new RestTemplateBuilder();
         Logger logger = new LoggerImpl(restTemplate);
         Context context = new PostgresContext(logger);
-        dbService = new PersistenceRepositoryImpl(context);
+        dbService = new PersistenceRepositoryImpl(context, logger);
     }
 
     @Test

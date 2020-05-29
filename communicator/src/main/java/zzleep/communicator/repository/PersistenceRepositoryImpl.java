@@ -54,7 +54,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
 
         try
         {
-            String sleepId = context.single(SLEEP_TABLE, String.format("%s is null and %s =%s",COL_FINISH_TIME, COL_DEVICE_ID,"'"+ data.getSource()+"'"), SLEEP_ID_EXTRACTOR);
+            String sleepId = context.single(SLEEP_TABLE, String.format("%s is null and %s = %s",COL_FINISH_TIME, COL_DEVICE_ID,"'"+ data.getSource()+"'"), SLEEP_ID_EXTRACTOR);
 
             if(sleepId != null)
             {
@@ -122,7 +122,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
                 if(sleepIdsForGoodRoomConditions.size()>3)
                 {
                     sources.add(id);
-                    context.delete(ACTIVE_VENTILATION_TABLE, String.format("%s =%s", COL_DEVICE_ID, id));
+                    context.delete(ACTIVE_VENTILATION_TABLE, String.format("%s = '%s'", COL_DEVICE_ID, id));
                 }
             }
 

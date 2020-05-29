@@ -13,7 +13,7 @@ import zzleep.core.repositories.PreferencesRepository;
 
 @RestController
 @RequestMapping("/api/preferences")
-@Api(value = "Preferences api")
+@Api(tags = {"Preferences"}, description = " ")
 public class PreferencesController extends ControllerBase {
 
     private final PreferencesRepository preferencesRepository;

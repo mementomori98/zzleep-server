@@ -58,7 +58,7 @@ public class EmbeddedControllerImpl implements EmbeddedController{
         while (true) {
             onProgress();
             try {
-                Thread.sleep(5000);//5min
+                Thread.sleep(5000);//5minN
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -98,6 +98,10 @@ public class EmbeddedControllerImpl implements EmbeddedController{
 
         if (message.getCmd().equals("rx")) {
             CurrentData currentData = processData(message);
+            // TODO REMOVE THIS, ZOLLY ASKED FOR IT
+            if (message.getEUI().equals("fake_device1")) {
+               currentData.setTemperatureData(new Random().nextDouble() * 3 + 10);
+            }
             logger.info(currentData.toString());
             receive(currentData);
 

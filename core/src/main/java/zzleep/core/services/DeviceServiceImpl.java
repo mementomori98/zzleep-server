@@ -9,7 +9,9 @@ import zzleep.core.repositories.AuthorizationService;
 import zzleep.core.repositories.DeviceRepository;
 import zzleep.core.repositories.SleepRepository;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class DeviceServiceImpl extends ServiceBase implements DeviceService {
@@ -59,6 +61,9 @@ public class DeviceServiceImpl extends ServiceBase implements DeviceService {
     public Response<List<Device>> getAllByUser(Authorized<Void> request) {
         return success(
             deviceRepository.getAllByUserId(request.getUserId())
+                .stream()
+                .sorted(Comparator.comparing(Device::getName))
+                .collect(Collectors.toList())
         );
     }
 
@@ -89,7 +94,9 @@ public class DeviceServiceImpl extends ServiceBase implements DeviceService {
     @Override
     public Response<List<String>> getAllAvailable() {
         return success(
-            deviceRepository.getAllAvailableIds()
+            deviceRepository.getAllAvailableIds().stream()
+                .sorted()
+                .collect(Collectors.toList())
         );
     }
 }

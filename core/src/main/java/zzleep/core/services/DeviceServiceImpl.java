@@ -7,6 +7,7 @@ import zzleep.core.models.RemoveDeviceModel;
 import zzleep.core.models.UpdateDeviceModel;
 import zzleep.core.repositories.AuthorizationService;
 import zzleep.core.repositories.DeviceRepository;
+import zzleep.core.repositories.SleepRepository;
 
 import java.util.List;
 
@@ -15,13 +16,16 @@ public class DeviceServiceImpl extends ServiceBase implements DeviceService {
 
     private final DeviceRepository deviceRepository;
     private final AuthorizationService authService;
+    private final SleepRepository sleepRepository;
 
     public DeviceServiceImpl(
         DeviceRepository deviceRepository,
-        AuthorizationService authService
+        AuthorizationService authService,
+        SleepRepository sleepRepository
     ) {
         this.deviceRepository = deviceRepository;
         this.authService = authService;
+        this.sleepRepository = sleepRepository;
     }
 
     @Override
@@ -77,6 +81,7 @@ public class DeviceServiceImpl extends ServiceBase implements DeviceService {
         if (!deviceRepository.exists(deviceId)) return notFound();
         if (!authService.userHasDevice(request.getUserId(), deviceId)) return unauthorized();
 
+        if (sleepRepository.isTracking(deviceId)) sleepRepository.stopTracking(deviceId);
         deviceRepository.update(new RemoveDeviceModel(deviceId));
         return success();
     }

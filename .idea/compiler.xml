@@ -8,19 +8,24 @@
         <outputRelativeToContentRoot value="true" />
         <module name="core" />
         <module name="api" />
+        <module name="communicator (1)" />
         <module name="communicator" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="api" target="1.8" />
       <module name="communicator" target="11" />
+      <module name="communicator (1)" target="11" />
       <module name="core" target="1.8" />
+      <module name="etl" target="1.8" />
       <module name="zzleep" target="1.8" />
+      <module name="zzleep (1)" target="1.7" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="communicator" options="" />
+      <module name="etl" options="" />
     </option>
   </component>
 </project>

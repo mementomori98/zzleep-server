@@ -10,7 +10,11 @@ import zzleep.core.models.AddDeviceModel;
 import zzleep.core.models.Device;
 import zzleep.core.models.RemoveDeviceModel;
 import zzleep.core.models.UpdateDeviceModel;
+import zzleep.core.repositories.AuthorizationService;
 import zzleep.core.repositories.DeviceRepository;
+import zzleep.core.services.Authorized;
+import zzleep.core.services.DeviceService;
+import zzleep.core.services.Response;
 
 import java.util.List;
 
@@ -19,10 +23,10 @@ import java.util.List;
 @Api(tags = {"Devices"}, description = " ")
 public class DevicesController extends ControllerBase {
 
-    private final DeviceRepository deviceRepository;
+    private final DeviceService deviceService;
 
-    public DevicesController(DeviceRepository deviceRepository) {
-        this.deviceRepository = deviceRepository;
+    public DevicesController(DeviceService deviceService) {
+        this.deviceService = deviceService;
     }
 
     @ApiOperation(value = "Connect a device to a user", response = Device.class)
@@ -33,13 +37,8 @@ public class DevicesController extends ControllerBase {
     })
     @PostMapping
     public ResponseEntity<Device> addDevice(@RequestBody AddDeviceModel model) {
-        // TODO firebase user id
-        if (model.getUserId().equals(deviceRepository.getById(model.getDeviceId()).getUserId()))
-            return custom(406);
-        if (deviceRepository.hasUser(model.getDeviceId()))
-            return custom(403);
-        return success(
-            deviceRepository.update(model)
+        return map(
+            deviceService.add(new Authorized<>(userId(), model))
         );
     }
 
@@ -50,12 +49,8 @@ public class DevicesController extends ControllerBase {
     })
     @PatchMapping
     public ResponseEntity<Device> updateDevice(@RequestBody UpdateDeviceModel model) {
-        Device device = deviceRepository.getById(model.getDeviceId());
-        String userId = "user1"; // TODO firebase
-        if (device.getUserId() == null) return custom(403);
-        if (!device.getUserId().equals(userId)) return custom(403);
-        return success(
-            deviceRepository.update(model)
+        return map(
+            deviceService.update(new Authorized<>(userId(), model))
         );
     }
 
@@ -65,40 +60,43 @@ public class DevicesController extends ControllerBase {
     })
     @GetMapping
     public ResponseEntity<List<Device>> getAllUserDevices() {
-        String userId = "user1"; // TODO firebase
-        return success(
-            deviceRepository.getAllByUserId(userId)
+        return map(
+            deviceService.getAllByUser(new Authorized<>(userId()))
         );
     }
 
     @ApiOperation(value = "Get a device", response = Device.class)
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successfully retrieved device"),
-        @ApiResponse(code = 403, message = "The device is not connected to this user"),
-        @ApiResponse(code = 404, message = "The device was not found")
+        @ApiResponse(code = 403, message = "The device is not connected to this user")
     })
     @GetMapping("/{deviceId}")
     public ResponseEntity<Device> getById(@PathVariable(value = "deviceId") String deviceId) {
-        String userId = "user1"; // TODO firebase
-        Device device = deviceRepository.getById(deviceId);
-        if (device == null) return notFound();
-        if (!userId.equals(device.getUserId())) return custom(403);
-        return success(device);
+        return map(
+            deviceService.getById(new Authorized<>(userId(), deviceId))
+        );
     }
 
     @ApiOperation(value = "Remove a device from user", response = Void.class)
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "The device has been removed from the user"),
-        @ApiResponse(code = 403, message = "The device is not associated with this user"),
-        @ApiResponse(code = 404, message = "The device was not found")
+        @ApiResponse(code = 403, message = "The device is not associated with this user")
     })
     @DeleteMapping("/{deviceId}")
     public ResponseEntity<Void> remove(@PathVariable(value = "deviceId") String deviceId) {
-        String userId = "user1"; // TODO firebase
-        Device device = deviceRepository.getById(deviceId);
-        if (device == null) return notFound();
-        if (!userId.equals(device.getUserId())) return custom(403);
-        deviceRepository.update(new RemoveDeviceModel(deviceId));
-        return success();
+        return map(
+            deviceService.remove(new Authorized<>(userId(), deviceId))
+        );
+    }
+
+    @ApiOperation(value = "[DEV] Get all available device IDs")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "The list of available device IDs have been retrieved")
+    })
+    @GetMapping("/available")
+    public ResponseEntity<List<String>> getAvailableDevices() {
+        return map(
+            deviceService.getAllAvailable()
+        );
     }
 }

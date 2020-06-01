@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.TimeZone;
 
-
+import zzleep.core.etl.EtlProcess;
 @SpringBootApplication
 @ComponentScan("zzleep")
 public class CommunicatorBoot implements CommandLineRunner
@@ -36,6 +36,7 @@ public class CommunicatorBoot implements CommandLineRunner
 
     @Override
     public void run(String... args) throws Exception {
+        new Thread(new EtlProcess()).start();
         System.out.println("Hello World");
 
 //        CurrentData currentData0 = new CurrentData(230.0, 22.0, 48.0, 30.5, "0004A30B002181EC", "2020-05-27 12:09:36");

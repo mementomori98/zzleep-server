@@ -2,6 +2,9 @@ package zzleep.api.controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import zzleep.core.services.Response;
+
+import static zzleep.core.services.Status.*;
 
 public abstract class ControllerBase {
 
@@ -43,5 +46,38 @@ public abstract class ControllerBase {
 
     protected <TType> ResponseEntity<TType> notFound(TType body) {
         return custom(404, body);
+    }
+
+    protected <TType> ResponseEntity<TType> forbidden() {
+        return custom(403);
+    }
+
+    protected <TType> ResponseEntity<TType> badRequest() {
+        return custom(400);
+    }
+
+    protected <TType> ResponseEntity<TType> successOrNotFound(TType object) {
+        return object == null ? notFound() : success(object);
+    }
+
+    protected <TType> ResponseEntity<TType> error() {
+        return custom(500);
+    }
+
+    protected <TType> ResponseEntity<TType> map(Response<TType> response) {
+        switch (response.getStatus()) {
+            case SUCCESS:
+                return success(response.getModel());
+            case NO_CONTENT:
+                return custom(204);
+            case UNAUTHORIZED:
+                return forbidden();
+            case NOT_ALLOWED:
+                return custom(406);
+            case NOT_FOUND:
+                return notFound();
+            default:
+                return error();
+        }
     }
 }

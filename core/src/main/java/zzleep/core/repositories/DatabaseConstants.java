@@ -24,6 +24,8 @@ public class DatabaseConstants {
     static final String FACT_COL_FACT_ID = "factId";
     static final String FACT_COL_TITLE = "title";
     static final String FACT_COL_CONTENT = "content";
+    static final String FACT_COL_SOURCE_TITLE = "sourceTitle";
+    static final String FACT_COL_SOURCE_URL = "sourceUrl";
 
     //room conditions
     static final String RC_TABLE_NAME = "datamodels.roomConditions";
@@ -56,7 +58,7 @@ public class DatabaseConstants {
     static final String DW_TABLE_NAME =
             "dw.factRoomConditions " +
                     "inner join dw.dimDevice on factRoomConditions.deviceKey = dimDevice.deviceKey " +
-                    "inner join dw.dimRating on factRoomConditions.ratingKey = dimRating.ratingKey " +
+                    "left outer join dw.dimRating on factRoomConditions.ratingKey = dimRating.ratingKey " +
                     "inner join dw.dimSleep on factRoomConditions.sleepKey = dimSleep.sleepKey";
     static final String DW_COL_SLEEP_ID = "sleepId";
     static final String DW_COL_TIMESTAMP = "timeRecorded";
@@ -72,4 +74,14 @@ public class DatabaseConstants {
     static final String DW_COL_AVERAGE_HUMIDITY = "avgHumidity";
     static final String DW_COL_AVERAGE_TEMPERATURE = "avgTemperature";
     static final String DW_COL_AVERAGE_SOUND = "avgSound";
+
+    // auth
+    static final String AUTH_TABLE_NAME =
+        "datamodels.device " +
+            "left outer join datamodels.sleep on device.deviceId = sleep.deviceId ";
+    static final String AUTH_SELECTOR = "device.userId, device.deviceId, sleep.sleepId";
+    static final String AUTH_USER_ID = "userId";
+    static final String AUTH_DEVICE_ID = "deviceId";
+    static final String AUTH_SLEEP_ID = "sleepId";
+
 }

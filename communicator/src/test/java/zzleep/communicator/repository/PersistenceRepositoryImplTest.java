@@ -26,7 +26,27 @@ public class PersistenceRepositoryImplTest {
         RestTemplateBuilder restTemplate =  new RestTemplateBuilder();
         Logger logger = new LoggerImpl(restTemplate);
         Context context = new PostgresContext(logger);
-        dbService = new PersistenceRepositoryImpl(context);
+        dbService = new PersistenceRepositoryImpl(context, logger);
+    }
+
+    @Test
+    public void getStartVentilation()
+    {
+        ArrayList<String> sources = dbService.getStartVentilation();
+        for (String source:
+             sources) {
+            System.out.println("v1:"+source);
+        }
+    }
+
+    @Test
+    public void getStopVentilation()
+    {
+        ArrayList<String> sources = dbService.getStopVentilation();
+        for (String source:
+                sources) {
+            System.out.println("v0:"+source);
+        }
     }
 
     @Test

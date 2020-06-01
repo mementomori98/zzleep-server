@@ -43,4 +43,13 @@ public final class Device {
     public String getUserId() {
         return userId;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Device)) return false;
+        Device other = (Device) obj;
+        return deviceId.equals(other.deviceId) &&
+            name.equals(other.name) &&
+            userId.equals(other.userId);
+    }
 }

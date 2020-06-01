@@ -16,7 +16,7 @@ import zzleep.core.repositories.SleepRepository;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static zzleep.core.services.Status.*;
 
@@ -59,9 +59,11 @@ public class DeviceServiceImplTest {
 
     @Test
     public void addNotFound() {
-        when(deviceRepository.getById(any())).thenReturn(null);
+        String deviceId = "device";
+        when(deviceRepository.getById(any())).thenReturn(new Device());
+        when(deviceRepository.getById(deviceId)).thenReturn(null);
 
-        Response<Device> result = sut.add(new Authorized<>("", new AddDeviceModel()));
+        Response<Device> result = sut.add(new Authorized<>("", new AddDeviceModel(deviceId, "")));
 
         assertEquals(NOT_FOUND, result.getStatus());
         verify(deviceRepository, never()).update(any(AddDeviceModel.class));
@@ -69,10 +71,12 @@ public class DeviceServiceImplTest {
 
     @Test
     public void addAlreadyAdded() {
+        String userId = "user";
+        String deviceId = "device";
         when(deviceRepository.getById(any())).thenReturn(new Device());
-        when(authService.userHasDevice(any(), any())).thenReturn(true);
+        when(authService.userHasDevice(userId, deviceId)).thenReturn(true);
 
-        Response<Device> result = sut.add(new Authorized<>("", new AddDeviceModel()));
+        Response<Device> result = sut.add(new Authorized<>(userId, new AddDeviceModel(deviceId, "")));
 
         assertEquals(NOT_ALLOWED, result.getStatus());
         verify(deviceRepository, never()).update(any(AddDeviceModel.class));
@@ -81,7 +85,6 @@ public class DeviceServiceImplTest {
     @Test
     public void addUnauthorized() {
         when(deviceRepository.getById(any())).thenReturn(new Device());
-        when(authService.userHasDevice("", "")).thenReturn(false);
         when(deviceRepository.hasUser(any())).thenReturn(true);
 
         Response<Device> result = sut.add(new Authorized<>("", new AddDeviceModel()));
@@ -94,17 +97,13 @@ public class DeviceServiceImplTest {
     public void addSuccess() {
         Device expected = new Device("id", "name", "user");
         AddDeviceModel model = new AddDeviceModel(expected.getDeviceId(), expected.getName());
-        when(deviceRepository.getById(any())).thenReturn(expected);
-        when(authService.userHasDevice(any(), any())).thenReturn(false);
-        when(deviceRepository.hasUser(any())).thenReturn(false);
+        when(deviceRepository.getById(expected.getDeviceId())).thenReturn(new Device());
         when(deviceRepository.update(model)).thenReturn(expected);
 
         Response<Device> result = sut.add(new Authorized<>(expected.getUserId(), model));
 
         assertEquals(SUCCESS, result.getStatus());
-        assertEquals(expected.getDeviceId(), result.getModel().getDeviceId());
-        assertEquals(expected.getUserId(), result.getModel().getUserId());
-        assertEquals(expected.getName(), result.getModel().getName());
+        assertEquals(expected, result.getModel());
         assertEquals(expected.getUserId(), model.getUserId());
 
         verify(deviceRepository, times(1)).update(any(AddDeviceModel.class));
@@ -130,9 +129,11 @@ public class DeviceServiceImplTest {
 
     @Test
     public void updateNotFound() {
-        when(deviceRepository.exists(any())).thenReturn(false);
+        String deviceId = "device";
+        when(deviceRepository.exists(any())).thenReturn(true);
+        when(deviceRepository.exists(deviceId)).thenReturn(false);
 
-        Response<Device> result = sut.update(new Authorized<>("", new UpdateDeviceModel()));
+        Response<Device> result = sut.update(new Authorized<>("", new UpdateDeviceModel(deviceId, "")));
 
         assertEquals(NOT_FOUND, result.getStatus());
         verify(deviceRepository, never()).update(any(UpdateDeviceModel.class));
@@ -153,16 +154,14 @@ public class DeviceServiceImplTest {
     public void updateSuccess() {
         Device expected = new Device("id", "name", "userId");
         UpdateDeviceModel model = new UpdateDeviceModel(expected.getDeviceId(), expected.getName());
-        when(deviceRepository.exists(any())).thenReturn(true);
-        when(authService.userHasDevice(any(), any())).thenReturn(true);
+        when(deviceRepository.exists(expected.getDeviceId())).thenReturn(true);
+        when(authService.userHasDevice(expected.getUserId(), expected.getDeviceId())).thenReturn(true);
         when(deviceRepository.update(model)).thenReturn(expected);
 
         Response<Device> result = sut.update(new Authorized<>(expected.getUserId(), model));
 
         assertEquals(SUCCESS, result.getStatus());
-        assertEquals(expected.getDeviceId(), result.getModel().getDeviceId());
-        assertEquals(expected.getName(), result.getModel().getName());
-        assertEquals(expected.getUserId(), result.getModel().getUserId());
+        assertEquals(expected, result.getModel());
 
         verify(deviceRepository, times(1)).update(any(UpdateDeviceModel.class));
     }
@@ -204,6 +203,46 @@ public class DeviceServiceImplTest {
         assertEquals(SUCCESS, result.getStatus());
         assertEquals(sorted, result.getModel());
         verify(deviceRepository, times(1)).getAllByUserId(userId);
+    }
+
+    @Test(expected = Exception.class)
+    public void getByIdNullRequest() {
+        sut.getById(null);
+    }
+
+    @Test
+    public void getByIdNotFound() {
+        when(deviceRepository.exists(any())).thenReturn(false);
+
+        Response<Device> result = sut.getById(new Authorized<>("", ""));
+
+        assertEquals(NOT_FOUND, result.getStatus());
+        assertNull(result.getModel());
+    }
+
+    @Test
+    public void getByIdUnauthorized() {
+        String deviceId = "id";
+        when(deviceRepository.exists(deviceId)).thenReturn(true);
+        when(authService.userHasDevice(any(), any())).thenReturn(false);
+
+        Response<Device> result = sut.getById(new Authorized<>("", deviceId));
+
+        assertEquals(UNAUTHORIZED, result.getStatus());
+        assertNull(result.getModel());
+    }
+
+    @Test
+    public void getByIdSuccess() {
+        Device expected = new Device("id", "name", "user1");
+        when(deviceRepository.exists(expected.getDeviceId())).thenReturn(true);
+        when(authService.userHasDevice(expected.getUserId(), expected.getDeviceId())).thenReturn(true);
+        when(deviceRepository.getById(expected.getDeviceId())).thenReturn(expected);
+
+        Response<Device> result = sut.getById(new Authorized<>(expected.getUserId(), expected.getDeviceId()));
+
+        assertEquals(SUCCESS, result.getStatus());
+        assertEquals(expected, result.getModel());
     }
 
     

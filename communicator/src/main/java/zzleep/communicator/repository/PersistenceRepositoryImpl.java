@@ -23,7 +23,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
     private static final String JOIN_PREFERENCES = "join datamodels.preferences on co2 < preferences.co2max " +
                                                     "AND humidity between humiditymin and humiditymax " +
                                                     "AND temperature between temperaturemin and temperaturemax";
-    private static final String JOIN_ACTIVE_VENTILATION ="join datamodels.activeventilation on preferences.deviceid = activeventilation.deviceid";
+    private static final String JOIN_ACTIVE_VENTILATION ="full join datamodels.activeventilation on preferences.deviceid = activeventilation.deviceid";
 
     private static final String COL_ACTIVES_ID ="activesleeps.sleepid";
     private static final String COL_SLEEP_ID = "sleepid";
@@ -117,7 +117,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
             String sleepId = context.single(SLEEP_TABLE, String.format("%s = '%s' and %s is null", COL_DEVICE_ID,id,COL_TIMESTAMP ), SLEEP_ID_EXTRACTOR);
             if(sleepId != null)
             {
-                List<String> sleepIdsForGoodRoomConditions = context.select(ROOM_C_TABLE + " "+JOIN_PREFERENCES, String.format("%s = %s and %s > now() - '15 minutes'::interval", COL_SLEEP_ID, sleepId, COL_TIMESTAMP), SLEEP_ID_EXTRACTOR);
+                List<String> sleepIdsForGoodRoomConditions = context.select(ROOM_C_TABLE + " "+JOIN_PREFERENCES, String.format("%s = %s and %s.%s ='%s' and %s > now() - '15 minutes'::interval", COL_SLEEP_ID, sleepId,PREFERENCE_TABLE, COL_DEVICE_ID, id,  COL_TIMESTAMP), SLEEP_ID_EXTRACTOR);
 
                 if(sleepIdsForGoodRoomConditions.size()>3)
                 {
@@ -138,10 +138,10 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         List<String> deviceIds = context.select(PREFERENCE_TABLE +" "+ JOIN_ACTIVE_VENTILATION, String.format("%s is true and %s.%s not in (select %s from %s)", COL_REGULATION_ENABLE, PREFERENCE_TABLE, COL_DEVICE_ID, COL_DEVICE_ID, ACTIVE_VENTILATION_TABLE), DEVICE_ID_EXTRACTOR);
 
         for (String id: deviceIds) {
-           String sleepId = context.single(SLEEP_TABLE, String.format("%s = '%s' and %s is null", COL_DEVICE_ID,id,COL_TIMESTAMP ), SLEEP_ID_EXTRACTOR);
+           String sleepId = context.single(SLEEP_TABLE, String.format("%s = '%s' and %s is null", COL_DEVICE_ID,id,COL_FINISH_TIME ), SLEEP_ID_EXTRACTOR);
            if(sleepId != null)
            {
-               List<String> sleepIdsForGoodRoomConditions = context.select(ROOM_C_TABLE + " "+JOIN_PREFERENCES, String.format("%s = %s and %s > now() - '15 minutes'::interval", COL_SLEEP_ID, sleepId, COL_TIMESTAMP), SLEEP_ID_EXTRACTOR);
+               List<String> sleepIdsForGoodRoomConditions = context.select(ROOM_C_TABLE + " "+JOIN_PREFERENCES, String.format("%s = %s and %s.%s ='%s' and %s > now() - '15 minutes'::interval", COL_SLEEP_ID, sleepId,PREFERENCE_TABLE, COL_DEVICE_ID, id,  COL_TIMESTAMP), SLEEP_ID_EXTRACTOR);
 
                if(sleepIdsForGoodRoomConditions.size()<3)
                {

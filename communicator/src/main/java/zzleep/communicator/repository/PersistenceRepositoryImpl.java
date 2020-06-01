@@ -117,7 +117,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
             String sleepId = context.single(SLEEP_TABLE, String.format("%s = '%s' and %s is null", COL_DEVICE_ID,id,COL_TIMESTAMP ), SLEEP_ID_EXTRACTOR);
             if(sleepId != null)
             {
-                List<String> sleepIdsForGoodRoomConditions = context.select(ROOM_C_TABLE + " "+JOIN_PREFERENCES, String.format("%s = %s and %s > now() - '15 minutes'::interval", COL_SLEEP_ID, sleepId, COL_TIMESTAMP), SLEEP_ID_EXTRACTOR);
+                List<String> sleepIdsForGoodRoomConditions = context.select(ROOM_C_TABLE + " "+JOIN_PREFERENCES, String.format("%s = %s and %s.%s ='%s' and %s > now() - '15 minutes'::interval", COL_SLEEP_ID, sleepId,PREFERENCE_TABLE, COL_DEVICE_ID, id,  COL_TIMESTAMP), SLEEP_ID_EXTRACTOR);
 
                 if(sleepIdsForGoodRoomConditions.size()>3)
                 {
@@ -141,7 +141,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
            String sleepId = context.single(SLEEP_TABLE, String.format("%s = '%s' and %s is null", COL_DEVICE_ID,id,COL_FINISH_TIME ), SLEEP_ID_EXTRACTOR);
            if(sleepId != null)
            {
-               List<String> sleepIdsForGoodRoomConditions = context.select(ROOM_C_TABLE + " "+JOIN_PREFERENCES, String.format("%s = %s and %s > now() - '15 minutes'::interval", COL_SLEEP_ID, sleepId, COL_TIMESTAMP), SLEEP_ID_EXTRACTOR);
+               List<String> sleepIdsForGoodRoomConditions = context.select(ROOM_C_TABLE + " "+JOIN_PREFERENCES, String.format("%s = %s and %s.%s ='%s' and %s > now() - '15 minutes'::interval", COL_SLEEP_ID, sleepId,PREFERENCE_TABLE, COL_DEVICE_ID, id,  COL_TIMESTAMP), SLEEP_ID_EXTRACTOR);
 
                if(sleepIdsForGoodRoomConditions.size()<3)
                {

@@ -15,5 +15,7 @@ public interface DeviceRepository {
     List<Device> getAllByUserId(String userId);
     Device getById(String deviceId);
     boolean hasUser(String deviceId);
+    boolean exists(String deviceId);
+    List<String> getAllAvailableIds();
 
 }

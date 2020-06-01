@@ -10,83 +10,66 @@ import zzleep.communicator.models.DownLinkMessage;
 import zzleep.communicator.models.UpLinkMessage;
 
 import org.springframework.stereotype.Component;
+import zzleep.communicator.network.fakeNetwork.Proxy;
+import zzleep.communicator.network.WebSocketHandler;
 import zzleep.communicator.repository.PersistenceRepository;
 
-
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.WebSocket;
-import java.net.http.WebSocket.Listener;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
+
+import java.util.Random;
 import java.util.TimeZone;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
+
 
 import org.apache.commons.codec.binary.Hex;
+import zzleep.core.logging.Logger;
 
 @Component
-public class EmbeddedControllerImpl implements EmbeddedController, Listener {
+public class EmbeddedControllerImpl implements EmbeddedController{
 
     private PersistenceRepository repository;
-    private WebSocket socket;
+    private WebSocketHandler socketHandler;
     private final Gson gson = new Gson();
+    private final Logger logger;
 
-    public EmbeddedControllerImpl(PersistenceRepository dbService) {
+    public EmbeddedControllerImpl(PersistenceRepository dbService, Logger logger) {
         this.repository = dbService;
-
-
-        HttpClient client = HttpClient.newHttpClient();
-        CompletableFuture<WebSocket> ws = client.newWebSocketBuilder()
-                .buildAsync(URI.create("wss://iotnet.teracom.dk/app?token=vnoSwQAAABFpb3RuZXQudGVyYWNvbS5ka5CGv5WoQH5B19isf4NMr3s="), this);
-
-        this.socket = ws.join();
-    }
-
-    @Override
-    public void onError(WebSocket webSocket, Throwable error) {
-        System.out.println("A " + error.getCause() + " exception was thrown.");
-        System.out.println("Message: " + error.getLocalizedMessage());
-
-        HttpClient client = HttpClient.newHttpClient();
-        CompletableFuture<WebSocket> ws = client.newWebSocketBuilder()
-                .buildAsync(URI.create("wss://iotnet.teracom.dk/app?token=vnoSwQAAABFpb3RuZXQudGVyYWNvbS5ka5CGv5WoQH5B19isf4NMr3s="), this);
-
-        this.socket = ws.join();
-
-        webSocket.abort();
-        System.out.println("onError completed");
-    }
-
-    @Override
-    public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
-        System.out.println("WebSocket closed!");
-        System.out.println("Status:" + statusCode + " Reason: " + reason);
-
-        HttpClient client = HttpClient.newHttpClient();
-        CompletableFuture<WebSocket> ws = client.newWebSocketBuilder()
-                .buildAsync(URI.create("wss://iotnet.teracom.dk/app?token=vnoSwQAAABFpb3RuZXQudGVyYWNvbS5ka5CGv5WoQH5B19isf4NMr3s="), this);
-
-        this.socket = ws.join();
-
-        webSocket.abort();
-
-        return new CompletableFuture().completedFuture("onClose() completed.").thenAccept(System.out::println);
-    }
-
-
-    @Override
-    public void onOpen(WebSocket webSocket) {
-
-        webSocket.request(1);
-        System.out.println("WebSocket Listener has been opened for requests.");
+        this.logger = logger;
+        this.socketHandler = new Proxy(this::receiveData, logger);
         onStart();
+
+    }
+
+
+    @Override
+    public void send(Command command) {
+        logger.info(command.toString());
+        CharSequence charSequence = processCommand(command);
+        socketHandler.send(charSequence);
+
+    }
+
+
+    @Override
+    public void run() {
+
+        while (true) {
+            onProgress();
+            try {
+                Thread.sleep(5000);//5minN
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    @Override
+    public void receive(CurrentData data) {
+
+        repository.putDataInDatabase(data);
 
     }
 
@@ -109,66 +92,27 @@ public class EmbeddedControllerImpl implements EmbeddedController, Listener {
 
     }
 
-    //@Override
-    public void send(Command command) {
-        CharSequence charSequence = processCommand(command);
-        sendText(charSequence, true);
-
-    }
-
-    //@Override
-    public CompletableFuture<WebSocket> sendText(CharSequence data, boolean last) {
-
-        socket.sendText(data, true);
-        socket.request(1);
-
-        System.out.println("sentTest completed");
-
-        return new CompletableFuture().newIncompleteFuture().thenAccept(System.out::println);
-    }
-
-
-    @Override
-    public void run() {
-
-        while (true) {
-            onProgress();
-            try {
-                Thread.sleep(300000);//5min
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-    @Override
-    public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
-        System.out.println(data);
-        String s = data.toString();
+    private void receiveData(String s) {
         UpLinkMessage message = gson.fromJson(s, UpLinkMessage.class);
-        if(message.getCmd().equals("rx"))
-        {
-            CurrentData currentData = processData(data);
+        logger.info(message.toString());
+
+        if (message.getCmd().equals("rx")) {
+            CurrentData currentData = processData(message);
+            // TODO REMOVE THIS, ZOLLY ASKED FOR IT
+            if (message.getEUI().equals("fake_device1")) {
+               currentData.setTemperatureData(new Random().nextDouble() * 3 + 10);
+            }
+            logger.info(currentData.toString());
             receive(currentData);
+
+// TODO: 5/28/2020 eliminate after figuring out the webSocket framework
+            Command command = new Command("0004A30B002181EC", 'D', 1);
+            send(command);
         }
-
-        webSocket.request(1);
-        return new CompletableFuture().completedFuture("onText() completed.").thenAccept(System.out::println);
-    }
-
-    @Override
-    public void receive(CurrentData data) {
-
-        repository.putDataInDatabase(data);
-
     }
 
 
-    private CurrentData processData(CharSequence data) {
-        String messageString = data.toString();
-        UpLinkMessage message = gson.fromJson(messageString, UpLinkMessage.class);
-        System.out.println(message.toString());
+    private CurrentData processData(UpLinkMessage message) {
 
         //source
         CurrentData currentData = new CurrentData();
@@ -176,47 +120,37 @@ public class EmbeddedControllerImpl implements EmbeddedController, Listener {
 
         //timestamp
         long timestampS = message.getTs();
-
         LocalDateTime triggerTime =
-                LocalDateTime.ofInstant(Instant.ofEpochSecond(timestampS), TimeZone
+                LocalDateTime.ofInstant(Instant.ofEpochMilli(timestampS), TimeZone
                         .getDefault().toZoneId());
 
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formatted = formatter.format(triggerTime);
-        System.out.println(formatted);
-
-//
-//        Date date = new Date(timestampS);
-//        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC+02:00"));
-//        String formatted = format.format(date);
-//        System.out.println("First try of converting date");
-//        System.out.println(formatted);
-
 
         //data
         Iterable<String> result = Splitter.fixedLength(4).split(message.getData());
         String[] parts = Iterables.toArray(result, String.class);
 
-        String humSHex = parts[0];
-        String tempSHex = parts[1];
+        String tempSHex = parts[0];
+        String humSHex = parts[1];
+        if (parts.length==4) {
+            String co2Hex = parts[2];
+            String soundHex = parts[3];
+        }
 
-        int temp = Integer.parseInt(humSHex, 16);
-        int tempR = temp/10;
-        int hum = Integer.parseInt(tempSHex,16);
-        int humR = hum/10;
-        int co2 = 0;
-        int sound = 0;
-
+        int temp = Integer.parseInt(tempSHex, 16);
+        int tempR = temp / 10;
+        int hum = Integer.parseInt(humSHex, 16);
+        int humR = hum / 10;
+        int co2 = getRandomNumberInRange(400, 600);
+        int sound = getRandomNumberInRange(30, 60);
 
         currentData.setTimeStamp(formatted);
-        currentData.setHumidityData((double)humR);
-        currentData.setTemperatureData((double)tempR);
-        currentData.setCo2Data(250.0); // TODO: 5/21/2020  changes
-        currentData.setSoundData(50.0);
-        System.out.println(currentData.toString());
-
+        currentData.setHumidityData(humR);
+        currentData.setTemperatureData(tempR);
+        currentData.setCo2Data(co2); // TODO: 5/21/2020  changes
+        currentData.setSoundData(sound);
 
         return currentData;
     }
@@ -224,10 +158,8 @@ public class EmbeddedControllerImpl implements EmbeddedController, Listener {
 
     private CharSequence processCommand(Command command) {
 
-        //getCommand =  D
-        //getValue = 1
-        String data=""+command.getCommandID()+command.getValue();
-        String hex =  Hex.encodeHexString(data.getBytes());
+        String data = "" + command.getCommandID() + command.getValue();
+        String hex = Hex.encodeHexString(data.getBytes());
 
         DownLinkMessage message = new DownLinkMessage(command.getDestination(), true, hex);
         String json = gson.toJson(message);
@@ -235,5 +167,14 @@ public class EmbeddedControllerImpl implements EmbeddedController, Listener {
 
     }
 
+    private static int getRandomNumberInRange(int min, int max) {
+
+        if (min >= max) {
+            throw new IllegalArgumentException("max must be greater than min");
+        }
+
+        Random r = new Random();
+        return r.nextInt((max - min) + 1) + min;
+    }
 
 }

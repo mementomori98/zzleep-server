@@ -59,7 +59,7 @@ public class PostgresContext implements Context {
     @Override
     public <TType> List<TType> selectComplex(String table, String selector, String condition, String groupBy, ResultSetExtractor<TType> extractor) {
         try {
-            return select(String.format("select %s from %s where %s group by %s", selector, table, condition, groupBy), extractor);
+            return select(String.format("select %s from %s where %s %s", selector, table, condition, groupBy == null ? "" : "group by " + groupBy), extractor);
         }
         catch (Exception e) {
             logger.error(String.format("Error when selecting %s from %s where %s group by %s",

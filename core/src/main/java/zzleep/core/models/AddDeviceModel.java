@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiParam;
+import springfox.documentation.annotations.ApiIgnore;
 
 @ApiModel(description = "Holds the data necessary to add a device to a user")
 public class AddDeviceModel {
@@ -13,7 +15,7 @@ public class AddDeviceModel {
     @JsonProperty("deviceId")
     private String deviceId;
 
-    @ApiModelProperty(example = "user1")
+    @ApiModelProperty(example = "user1", hidden = true)
     @JsonSerialize
     @JsonProperty("userId")
     private String userId;

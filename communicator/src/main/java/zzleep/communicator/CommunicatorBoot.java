@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.TimeZone;
 
-
+import zzleep.core.etl.EtlProcess;
 @SpringBootApplication
 @ComponentScan("zzleep")
 public class CommunicatorBoot implements CommandLineRunner
@@ -36,30 +36,17 @@ public class CommunicatorBoot implements CommandLineRunner
 
     @Override
     public void run(String... args) throws Exception {
+        new Thread(new EtlProcess()).start();
         System.out.println("Hello World");
 
+//        CurrentData currentData0 = new CurrentData(230.0, 22.0, 48.0, 30.5, "0004A30B002181EC", "2020-05-27 12:09:36");
+//        embeddedController.receive(currentData0);
+//        CurrentData currentData = new CurrentData(230.0, 27.5, 48.0, 30.5, "0004A30B002181EC", "2020-05-27 11:40:36");
+//        embeddedController.receive(currentData);
+//        CurrentData currentData1 = new CurrentData(220.0, 28.0,47.0, 45, "0004A30B002181EC", "2020-05-27 11:41:45");
+//        embeddedController.receive(currentData1);
 
 
-        System.out.println("Date test:");
-        long seconds = 1590501769;
-
-
-
-
-//        //format.setTimeZone(TimeZone.getTimeZone("Etc/UTC")); // TODO: 5/21/2020 2020-05-21 09:03:22 instead of 11:03:22 check with UTC+02:00
-//        format.setTimeZone(TimeZone.getTimeZone("GMT+02:00"));
-//        String display0 = TimeZone.getTimeZone("Etc/UTC").getDisplayName();
-//        System.out.println("Display0: "+display0);
-//        String display = TimeZone.getTimeZone("Denmark/Copenhagen").getDisplayName();
-//        System.out.println("Display: " + display);
-//        String display2 = TimeZone.getTimeZone("Etc/UTC+02:00").getDisplayName();
-//        System.out.println("Display2: "+display2);
-//        //String formatted = format.format(date);
-//        System.out.println("Data conversion test:");
-//       // System.out.println(formatted);
-
-//        Command command = new Command("0004A30B002181EC", 'D', 1);
-//        embeddedController.send(command);
 
     }
 }

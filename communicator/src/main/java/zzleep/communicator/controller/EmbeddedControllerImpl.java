@@ -100,7 +100,7 @@ public class EmbeddedControllerImpl implements EmbeddedController{
             CurrentData currentData = processData(message);
             // TODO REMOVE THIS, ZOLLY ASKED FOR IT
             if (message.getEUI().equals("fake_device1")) {
-               currentData.setTemperatureData(new Random().nextDouble() * 3 + 10);
+               currentData.setTemperatureData(new Random().nextInt() * 3 + 10);
             }
             logger.info(currentData.toString());
             receive(currentData);
@@ -142,9 +142,9 @@ public class EmbeddedControllerImpl implements EmbeddedController{
         int temp = Integer.parseInt(tempSHex, 16);
         int tempR = temp / 10;
         int hum = Integer.parseInt(humSHex, 16);
-        int humR = hum / 10;
+        double humR = (double)hum / 10;
         int co2 = getRandomNumberInRange(400, 600);
-        int sound = getRandomNumberInRange(30, 60);
+        double sound = getRandomNumberInRange(30, 60);
 
         currentData.setTimeStamp(formatted);
         currentData.setHumidityData(humR);

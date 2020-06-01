@@ -2,8 +2,8 @@ package zzleep.communicator.models;
 
 public class CurrentData {
 
-    private double co2Data;
-    private double temperatureData;
+    private int co2Data;
+    private int temperatureData;
     private double humidityData;
     private double soundData;
     private String source;
@@ -20,7 +20,7 @@ public class CurrentData {
         this.timeStamp = "";
     }
 
-    public CurrentData(double co2Data, double temperatureData, double humidityData, double soundData, String source, String timeStamp) {
+    public CurrentData(int co2Data, int temperatureData, double humidityData, double soundData, String source, String timeStamp) {
         this.co2Data = co2Data;
         this.temperatureData = temperatureData;
         this.humidityData = humidityData;
@@ -29,19 +29,19 @@ public class CurrentData {
         this.timeStamp = timeStamp;
     }
 
-    public double getCo2Data() {
+    public int getCo2Data() {
         return co2Data;
     }
 
-    public void setCo2Data(double co2Data) {
+    public void setCo2Data(int co2Data) {
         this.co2Data = co2Data;
     }
 
-    public double getTemperatureData() {
+    public int getTemperatureData() {
         return temperatureData;
     }
 
-    public void setTemperatureData(double temperatureData) {
+    public void setTemperatureData(int temperatureData) {
         this.temperatureData = temperatureData;
     }
 

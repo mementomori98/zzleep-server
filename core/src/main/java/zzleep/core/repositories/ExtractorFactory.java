@@ -75,6 +75,10 @@ public class ExtractorFactory {
         row.getString(DatabaseConstants.DEVICE_COL_USER_ID)
     );
 
+    private static final Context.ResultSetExtractor<Integer> sleepIdExtractor = row-> row.getInt(DatabaseConstants.SLEEP_COL_SLEEP_ID);
+
+    private static final Context.ResultSetExtractor<String> deviceIdExtractor = row-> ""+row.getString(DatabaseConstants.DEVICE_COL_ID);
+
     public static Context.ResultSetExtractor<SleepSession> getSleepSessionExtractor() {
         return sleepSessionExtractor;
     }
@@ -105,5 +109,13 @@ public class ExtractorFactory {
 
     public static Context.ResultSetExtractor<AuthObject> getAuthObjectExtractor() {
         return authObjectExtractor;
+    }
+
+    public static Context.ResultSetExtractor<Integer> getSleepIdExtractor() {
+        return sleepIdExtractor;
+    }
+
+    public static Context.ResultSetExtractor<String> getDeviceIdExtractor() {
+        return deviceIdExtractor;
     }
 }

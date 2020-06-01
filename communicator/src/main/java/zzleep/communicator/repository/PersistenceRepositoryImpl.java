@@ -1,6 +1,8 @@
 package zzleep.communicator.repository;
 
-
+import zzleep.core.models.Sleep;
+import zzleep.core.repositories.DatabaseConstants;
+import zzleep.core.repositories.ExtractorFactory;
 import org.springframework.web.client.HttpClientErrorException;
 import zzleep.communicator.models.Command;
 import zzleep.communicator.models.CurrentData;
@@ -8,13 +10,14 @@ import org.springframework.stereotype.Component;
 import zzleep.core.logging.Logger;
 import zzleep.core.repositories.Context;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 
 
 @Component
 public class PersistenceRepositoryImpl implements PersistenceRepository {
-    private static final String SLEEP_TABLE = "datamodels.sleep";
+/*    private static final String SLEEP_TABLE = "datamodels.sleep";
     private static final String ACTIVE_SLEEP_TABLE ="datamodels.activesleeps";
     private static final String ROOM_C_TABLE = "datamodels.roomConditions";
     private static final String PREFERENCE_TABLE = "datamodels.preferences";
@@ -35,13 +38,14 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
     private static final String COL_HUMIDITY = "humidity";
     private static final String COL_FINISH_TIME = "datetimeend";
     private static final String JOIN_AS = "join datamodels.activesleeps on sleep.sleepid = activesleeps.sleepid ";
-    private static final String JOIN_EXCEPT = "left outer join datamodels.activesleeps on sleep.sleepid = activesleeps.sleepid";
+    private static final String LEFT_OUTER_JOIN = "left outer join datamodels.activesleeps on sleep.sleepid = activesleeps.sleepid";*/
+    private static final String LEFT_OUTER_JOIN_STRING = "%s left outer join %s on %s";
 
     private Context context;
     private Logger logger;
 
-    private static final Context.ResultSetExtractor<String> SLEEP_ID_EXTRACTOR = row-> ""+row.getInt(COL_SLEEP_ID);
-    private static final Context.ResultSetExtractor<String> DEVICE_ID_EXTRACTOR = row-> ""+row.getString(COL_DEVICE_ID);
+    private static final Context.ResultSetExtractor<Integer> sleepIdExtractor = ExtractorFactory.getSleepIdExtractor();
+    private static final Context.ResultSetExtractor<String> DEVICE_ID_EXTRACTOR = ExtractorFactory.getDeviceIdExtractor();
 
     public PersistenceRepositoryImpl(Context context, Logger logger)
     {
@@ -52,28 +56,48 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
     @Override
     public void putDataInDatabase(CurrentData data){
 
-        try
-        {
-            String sleepId = context.single(SLEEP_TABLE, String.format("%s is null and %s = %s",COL_FINISH_TIME, COL_DEVICE_ID,"'"+ data.getSource()+"'"), SLEEP_ID_EXTRACTOR);
+        Integer sleepId = getSleepId(data.getSource());
 
-            if(sleepId != null)
-            {
+        if(sleepId != null)
+            insertRoomConditions(data, sleepId);
+        else
+            logger.warn("Warning.SleepId is null");
+        //there was a try catch here with HTTpClientErrorException
+    }
 
-                String columns = COL_SLEEP_ID+", "+COL_TIMESTAMP+", "+COL_TEMPERATURE+", "+COL_CO2+", "+COL_SOUND+", "+COL_HUMIDITY;
-                String values = sleepId +", "+ "'"+data.getTimeStamp()+"'" +", "+data.getTemperatureData()+", "+data.getCo2Data()+", "+data.getSoundData()+", "+data.getHumidityData();
-                context.insert(ROOM_C_TABLE,columns, values, SLEEP_ID_EXTRACTOR);
-            }
-            else
-            {
-                logger.warn("Warning.SleepId is null");
-            }
+    private Integer getSleepId(String deviceId)
+    {
+        return context.single(
+                DatabaseConstants.SLEEP_TABLE_NAME,
+                String.format("%s is null and %s = '%s'",
+                        DatabaseConstants.SLEEP_COL_FINISH_TIME,
+                        DatabaseConstants.SLEEP_COL_DEVICE_ID,
+                        deviceId),
+                sleepIdExtractor
+        );
+    }
 
-        }catch(HttpClientErrorException e)
-        {
-            logger.error("You are trying to introduce invalid format data ");
-
-        }
-
+    private void insertRoomConditions(CurrentData data, int sleepId)
+    {
+        String columns = String.format(
+                "%s, %s, %s, %s, %s, %s",
+                DatabaseConstants.RC_COL_SLEEP_ID,
+                DatabaseConstants.RC_COL_TIME,
+                DatabaseConstants.RC_COL_TEMPERATURE,
+                DatabaseConstants.RC_COL_CO2,
+                DatabaseConstants.RC_COL_SOUND,
+                DatabaseConstants.RC_COL_HUMIDITY
+        );
+        String values = String.format(
+                "%d, '%s', %d, %d, %.2f, %.2f",
+                sleepId,
+                data.getTimeStamp(),
+                data.getTemperatureData(),
+                data.getCo2Data(),
+                data.getSoundData(),
+                data.getHumidityData()
+        );
+        context.insert(DatabaseConstants.RC_TABLE_NAME,columns, values, sleepIdExtractor);
     }
 
     @Override
@@ -110,7 +134,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
     ArrayList<String> getStopVentilation() {
 
 
-        ArrayList<String> sources = new ArrayList<>();
+        /*ArrayList<String> sources = new ArrayList<>();
         List<String> deviceIds = context.select(PREFERENCE_TABLE +" "+ JOIN_ACTIVE_VENTILATION, String.format("%s is true and %s.%s in (select %s from %s)", COL_REGULATION_ENABLE, PREFERENCE_TABLE, COL_DEVICE_ID, COL_DEVICE_ID, ACTIVE_VENTILATION_TABLE), DEVICE_ID_EXTRACTOR);
 
         for (String id: deviceIds) {
@@ -128,13 +152,25 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
 
         }
 
-        return sources;
-
+        return sources;*/
+return null;
     }
 
     ArrayList<String> getStartVentilation() {
 
-        ArrayList<String> sources = new ArrayList<>();
+        List<Sleep> sleeps = getActiveSleepsWhereRegulationIsEnabled();
+        ArrayList<String> deviceIdsToRegulate = new ArrayList<>();
+
+        for(int i = 0; i < sleeps.size(); ++i)
+        {
+            if(needsRegulations(sleeps.get(i).getSleepId()))
+            {
+                deviceIdsToRegulate.add(sleeps.get(i).getDeviceId());
+                context.insert(DatabaseConstants.ACTIVE_VENTILATION_TABLE, DatabaseConstants.ACTIVE_VENTILATION_COL_DEVICE_ID, sleeps.get(i).getDeviceId(), DEVICE_ID_EXTRACTOR);
+            }
+        }
+        return deviceIdsToRegulate;
+        /*ArrayList<String> sources = new ArrayList<>();
         List<String> deviceIds = context.select(PREFERENCE_TABLE +" "+ JOIN_ACTIVE_VENTILATION, String.format("%s is true and %s.%s not in (select %s from %s)", COL_REGULATION_ENABLE, PREFERENCE_TABLE, COL_DEVICE_ID, COL_DEVICE_ID, ACTIVE_VENTILATION_TABLE), DEVICE_ID_EXTRACTOR);
 
         for (String id: deviceIds) {
@@ -152,82 +188,154 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
 
         }
 
-        return sources;
+        return sources;*/
+    }
+
+    private boolean needsRegulations(int sleepId)
+    {
+        String bigJoinTable = String.format(
+                "%s join %s on %s.%s = %s.%s join %s on %s.%s = %s.%s",
+                DatabaseConstants.RC_TABLE_NAME,
+                DatabaseConstants.SLEEP_TABLE_NAME,
+                DatabaseConstants.RC_TABLE_NAME,
+                DatabaseConstants.RC_COL_SLEEP_ID,
+                DatabaseConstants.SLEEP_TABLE_NAME,
+                DatabaseConstants.SLEEP_COL_SLEEP_ID,
+                DatabaseConstants.PREFERENCES_TABLE_NAME,
+                DatabaseConstants.PREFERENCES_TABLE_NAME,
+                DatabaseConstants.PREFERENCES_COL_DEVICE_ID,
+                DatabaseConstants.SLEEP_TABLE_NAME,
+                DatabaseConstants.SLEEP_COL_DEVICE_ID
+         );
+        //String activeSleepsQuery = String.format("select %s from %s", DatabaseConstants.ACTIVE_SLEEPS_COL_SLEEP_ID, DatabaseConstants.ACTIVE_SLEEPS_TABLE);
+        String condition = String.format(
+                "%s.%s < %s.%s and %s.%s > %s.%s and %s.%s < %s.%s and %s.%s > %s.%s and %s.%s < %s.%s and %s.%s > now - '15 minutes'::interval and %s.%s = %d",
+                DatabaseConstants.RC_TABLE_NAME,
+                DatabaseConstants.RC_COL_CO2,
+                DatabaseConstants.PREFERENCES_TABLE_NAME,
+                DatabaseConstants.PREFERENCES_COL_CO2_MAX,
+                DatabaseConstants.RC_TABLE_NAME,
+                DatabaseConstants.RC_COL_HUMIDITY,
+                DatabaseConstants.PREFERENCES_TABLE_NAME,
+                DatabaseConstants.PREFERENCES_COL_HUMIDITY_MIN,
+                DatabaseConstants.RC_TABLE_NAME,
+                DatabaseConstants.RC_COL_HUMIDITY,
+                DatabaseConstants.PREFERENCES_TABLE_NAME,
+                DatabaseConstants.PREFERENCES_COL_HUMIDITY_MAX,
+                DatabaseConstants.RC_TABLE_NAME,
+                DatabaseConstants.RC_COL_TEMPERATURE,
+                DatabaseConstants.PREFERENCES_TABLE_NAME,
+                DatabaseConstants.PREFERENCES_COL_TEMPERATURE_MIN,
+                DatabaseConstants.RC_TABLE_NAME,
+                DatabaseConstants.RC_COL_TEMPERATURE,
+                DatabaseConstants.PREFERENCES_TABLE_NAME,
+                DatabaseConstants.PREFERENCES_COL_TEMPERATURE_MAX,
+                DatabaseConstants.RC_COL_TIME,
+                DatabaseConstants.SLEEP_TABLE_NAME,
+                DatabaseConstants.SLEEP_COL_SLEEP_ID,
+                sleepId
+        );
+        if(context.select(bigJoinTable,
+                condition,
+                sleepIdExtractor).size() < 3) return true;
+        return false;
+    }
+
+    private List<Sleep> getActiveSleepsWhereRegulationIsEnabled()
+    {
+        String regulationEnabledDeviceId = String.format("select %s from %s where %s is true",
+                DatabaseConstants.PREFERENCES_COL_DEVICE_ID,
+                DatabaseConstants.PREFERENCES_TABLE_NAME,
+                DatabaseConstants.PREFERENCES_COL_REGULATIONS_ENABLED);
+        String activeSleepsIds = String.format("select %s from %s", DatabaseConstants.ACTIVE_SLEEPS_COL_SLEEP_ID, DatabaseConstants.ACTIVE_SLEEPS_TABLE);
+        String condition = String.format(
+                "%s in (%s) and %s in (%s)",
+                DatabaseConstants.SLEEP_COL_SLEEP_ID,
+                activeSleepsIds,
+                DatabaseConstants.SLEEP_COL_DEVICE_ID,
+                regulationEnabledDeviceId
+        );
+        return context.select(
+                DatabaseConstants.SLEEP_TABLE_NAME,
+                condition,
+                ExtractorFactory.getSleepExtractor()
+                );
     }
 
     ArrayList<String> getStoppedSleeps() {
 
-        List<String> sleepIds = context.select(SLEEP_TABLE +" "+ JOIN_AS, String.format("%s is not null", COL_FINISH_TIME), SLEEP_ID_EXTRACTOR);
-        for (String sleepId:sleepIds) {
-
-            context.delete(ACTIVE_SLEEP_TABLE, String.format("%s = %s", COL_SLEEP_ID, sleepId));
-
-        }
-
-        ArrayList<String> sources = getSources(sleepIds);
-
-        // TODO: 5/27/2020 Tell embedded that DO stops also ventilation if on 
-        for (String source:sources) {
-            context.delete(ACTIVE_VENTILATION_TABLE, String.format("%s ='%s'", COL_DEVICE_ID, source));
-        }
-        return sources;
+        List<Sleep> sleeps = getFinishedSleeps();
+        removeFromActiveSleeps(sleeps);
+        ArrayList<String> deviceIds = getDeviceIds(sleeps);
+        removeVentilationFromDatabase(deviceIds);
+        return deviceIds;
     }
 
+    private List<Sleep> getFinishedSleeps()
+    {
+        String selectFromActiveSleeps = String.format(
+                "select %s from %s",
+                DatabaseConstants.ACTIVE_SLEEPS_COL_SLEEP_ID,
+                DatabaseConstants.ACTIVE_SLEEPS_TABLE);
 
+        String condition = String.format(
+                "%s is not null and %s in (%s)",
+                DatabaseConstants.SLEEP_COL_FINISH_TIME,
+                DatabaseConstants.SLEEP_COL_SLEEP_ID,
+                selectFromActiveSleeps);
+        return context.select(DatabaseConstants.SLEEP_TABLE_NAME, condition, ExtractorFactory.getSleepExtractor());
+    }
+
+    private void removeFromActiveSleeps(List<Sleep> sleeps)
+    {
+        for(int i = 0; i < sleeps.size(); ++i)
+            context.delete(DatabaseConstants.ACTIVE_SLEEPS_TABLE, String.format("%s = %d", DatabaseConstants.ACTIVE_SLEEPS_COL_SLEEP_ID, sleeps.get(i).getSleepId()));
+    }
+
+    private void removeVentilationFromDatabase(List<String> deviceIds)
+    {
+        for(int i = 0; i < deviceIds.size(); ++i)
+            context.delete(DatabaseConstants.ACTIVE_VENTILATION_TABLE, String.format("%s ='%s'", DatabaseConstants.ACTIVE_VENTILATION_COL_DEVICE_ID, deviceIds));
+    }
 
     ArrayList<String> getActiveSleeps() {
-
-        List<String> sleepIds = context.selectExcept(SLEEP_TABLE +" "+JOIN_EXCEPT, String.format("%s is null", COL_FINISH_TIME),
-                SLEEP_TABLE +" "+ JOIN_EXCEPT, String.format("%s is not null ", COL_ACTIVES_ID), SLEEP_ID_EXTRACTOR);
-
-        for (String sleepId:sleepIds) {
-            context.insert(ACTIVE_SLEEP_TABLE, COL_SLEEP_ID, sleepId, SLEEP_ID_EXTRACTOR);
-        }
-        return getSources(sleepIds);
+        List<Sleep> newSleeps = getNewSleeps();
+        insertNewSleepsInActiveSleeps(newSleeps);
+        return getDeviceIds(newSleeps);
     }
 
-    ArrayList<String> getSources(List<String> sleepIds) {
-        ArrayList<String> sources = new ArrayList<>();
+    private List<Sleep> getNewSleeps()
+    {
+        String selectFromActiveSleeps = String.format(
+                "select %s from %s",
+                DatabaseConstants.ACTIVE_SLEEPS_COL_SLEEP_ID,
+                DatabaseConstants.ACTIVE_SLEEPS_TABLE);
 
-        for (String sleepId:sleepIds) {
-
-            if(isInteger(sleepId))
-            {
-                try{
-                    String deviceId = context.single(SLEEP_TABLE, String.format("%s = %s", COL_SLEEP_ID, sleepId), DEVICE_ID_EXTRACTOR);
-                    if (deviceId!=null)
-                    {
-                        sources.add(deviceId);
-
-                    }
-                }catch(HttpClientErrorException e)
-                {
-                    logger.error("You are trying to retrieve a device for a non existing or incorrect format of sleepId");
-
-                }
-            }
-
-
-        }
-
-
-        return sources;
+        String condition = String.format(
+                "%s is null and %s not in (%s)",
+                DatabaseConstants.SLEEP_COL_FINISH_TIME,
+                DatabaseConstants.SLEEP_COL_SLEEP_ID,
+                selectFromActiveSleeps);
+        return context.select(DatabaseConstants.SLEEP_TABLE_NAME, condition, ExtractorFactory.getSleepExtractor());
     }
 
-
-    public static boolean isInteger(String s) {
-        return isInteger(s,10);
+    private void insertNewSleepsInActiveSleeps(List<Sleep> sleeps)
+    {
+        for(int i = 0; i < sleeps.size(); ++i)
+        {
+            context.insert(
+                    DatabaseConstants.ACTIVE_SLEEPS_TABLE,
+                    DatabaseConstants.ACTIVE_SLEEPS_COL_SLEEP_ID,
+                    "" + sleeps.get(i).getSleepId(),
+                    sleepIdExtractor);
+        }
     }
 
-    public static boolean isInteger(String s, int radix) {
-        if(s.isEmpty()) return false;
-        for(int i = 0; i < s.length(); i++) {
-            if(i == 0 && s.charAt(i) == '-') {
-                if(s.length() == 1) return false;
-                else continue;
-            }
-            if(Character.digit(s.charAt(i),radix) < 0) return false;
-        }
-        return true;
+    private ArrayList<String> getDeviceIds(List<Sleep> sleeps)
+    {
+        ArrayList<String> deviceIds = new ArrayList<>();
+        for(int i = 0; i < sleeps.size(); ++i)
+            deviceIds.add(sleeps.get(i).getDeviceId());
+        return deviceIds;
     }
 }

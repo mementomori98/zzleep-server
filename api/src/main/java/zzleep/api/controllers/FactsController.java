@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import zzleep.core.logging.Logger;
 import zzleep.core.models.Fact;
-import zzleep.core.repositories.FactRepository;
+
+import zzleep.core.services.Authorized;
+import zzleep.core.services.FactService;
 
 import java.util.List;
 
@@ -20,12 +21,12 @@ import java.util.List;
 @Api(tags = {"Facts"}, description = " ")
 public class FactsController extends ControllerBase {
 
-    private final FactRepository factRepository;
-    private final Logger logger;
+    private final FactService factService;
 
-    public FactsController(FactRepository factRepository, Logger logger) {
-        this.factRepository = factRepository;
-        this.logger = logger;
+
+    public FactsController(FactService factService) {
+        this.factService = factService;
+
     }
 
     @ApiOperation(value = "Get a random fact", response = Fact.class)
@@ -35,7 +36,7 @@ public class FactsController extends ControllerBase {
     @GetMapping("/random")
     public ResponseEntity<Fact> getFact(@RequestParam(name = "previousFactId", defaultValue = "-1") int factId)
     {
-        return success(factRepository.get(factId));
+        return map(factService.getFact(new Authorized<>(userId(),factId)));
     }
 
     @ApiOperation(value = "Get all facts", response = Fact[].class)
@@ -44,7 +45,7 @@ public class FactsController extends ControllerBase {
     })
     @GetMapping
     public ResponseEntity<List<Fact>> getAll() {
-        return success(factRepository.getAll());
+        return map(factService.getAll(new Authorized<>(userId())));
     }
 
 }

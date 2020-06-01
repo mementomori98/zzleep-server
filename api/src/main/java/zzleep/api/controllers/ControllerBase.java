@@ -76,6 +76,8 @@ public abstract class ControllerBase {
                 return custom(406);
             case NOT_FOUND:
                 return custom(404);
+            case CONFLICT:
+                return custom(409);
             default:
                 return custom(500);
         }

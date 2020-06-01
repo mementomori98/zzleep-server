@@ -25,6 +25,14 @@ public class AddDeviceModel {
     @JsonProperty("name")
     private String name;
 
+    public AddDeviceModel() {
+    }
+
+    public AddDeviceModel(String deviceId, String name) {
+        this.deviceId = deviceId;
+        this.name = name;
+    }
+
     public String getDeviceId() {
         return deviceId;
     }

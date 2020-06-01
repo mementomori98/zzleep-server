@@ -34,9 +34,8 @@ public class DeviceServiceImpl extends ServiceBase implements DeviceService {
     public Response<Device> add(Authorized<AddDeviceModel> request) {
         AddDeviceModel model = request.getModel();
         model.setUserId(request.getUserId());
-        Device device = deviceRepository.getById(model.getDeviceId());
 
-        if (device == null) return notFound();
+        if (!deviceRepository.exists(model.getDeviceId())) return notFound();
         if (authService.userHasDevice(request.getUserId(), model.getDeviceId())) return notAllowed();
         if (deviceRepository.hasUser(model.getDeviceId())) return unauthorized();
 

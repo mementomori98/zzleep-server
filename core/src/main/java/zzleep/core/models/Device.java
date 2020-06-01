@@ -23,6 +23,9 @@ public final class Device {
     @JsonProperty("userId")
     private String userId;
 
+    public Device() {
+    }
+
     public Device(String deviceId, String name, String userId) {
         this.deviceId = deviceId;
         this.name = name;

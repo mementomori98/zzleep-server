@@ -7,21 +7,27 @@ import zzleep.core.models.RemoveDeviceModel;
 import zzleep.core.models.UpdateDeviceModel;
 import zzleep.core.repositories.AuthorizationService;
 import zzleep.core.repositories.DeviceRepository;
+import zzleep.core.repositories.SleepRepository;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class DeviceServiceImpl extends ServiceBase implements DeviceService {
 
     private final DeviceRepository deviceRepository;
     private final AuthorizationService authService;
+    private final SleepRepository sleepRepository;
 
     public DeviceServiceImpl(
         DeviceRepository deviceRepository,
-        AuthorizationService authService
+        AuthorizationService authService,
+        SleepRepository sleepRepository
     ) {
         this.deviceRepository = deviceRepository;
         this.authService = authService;
+        this.sleepRepository = sleepRepository;
     }
 
     @Override
@@ -55,6 +61,9 @@ public class DeviceServiceImpl extends ServiceBase implements DeviceService {
     public Response<List<Device>> getAllByUser(Authorized<Void> request) {
         return success(
             deviceRepository.getAllByUserId(request.getUserId())
+                .stream()
+                .sorted(Comparator.comparing(Device::getName))
+                .collect(Collectors.toList())
         );
     }
 
@@ -77,6 +86,7 @@ public class DeviceServiceImpl extends ServiceBase implements DeviceService {
         if (!deviceRepository.exists(deviceId)) return notFound();
         if (!authService.userHasDevice(request.getUserId(), deviceId)) return unauthorized();
 
+        if (sleepRepository.isTracking(deviceId)) sleepRepository.stopTracking(deviceId);
         deviceRepository.update(new RemoveDeviceModel(deviceId));
         return success();
     }
@@ -84,7 +94,9 @@ public class DeviceServiceImpl extends ServiceBase implements DeviceService {
     @Override
     public Response<List<String>> getAllAvailable() {
         return success(
-            deviceRepository.getAllAvailableIds()
+            deviceRepository.getAllAvailableIds().stream()
+                .sorted()
+                .collect(Collectors.toList())
         );
     }
 }

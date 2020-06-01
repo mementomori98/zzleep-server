@@ -24,7 +24,7 @@ public class ReportServiceImpl extends ServiceBase implements ReportService{
         GetIntervalReportModel model = request.getModel();
         IntervalReport report = warehouseRepository.getReport(model.getDeviceId(), new Interval(model.getStart(),model.getEnd()));
 
-        if (authorizationService.userHasDevice(request.getUserId(), model.getDeviceId())) return notAllowed();
+        if (!authorizationService.userHasDevice(request.getUserId(), model.getDeviceId())) return unauthorized();
 
         return success(report);
     }
@@ -34,7 +34,7 @@ public class ReportServiceImpl extends ServiceBase implements ReportService{
 
         String userId = request.getUserId();
         Integer sleepId = request.getModel();
-        if(!authorizationService.userHasSleep(userId,sleepId)) return notAllowed();
+        if(!authorizationService.userHasSleep(userId,sleepId)) return unauthorized();
 
         SleepData data = warehouseRepository.getSleepData(request.getModel());
 
@@ -44,7 +44,7 @@ public class ReportServiceImpl extends ServiceBase implements ReportService{
     @Override
     public Response<IdealRoomConditions> getIdealRoomConditions(Authorized<String> request) {
 
-        if(!authorizationService.userHasDevice(request.getUserId(), request.getModel())) return notAllowed();
+        if(!authorizationService.userHasDevice(request.getUserId(), request.getModel())) return unauthorized();
 
         return success(warehouseRepository.getIdealRoomCondition(request.getModel()));
     }

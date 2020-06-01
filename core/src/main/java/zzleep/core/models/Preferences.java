@@ -1,5 +1,6 @@
 package zzleep.core.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModel;
@@ -83,6 +84,7 @@ public final class Preferences {
         return temperatureMax;
     }
 
+    @JsonIgnore
     public boolean isValid() {
         return temperatureMin > temperatureMax ||
             humidityMin > humidityMax;

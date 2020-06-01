@@ -43,7 +43,7 @@ public class PreferencesController extends ControllerBase {
         @ApiResponse(code = 403, message = "The user does not own a device with this ID")
     })
     @PutMapping
-    public ResponseEntity<Preferences> updateAccount(@RequestBody Preferences model) {
+    public ResponseEntity<Preferences> updatePreferences(@RequestBody Preferences model) {
         if (!authService.userHasDevice(userId(), model.getDeviceId())) return forbidden();
         try {
             Preferences preferences = preferencesRepository.setPreferences(model);

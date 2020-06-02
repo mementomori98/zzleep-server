@@ -10,18 +10,17 @@ import zzleep.core.logging.Logger;
 import zzleep.core.models.Preferences;
 import zzleep.core.repositories.AuthorizationService;
 import zzleep.core.repositories.PreferencesRepository;
+import zzleep.core.services.Authorized;
+import zzleep.core.services.PreferencesService;
 
 @RestController
 @RequestMapping("/api/preferences")
 @Api(tags = {"Preferences"}, description = " ")
 public class PreferencesController extends ControllerBase {
+    private final PreferencesService preferencesService;
 
-    private final PreferencesRepository preferencesRepository;
-    private final AuthorizationService authService;
-
-    public PreferencesController(PreferencesRepository preferencesRepository, Logger logger, AuthorizationService authService) {
-        this.preferencesRepository = preferencesRepository;
-        this.authService = authService;
+    public PreferencesController(PreferencesService preferencesService){
+        this.preferencesService = preferencesService;
     }
 
     @ApiOperation(value = "Get current preferences", response = Preferences.class)
@@ -31,9 +30,7 @@ public class PreferencesController extends ControllerBase {
     })
     @GetMapping("/{deviceId}")
     public ResponseEntity<Preferences> getPreferences(@PathVariable(name = "deviceId") String deviceId) {
-        if (!authService.userHasDevice(userId(), deviceId)) return forbidden();
-        Preferences preferences = preferencesRepository.getPreferences(deviceId);
-        return successOrNotFound(preferences);
+        return map(preferencesService.getByDeviceId( new Authorized<>(userId(), deviceId)));
     }
 
     @ApiOperation(value = "Update user preferences")
@@ -44,12 +41,6 @@ public class PreferencesController extends ControllerBase {
     })
     @PutMapping
     public ResponseEntity<Preferences> updatePreferences(@RequestBody Preferences model) {
-        if (!authService.userHasDevice(userId(), model.getDeviceId())) return forbidden();
-        try {
-            Preferences preferences = preferencesRepository.setPreferences(model);
-            return successOrNotFound(preferences);
-        } catch (PreferencesRepository.InvalidValuesException e) {
-            return badRequest();
-        }
+        return map(preferencesService.update(new Authorized<>(userId(), model)));
     }
 }

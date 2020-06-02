@@ -1,5 +1,8 @@
 package zzleep.api.security;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.UserRecord;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,24 +15,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-
     public UserDetailsServiceImpl() {
     }
 
-    // userId:1234
-
     @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        // if userId exists
-        //   return {userId:1234}
-        // else
-        //   throw UsernameNotFoundException
-         return User
-            .withUsername(s)
-            .password(passwordEncoder().encode("1234"))
-            .roles("USER")
-            .build();
-        // throw new UsernameNotFoundException("User " + s + " not found.");
+    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+        UserRecord user = null;
+        try {
+            user = FirebaseAuth.getInstance().getUser(userId);
+        } catch (FirebaseAuthException e) {
+            throw new UsernameNotFoundException("User " + userId + " not found.");
+        }
+        return User
+        .withUsername(userId)
+        .password(passwordEncoder().encode("1234"))
+        .roles("USER")
+        .build();
     }
 
     @Bean

@@ -12,18 +12,20 @@ import org.springframework.web.bind.annotation.RestController;
 import zzleep.core.models.RoomCondition;
 import zzleep.core.repositories.AuthorizationService;
 import zzleep.core.repositories.RoomConditionsRepository;
+import zzleep.core.services.Authorized;
+import zzleep.core.services.RoomConditionsService;
 
 @RestController
 @RequestMapping("/api/room-conditions")
 @Api(tags = {"Room Conditions"}, description = " ")
 public class RoomConditionsController extends ControllerBase {
 
-    private final AuthorizationService authService;
-    private final RoomConditionsRepository repository;
 
-    public RoomConditionsController(AuthorizationService authService, RoomConditionsRepository repository) {
-        this.authService = authService;
-        this.repository = repository;
+    private RoomConditionsService service;
+
+    public RoomConditionsController( RoomConditionsService service) {
+        this.service = service;
+
     }
 
     @ApiOperation(value = "Get current room condition", response = RoomCondition.class)
@@ -35,19 +37,7 @@ public class RoomConditionsController extends ControllerBase {
     })
     @GetMapping("/{deviceId}")
     public ResponseEntity<RoomCondition> getReport(@PathVariable(name = "deviceId") String deviceId) {
-        if (!authService.userHasDevice(userId(), deviceId)) return forbidden();
-        try{
-            return success(
-                repository.getCurrentData(deviceId)
-            );
-        }
-        catch(RoomConditionsRepository.SleepNotFoundException ex)
-        {
-            return notFound();
-        }
-        catch(RoomConditionsRepository.NoDataException ex)
-        {
-            return custom(204);
-        }
+
+        return map(service.getReport(new Authorized<>(userId(), deviceId)));
     }
 }

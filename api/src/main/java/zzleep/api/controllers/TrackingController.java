@@ -7,20 +7,23 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import zzleep.core.models.Sleep;
+import zzleep.core.models.SleepRating;
 import zzleep.core.repositories.AuthorizationService;
 import zzleep.core.repositories.SleepRepository;
+import zzleep.core.services.Authorized;
+import zzleep.core.services.TrackingService;
 
 @RestController
 @RequestMapping("/api/tracking")
 @Api(tags = {"Tracking"}, description = " ")
 public class TrackingController extends ControllerBase {
 
-    private final SleepRepository sleepRepository;
-    private final AuthorizationService authService;
 
-    public TrackingController(SleepRepository sleepRepository, AuthorizationService authService) {
-        this.sleepRepository = sleepRepository;
-        this.authService = authService;
+    private final TrackingService trackingService;
+
+    public TrackingController( TrackingService trackingService) {
+
+        this.trackingService = trackingService;
     }
 
     @ApiOperation(value = "Start sleep tracking", response = Sleep.class)
@@ -31,14 +34,7 @@ public class TrackingController extends ControllerBase {
     })
     @PostMapping("/start/{deviceId}")
     public ResponseEntity<Sleep> startTracking(@PathVariable(value = "deviceId") String deviceId) {
-        if (!authService.userHasDevice(userId(), deviceId)) return forbidden();
-        try {
-            return success(sleepRepository.startTracking(deviceId));
-        } catch (SleepRepository.SleepNotStoppedException ex) {
-            return custom(409);
-        } catch (SleepRepository.DeviceNotFoundException ex) {
-            return notFound();
-        }
+       return  map(trackingService.startTracking(new Authorized<>(userId(), deviceId)));
     }
 
     @ApiOperation(value = "Stop sleep tracking", response = Sleep.class)
@@ -49,14 +45,7 @@ public class TrackingController extends ControllerBase {
     })
     @PutMapping("/stop/{deviceId}")
     public ResponseEntity<Sleep> stopTracking(@PathVariable(value = "deviceId") String deviceId) {
-        if (!authService.userHasDevice(userId(), deviceId)) return forbidden();
-        try {
-            return success(sleepRepository.stopTracking(deviceId));
-        } catch (SleepRepository.DeviceNotFoundException ex) {
-            return notFound();
-        } catch (SleepRepository.SleepNotStartedException ex) {
-            return custom(409);
-        }
+      return map(trackingService.stopTracking(new Authorized<>(userId(), deviceId)));
     }
 
     @ApiOperation(value = "Rate sleep", response = Sleep.class)
@@ -66,14 +55,8 @@ public class TrackingController extends ControllerBase {
     })
     @PutMapping("/{sleepId}/{rating}")
     public ResponseEntity<Sleep> setRating(@PathVariable(value = "sleepId") int sleepId, @PathVariable(value = "rating") int rating) {
-        Sleep sleep;
-        if (!authService.userHasSleep(userId(), sleepId)) return forbidden();
-        try {
-            sleep = sleepRepository.rateSleep(sleepId, rating);
-            return success(sleep);
-        } catch (SleepRepository.SleepNotFoundException ex) {
-            return notFound();
-        }
+
+        return map(trackingService.setRating(new Authorized<>(userId(), new SleepRating(sleepId, rating))));
     }
 
     @ApiOperation(value = "Get whether a device is currently tracking", response = Boolean.class)
@@ -83,11 +66,6 @@ public class TrackingController extends ControllerBase {
     })
     @GetMapping("/{deviceId}")
     public ResponseEntity<Boolean> isTracking(@PathVariable(value = "deviceId") String deviceId) {
-        if (!authService.userHasDevice(userId(), deviceId)) return forbidden();
-        try {
-            return success(sleepRepository.isTracking(deviceId));
-        } catch (SleepRepository.DeviceNotFoundException e) {
-            return notFound();
-        }
+        return map(trackingService.isTracking(new Authorized<>(userId(), deviceId)));
     }
 }

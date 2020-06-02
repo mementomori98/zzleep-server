@@ -22,7 +22,7 @@ public class ApiBoot
         FileInputStream serviceAccount =
                 null;
         try {
-            serviceAccount = new FileInputStream("api\\zzleep-firebase-key.json");
+            serviceAccount = new FileInputStream("api/zzleep-firebase-key.json");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

@@ -54,7 +54,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
 
         try
         {
-            String sleepId = context.single(SLEEP_TABLE, String.format("%s is null and %s = %s",COL_FINISH_TIME, COL_DEVICE_ID,"'"+ data.getSource()+"'"), SLEEP_ID_EXTRACTOR);
+            String sleepId = context.single(SLEEP_TABLE, String.format("%s is null and %s = '%s'",COL_FINISH_TIME, COL_DEVICE_ID,"'"+ data.getSource()+"'"), SLEEP_ID_EXTRACTOR);
 
             if(sleepId != null)
             {

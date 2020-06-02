@@ -31,12 +31,14 @@ public class EmbeddedControllerImpl implements EmbeddedController{
 
     private PersistenceRepository repository;
     private WebSocketHandler socketHandler;
+    private CommandsHandler commandsHandler;
     private final Gson gson = new Gson();
     private final Logger logger;
 
-    public EmbeddedControllerImpl(PersistenceRepository dbService, Logger logger) {
+    public EmbeddedControllerImpl(PersistenceRepository dbService, Logger logger, CommandsHandler commandsHandler) {
         this.repository = dbService;
         this.logger = logger;
+        this.commandsHandler = commandsHandler;
         this.socketHandler = new Proxy(this::receiveData, logger);
         onStart();
 
@@ -84,7 +86,7 @@ public class EmbeddedControllerImpl implements EmbeddedController{
 
     private void onProgress() {
 
-        ArrayList<Command> commands = repository.getUpdates();
+        ArrayList<Command> commands = commandsHandler.getUpdates();
 
         for (Command command : commands) {
             send(command);

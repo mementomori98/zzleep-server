@@ -18,7 +18,7 @@ import java.util.List;
 
 public class PersistenceRepositoryImplTest {
 
-    private static PersistenceRepositoryImpl dbService;
+/*    private static PersistenceRepositoryImpl dbService;
 
     @BeforeClass
     public static void setUp()
@@ -217,7 +217,7 @@ public class PersistenceRepositoryImplTest {
         for (String deviceId:sources) {
             System.out.println("0: "+deviceId);
         }
-    }
+    }*/
 
 
 

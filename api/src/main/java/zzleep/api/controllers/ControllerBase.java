@@ -67,17 +67,19 @@ public abstract class ControllerBase {
     protected <TType> ResponseEntity<TType> map(Response<TType> response) {
         switch (response.getStatus()) {
             case SUCCESS:
-                return success(response.getModel());
+                return custom(200, response.getModel());
             case NO_CONTENT:
                 return custom(204);
             case UNAUTHORIZED:
-                return forbidden();
+                return custom(403);
             case NOT_ALLOWED:
                 return custom(406);
             case NOT_FOUND:
-                return notFound();
+                return custom(404);
+            case CONFLICT:
+                return custom(409);
             default:
-                return error();
+                return custom(500);
         }
     }
 }

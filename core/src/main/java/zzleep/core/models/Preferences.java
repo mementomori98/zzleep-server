@@ -86,7 +86,7 @@ public final class Preferences {
 
     @JsonIgnore
     public boolean isValid() {
-        return temperatureMin > temperatureMax ||
-            humidityMin > humidityMax;
+        return temperatureMin < temperatureMax &&
+            humidityMin < humidityMax;
     }
 }

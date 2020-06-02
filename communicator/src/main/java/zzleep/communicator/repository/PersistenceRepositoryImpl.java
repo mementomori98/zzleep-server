@@ -146,7 +146,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
                if(sleepIdsForGoodRoomConditions.size()<3)
                {
                    sources.add(id);
-                   context.insert(ACTIVE_VENTILATION_TABLE, COL_DEVICE_ID, id, DEVICE_ID_EXTRACTOR);
+                   context.insert(ACTIVE_VENTILATION_TABLE, COL_DEVICE_ID, String.format("'%s'", id), DEVICE_ID_EXTRACTOR);
                }
            }
 

@@ -23,10 +23,9 @@ public class DataSettings {
     }
 
     private static void configureProd() {
-        // url = jdbc:postgresql://HOST:PORT/DATABASE
-        url = "jdbc:postgresql://ec2-176-34-97-213.eu-west-1.compute.amazonaws.com:5432/d2ka0f2unsn83u";
-        user = "oyggsjqtgcdqlh";
-        password = "c0b9d98e5e08a21f7c5915443f633865809943e6a1132ffcaa2454d1990ba6b6";
+        url = "jdbc:postgresql://ec2-54-217-213-79.eu-west-1.compute.amazonaws.com:5432/d5agr6187gipnp";
+        user = "vukflngbflapxv";
+        password = "8f2399a5934e3dbc54e6b6f2713bc57bc8176a52d27f63f60f7b48885d22d3a6";
     }
 
     public static String getDatabase() {

@@ -11,4 +11,11 @@ public class RemoveDeviceModel {
     public String getDeviceId() {
         return deviceId;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof RemoveDeviceModel))
+            return false;
+        return ((RemoveDeviceModel) obj).deviceId.equals(deviceId);
+    }
 }

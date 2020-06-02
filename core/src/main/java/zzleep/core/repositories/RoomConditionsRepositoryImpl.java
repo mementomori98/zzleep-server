@@ -31,7 +31,7 @@ public class RoomConditionsRepositoryImpl implements RoomConditionsRepository {
     private RoomCondition getCurrentRoomConditions(Sleep sleep) {
         return context.single(
             DatabaseConstants.RC_TABLE_NAME,
-            String.format("%s = '%s' order by %s desc limit 1",
+            String.format("%s = %d order by %s desc limit 1",
                 DatabaseConstants.RC_COL_SLEEP_ID, sleep.getSleepId(),
                 DatabaseConstants.RC_COL_TIME),
             extractor

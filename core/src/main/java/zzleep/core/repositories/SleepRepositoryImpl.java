@@ -61,7 +61,7 @@ public class SleepRepositoryImpl implements SleepRepository {
         return context.insert(
             DatabaseConstants.SLEEP_TABLE_NAME,
             String.format("%s, %s", DatabaseConstants.SLEEP_COL_DEVICE_ID, DatabaseConstants.SLEEP_COL_START_TIME),
-            String.format("'%s', '%s'", deviceId, dateToString(LocalDateTime.now())),
+            String.format("'%s', now()+'2 hours'::interval", deviceId),
             extractor
         );
     }

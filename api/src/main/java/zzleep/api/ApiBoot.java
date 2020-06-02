@@ -18,25 +18,25 @@ public class ApiBoot
     public static void main( String[] args )
     {
         SpringApplication.run(ApiBoot.class, args);
-
-        FileInputStream serviceAccount =
-                null;
-        try {
-            serviceAccount = new FileInputStream("api/zzleep-firebase-key.json");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        FirebaseOptions options = null;
-        try {
-            options = new FirebaseOptions.Builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .build();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        FirebaseApp.initializeApp(options);
+        //
+        // FileInputStream serviceAccount =
+        //         null;
+        // try {
+        //     serviceAccount = new FileInputStream("api/zzleep-firebase-key.json");
+        // } catch (FileNotFoundException e) {
+        //     e.printStackTrace();
+        // }
+        //
+        // FirebaseOptions options = null;
+        // try {
+        //     options = new FirebaseOptions.Builder()
+        //             .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+        //             .build();
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
+        //
+        // FirebaseApp.initializeApp(options);
 
     }
 }

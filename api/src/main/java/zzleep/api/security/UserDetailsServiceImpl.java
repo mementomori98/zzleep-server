@@ -20,12 +20,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        UserRecord user = null;
-        try {
-            user = FirebaseAuth.getInstance().getUser(userId);
-        } catch (FirebaseAuthException e) {
-            throw new UsernameNotFoundException("User " + userId + " not found.");
-        }
+        // UserRecord user = null;
+        // try {
+        //     user = FirebaseAuth.getInstance().getUser(userId);
+        // } catch (FirebaseAuthException e) {
+        //     throw new UsernameNotFoundException("User " + userId + " not found.");
+        // }
         return User
         .withUsername(userId)
         .password(passwordEncoder().encode("1234"))

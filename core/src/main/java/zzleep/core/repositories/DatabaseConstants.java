@@ -40,8 +40,8 @@ public class DatabaseConstants {
     static final String SLEEP_SESSION_COL_SLEEP_ID = "sleepId";
     static final String SLEEP_SESSION_COL_DEVICE_ID = "deviceId";
     static final String SLEEP_SESSION_COL_RATING = "rating";
-    static final String SLEEP_SESSION_COL_TIME_START = "timeStart";
-    static final String SLEEP_SESSION_COL_TIME_FINISH = "timeFinish";
+    static final String SLEEP_SESSION_COL_TIME_START = "dateTimeStart";
+    static final String SLEEP_SESSION_COL_TIME_FINISH = "dateTimeEnd";
     static final String SLEEP_SESSION_COL_AVERAGE_CO2 = "avgCo2";
     static final String SLEEP_SESSION_COL_AVERAGE_HUMIDITY = "avgHumidity";
     static final String SLEEP_SESSION_COL_AVERAGE_TEMPERATURE = "avgTemperature";
@@ -68,8 +68,8 @@ public class DatabaseConstants {
     static final String DW_COL_CO2 = "co2Level";
     static final String DW_COL_DEVICE_ID = "deviceId";
     static final String DW_COL_RATING = "rating";
-    static final String DW_COL_TIME_START = "timeStart";
-    static final String DW_COL_TIME_FINISH = "timeFinish";
+    static final String DW_COL_TIME_START = "dateTimeStart";
+    static final String DW_COL_TIME_FINISH = "dateTimeEnd";
     static final String DW_COL_AVERAGE_CO2 = "avgCo2";
     static final String DW_COL_AVERAGE_HUMIDITY = "avgHumidity";
     static final String DW_COL_AVERAGE_TEMPERATURE = "avgTemperature";

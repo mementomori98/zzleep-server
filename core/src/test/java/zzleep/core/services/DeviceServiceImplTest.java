@@ -6,13 +6,13 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import zzleep.TestException;
 import zzleep.core.models.AddDeviceModel;
 import zzleep.core.models.Device;
 import zzleep.core.models.RemoveDeviceModel;
 import zzleep.core.models.UpdateDeviceModel;
 import zzleep.core.repositories.AuthorizationService;
 import zzleep.core.repositories.DeviceRepository;
+import zzleep.core.repositories.PreferencesRepository;
 import zzleep.core.repositories.SleepRepository;
 
 import java.util.Arrays;
@@ -33,12 +33,14 @@ public class DeviceServiceImplTest {
     AuthorizationService authService;
     @Mock
     SleepRepository sleepRepository;
+    @Mock
+    PreferencesRepository preferencesRepository;
 
     DeviceServiceImpl sut;
 
     @Before
     public void setup() {
-        sut = new DeviceServiceImpl(deviceRepository, authService, sleepRepository);
+        sut = new DeviceServiceImpl(deviceRepository, authService, sleepRepository, preferencesRepository);
     }
 
     @Test(expected = Exception.class)
@@ -300,6 +302,17 @@ public class DeviceServiceImplTest {
 
         assertEquals(SUCCESS, result.getStatus());
         verify(deviceRepository, times(1)).update(new RemoveDeviceModel(deviceId));
+    }
+
+    @Test
+    public void removeDeletesPreferences() {
+        String deviceId = "device";
+        when(deviceRepository.exists(any())).thenReturn(true);
+        when(authService.userHasDevice(any(), any())).thenReturn(true);
+
+        Response<Void> result = sut.remove(new Authorized<>("", deviceId));
+
+        verify(preferencesRepository, times(1)).delete(deviceId);
     }
 
     @Test

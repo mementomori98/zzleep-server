@@ -85,4 +85,13 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
             preferencesExtractor
         );
     }
+
+    @Override
+    public void delete(String deviceId) {
+        if (exists(deviceId))
+            context.delete(
+                DatabaseConstants.PREFERENCES_TABLE_NAME,
+                String.format("%s = '%s'", DatabaseConstants.PREFERENCES_COL_DEVICE_ID, deviceId)
+            );
+    }
 }

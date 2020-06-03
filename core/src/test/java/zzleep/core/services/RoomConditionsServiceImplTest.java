@@ -28,86 +28,81 @@ public class RoomConditionsServiceImplTest {
     AuthorizationService authorizationService;
 
     @Mock
-    RoomConditionsRepository repository;
+    RoomConditionsRepository roomConditionsRepository;
 
     RoomConditionsServiceImpl sut;
 
     @Before
     public void setUp() {
-        sut = new RoomConditionsServiceImpl(authorizationService, repository);
+        sut = new RoomConditionsServiceImpl(authorizationService, roomConditionsRepository);
     }
 
     @Test(expected = Exception.class)
-    public void getReportNullRequest() throws RoomConditionsRepository.SleepNotFoundException, RoomConditionsRepository.NoDataException {
+    public void getCurrentNullRequest() {
         try {
-            sut.getReport(null);
+            sut.getCurrent(null);
         } finally {
-            verify(repository, never()).getCurrentData(any(String.class));
+            verify(roomConditionsRepository, never()).getCurrent(any(String.class));
         }
     }
 
     @Test
-    public void getReportNullModel() throws RoomConditionsRepository.SleepNotFoundException, RoomConditionsRepository.NoDataException {
+    public void getCurrentNullModel() {
         try {
-            sut.getReport(new Authorized<>(""));
+            sut.getCurrent(new Authorized<>(""));
         } finally {
-            verify(repository, never()).getCurrentData(any(String.class));
+            verify(roomConditionsRepository, never()).getCurrent(any(String.class));
         }
     }
 
     @Test
-    public void getReportUnauthorized() throws RoomConditionsRepository.SleepNotFoundException, RoomConditionsRepository.NoDataException {
+    public void getCurrentUnauthorized() {
         String userId = "user";
         String deviceId = "device";
 
         when(authorizationService.userHasDevice(any(), any())).thenReturn(true);
         when(authorizationService.userHasDevice(userId, deviceId)).thenReturn(false);
 
-        Response<RoomCondition> result = sut.getReport(new Authorized<>(userId, deviceId));
+        Response<RoomCondition> result = sut.getCurrent(new Authorized<>(userId, deviceId));
 
         assertEquals(UNAUTHORIZED, result.getStatus());
-
-        verify(repository, never()).getCurrentData(any(String.class));
+        verify(roomConditionsRepository, never()).getCurrent(any(String.class));
     }
 
 
     @Test
-    public void getReportNotFound() throws RoomConditionsRepository.SleepNotFoundException, RoomConditionsRepository.NoDataException {
+    public void getCurrentNotFound() {
         String userId = "user";
         String deviceId = "deviceId";
 
         when(authorizationService.userHasDevice(any(), any())).thenReturn(true);
         when(authorizationService.userHasDevice(userId, deviceId)).thenReturn(true);
-        when(repository.getCurrentData(deviceId)).thenThrow(RoomConditionsRepository.SleepNotFoundException.class);
+        when(roomConditionsRepository.getCurrent(deviceId)).thenThrow(RoomConditionsRepository.SleepNotFoundException.class);
 
-        Response<RoomCondition> result = sut.getReport(new Authorized<>(userId, deviceId));
+        Response<RoomCondition> result = sut.getCurrent(new Authorized<>(userId, deviceId));
 
         assertEquals(NOT_FOUND, result.getStatus());
-
-        verify(repository, times(1)).getCurrentData(deviceId);
+        verify(roomConditionsRepository, times(1)).getCurrent(deviceId);
     }
 
     @Test
-    public void getReportNoContent() throws RoomConditionsRepository.SleepNotFoundException, RoomConditionsRepository.NoDataException {
+    public void getCurrentNoContent() {
         String userId = "user";
         String deviceId = "device";
 
         when(authorizationService.userHasDevice(any(), any())).thenReturn(true);
-        when(authorizationService.userHasDevice(userId, deviceId)).thenReturn(true);
-        when(repository.getCurrentData(deviceId)).thenThrow(RoomConditionsRepository.NoDataException.class);
+        when(authorizationService.userHasDevice(any(), any())).thenReturn(true);
+        when(roomConditionsRepository.getCurrent(any())).thenReturn(new RoomCondition());
+        when(roomConditionsRepository.getCurrent(deviceId)).thenThrow(new RoomConditionsRepository.NoDataException());
 
-        Response<RoomCondition> result = sut.getReport(new Authorized<>(userId, deviceId));
+        Response<RoomCondition> result = sut.getCurrent(new Authorized<>(userId, deviceId));
 
         assertEquals(NO_CONTENT, result.getStatus());
-
-        verify(repository, times(1)).getCurrentData(deviceId);
-
-
+        verify(roomConditionsRepository, times(1)).getCurrent(deviceId);
     }
 
-
     @Test
-    public void getReportSuccess() throws RoomConditionsRepository.SleepNotFoundException, RoomConditionsRepository.NoDataException {
+    public void getCurrentSuccess() {
         String userId = "user";
         String deviceId = "device";
 
@@ -118,15 +113,74 @@ public class RoomConditionsServiceImplTest {
 
         when(authorizationService.userHasDevice(any(), any())).thenReturn(true);
         when(authorizationService.userHasDevice(userId, deviceId)).thenReturn(true);
-        when(repository.getCurrentData(deviceId)).thenReturn(expected);
+        when(roomConditionsRepository.getCurrent(deviceId)).thenReturn(expected);
 
-        Response<RoomCondition> result = sut.getReport(new Authorized<>(userId, deviceId));
-
+        Response<RoomCondition> result = sut.getCurrent(new Authorized<>(userId, deviceId));
 
         assertEquals(SUCCESS, result.getStatus());
-
-        verify(repository, times(1)).getCurrentData(any(String.class));
-
-
+        verify(roomConditionsRepository, times(1)).getCurrent(any(String.class));
     }
+    
+    @Test(expected = Exception.class)
+    public void getLatestNullRequest() {
+        sut.getLatest(null);
+    }
+
+    @Test
+    public void getLatestUnauthorized() {
+        String userId = "user";
+        String deviceId = "device";
+
+        when(authorizationService.userHasDevice(any(), any())).thenReturn(true);
+        when(authorizationService.userHasDevice(userId, deviceId)).thenReturn(false);
+
+        Response<RoomCondition> result = sut.getLatest(new Authorized<>(userId, deviceId));
+
+        assertEquals(UNAUTHORIZED, result.getStatus());
+        assertNull(result.getModel());
+    }
+
+    @Test
+    public void getLatestNotFound() {
+        String deviceId = "device";
+
+        when(authorizationService.userHasDevice(any(), any())).thenReturn(true);
+        when(roomConditionsRepository.getLatest(any())).thenReturn(new RoomCondition());
+        when(roomConditionsRepository.getLatest(deviceId)).thenThrow(new RoomConditionsRepository.SleepNotFoundException());
+
+        Response<RoomCondition> result = sut.getLatest(new Authorized<>("", deviceId));
+
+        assertEquals(NOT_FOUND, result.getStatus());
+        assertNull(result.getModel());
+    }
+
+    @Test
+    public void getLatestNoContent() {
+        String deviceId = "device";
+
+        when(authorizationService.userHasDevice(any(), any())).thenReturn(true);
+        when(roomConditionsRepository.getLatest(any())).thenReturn(new RoomCondition());
+        when(roomConditionsRepository.getLatest(deviceId)).thenThrow(new RoomConditionsRepository.NoDataException());
+
+        Response<RoomCondition> result = sut.getLatest(new Authorized<>("", deviceId));
+
+        assertEquals(NO_CONTENT, result.getStatus());
+        assertNull(result.getModel());
+    }
+
+    @Test
+    public void getLatestSuccess() {
+        String deviceId = "device";
+        RoomCondition expected = new RoomCondition();
+
+        when(authorizationService.userHasDevice(any(), any())).thenReturn(true);
+        when(roomConditionsRepository.getLatest(any())).thenReturn(null);
+        when(roomConditionsRepository.getLatest(deviceId)).thenReturn(expected);
+
+        Response<RoomCondition> result = sut.getLatest(new Authorized<>("", deviceId));
+
+        assertEquals(SUCCESS, result.getStatus());
+        assertEquals(expected, result.getModel());
+    }
+
 }

@@ -20,19 +20,28 @@ public class RoomConditionsRepositoryImpl implements RoomConditionsRepository {
     private static final Context.ResultSetExtractor<Sleep> sleepExtractor = ExtractorFactory.getSleepExtractor();
 
     @Override
-    public RoomCondition getCurrentData(String deviceId) throws SleepNotFoundException, NoDataException {
+    public RoomCondition getCurrent(String deviceId) {
         Sleep sleep = sleepRepository.getActiveSleep(deviceId);
         if (sleep == null) throw new SleepNotFoundException();
-        RoomCondition roomConditions = getCurrentRoomConditions(sleep);
+        RoomCondition roomConditions = getLatestRoomCondition(sleep.getSleepId());
         if (roomConditions == null) throw new NoDataException();
         return roomConditions;
     }
 
-    private RoomCondition getCurrentRoomConditions(Sleep sleep) {
+    @Override
+    public RoomCondition getLatest(String deviceId) {
+        Sleep sleep = sleepRepository.getLatestSleep(deviceId);
+        if (sleep == null) throw new SleepNotFoundException();
+        RoomCondition roomCondition = getLatestRoomCondition(sleep.getSleepId());
+        if (roomCondition == null) throw new NoDataException();
+        return roomCondition;
+    }
+
+    private RoomCondition getLatestRoomCondition(int sleepId) {
         return context.single(
             DatabaseConstants.RC_TABLE_NAME,
             String.format("%s = %d order by %s desc limit 1",
-                DatabaseConstants.RC_COL_SLEEP_ID, sleep.getSleepId(),
+                DatabaseConstants.RC_COL_SLEEP_ID, sleepId,
                 DatabaseConstants.RC_COL_TIME),
             extractor
         );

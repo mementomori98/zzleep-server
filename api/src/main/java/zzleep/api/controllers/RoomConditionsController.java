@@ -34,9 +34,19 @@ public class RoomConditionsController extends ControllerBase {
         @ApiResponse(code = 404, message = "There is no active tracking for this device")
     })
     @GetMapping("/{deviceId}")
-    public ResponseEntity<RoomCondition> getReport(@PathVariable(name = "deviceId") String deviceId) {
-        return map(roomConditionsService.getReport(new Authorized<>(userId(), deviceId)));
+    public ResponseEntity<RoomCondition> getCurrent(@PathVariable(name = "deviceId") String deviceId) {
+        return map(roomConditionsService.getCurrent(new Authorized<>(userId(), deviceId)));
     }
 
-
+    @ApiOperation(value = "Get the latest recorded room condition for a device", response = RoomCondition.class)
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successfully retrieved latest recorded room condition"),
+        @ApiResponse(code = 204, message = "The current tracking session is the first, and it has not measured any values yet"),
+        @ApiResponse(code = 403, message = "The user does not have a device with this ID"),
+        @ApiResponse(code = 404, message = "No measurements have been made on this device yet")
+    })
+    @GetMapping("/{deviceId}/latest")
+    public ResponseEntity<RoomCondition> getLatest(@PathVariable(name = "deviceId") String deviceId) {
+        return map(roomConditionsService.getLatest(new Authorized<>(userId(), deviceId)));
+    }
 }

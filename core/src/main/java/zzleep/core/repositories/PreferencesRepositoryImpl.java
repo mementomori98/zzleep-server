@@ -93,7 +93,5 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
                 DatabaseConstants.PREFERENCES_TABLE_NAME,
                 String.format("%s = '%s'", DatabaseConstants.PREFERENCES_COL_DEVICE_ID, deviceId)
             );
-        else
-            throw new IllegalStateException("Preferences don't exist");
     }
 }

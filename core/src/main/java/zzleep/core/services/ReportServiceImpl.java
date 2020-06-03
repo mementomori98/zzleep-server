@@ -22,9 +22,9 @@ public class ReportServiceImpl extends ServiceBase implements ReportService{
     public Response<IntervalReport> getReport(Authorized<GetIntervalReportModel> request) {
 
         GetIntervalReportModel model = request.getModel();
-        IntervalReport report = warehouseRepository.getReport(model.getDeviceId(), new Interval(model.getStart(),model.getEnd()));
 
         if (!authorizationService.userHasDevice(request.getUserId(), model.getDeviceId())) return unauthorized();
+        IntervalReport report = warehouseRepository.getReport(model.getDeviceId(), new Interval(model.getStart(),model.getEnd()));
 
         return success(report);
     }

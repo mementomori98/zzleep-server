@@ -21,7 +21,7 @@ public class PreferencesServiceImpl extends ServiceBase implements PreferencesSe
         String deviceId = request.getModel();
         if (!authService.userHasDevice(request.getUserId(), deviceId)) return unauthorized();
         Preferences preferences = preferencesRepository.getPreferences(deviceId);
-        if (preferences == null) notFound();
+        if (preferences == null) return notFound();
         return success(preferences);
     }
 
@@ -31,8 +31,9 @@ public class PreferencesServiceImpl extends ServiceBase implements PreferencesSe
         if (!authService.userHasDevice(request.getUserId(), preferences.getDeviceId())) return unauthorized();
         try {
             Preferences returnPreferences = preferencesRepository.setPreferences(preferences);
-            if (preferences == null) notFound();
-            return success(returnPreferences);
+            if (returnPreferences == null) return notFound();
+            else
+                return success(returnPreferences);
         } catch (PreferencesRepository.InvalidValuesException e) {
             return notFound();
         }

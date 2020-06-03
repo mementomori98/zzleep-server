@@ -51,12 +51,15 @@ public class CommandsHandlerImpl implements CommandsHandler{
         return commands;
     }
 
-    private ArrayList<Command> stopVentilationForStoppedSleeps(List<Sleep> stopDevicesForSleeps) {
+    public ArrayList<Command> stopVentilationForStoppedSleeps(List<Sleep> stopDevicesForSleeps) {
         ArrayList<Command> commands = new ArrayList<>();
         for(int i = 0; i < stopDevicesForSleeps.size(); ++i)
         {
-            repository.deleteVentilationFromDb(stopDevicesForSleeps.get(i).getDeviceId());
-            commands.add(new Command(stopDevicesForSleeps.get(i).getDeviceId(), 'V', 0));
+            if(repository.getDeviceIdFromActiveVentilations(stopDevicesForSleeps.get(i).getDeviceId()) != null)
+            {
+                repository.deleteVentilationFromDb(stopDevicesForSleeps.get(i).getDeviceId());
+                commands.add(new Command(stopDevicesForSleeps.get(i).getDeviceId(), 'V', 0));
+            }
         }
         return commands;
     }
@@ -75,18 +78,18 @@ public class CommandsHandlerImpl implements CommandsHandler{
         return commands;
     }
 
-    private Command createCommand(Sleep sleep, int count) {
+    public Command createCommand(Sleep sleep, int count) {
         if(count < 3)
         {
-            return needsVentilation(sleep);
+            return getStartVentilationCommand(sleep);
         }
         else
         {
-            return doesNotNeedVentilation(sleep);
+            return getStopVentilationCommand(sleep);
         }
     }
 
-    private Command needsVentilation(Sleep sleep)
+    public Command getStartVentilationCommand(Sleep sleep)
     {
         if(!isSleepAlreadyRegulated(sleep))
         {
@@ -96,7 +99,7 @@ public class CommandsHandlerImpl implements CommandsHandler{
         return null;
     }
 
-    private Command doesNotNeedVentilation(Sleep sleep)
+    public Command getStopVentilationCommand(Sleep sleep)
     {
         if(isSleepAlreadyRegulated(sleep))
         {
@@ -106,32 +109,32 @@ public class CommandsHandlerImpl implements CommandsHandler{
         return null;
     }
 
-    private boolean isSleepAlreadyRegulated(Sleep sleep)
+    public boolean isSleepAlreadyRegulated(Sleep sleep)
     {
         String deviceId = repository.getDeviceIdFromActiveVentilations(sleep.getDeviceId());
         return !(deviceId == null);
     }
 
-    private List<Sleep> getStoppedSleeps() {
+    public List<Sleep> getStoppedSleeps() {
 
         List<Sleep> sleeps = repository.getFinishedSleeps();
         removeFromActiveSleeps(sleeps);
         return sleeps;
     }
 
-    private void removeFromActiveSleeps(List<Sleep> sleeps)
+    public void removeFromActiveSleeps(List<Sleep> sleeps)
     {
         for(int i = 0; i < sleeps.size(); ++i)
             repository.removeActiveSleep(sleeps.get(i).getSleepId());
     }
 
-    private List<Sleep> getActiveSleeps() {
+    public List<Sleep> getActiveSleeps() {
         List<Sleep> newSleeps = repository.getNewSleeps();
         insertNewSleepsInActiveSleeps(newSleeps);
         return newSleeps;
     }
 
-    private void insertNewSleepsInActiveSleeps(List<Sleep> sleeps)
+    public void insertNewSleepsInActiveSleeps(List<Sleep> sleeps)
     {
         for(int i = 0; i < sleeps.size(); ++i)
         {

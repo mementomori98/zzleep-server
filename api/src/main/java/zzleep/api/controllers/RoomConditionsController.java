@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import zzleep.core.models.RoomCondition;
-import zzleep.core.repositories.AuthorizationService;
-import zzleep.core.repositories.RoomConditionsRepository;
 import zzleep.core.services.Authorized;
 import zzleep.core.services.RoomConditionsService;
 
@@ -21,10 +19,10 @@ import zzleep.core.services.RoomConditionsService;
 public class RoomConditionsController extends ControllerBase {
 
 
-    private RoomConditionsService service;
+    private final RoomConditionsService roomConditionsService;
 
-    public RoomConditionsController( RoomConditionsService service) {
-        this.service = service;
+    public RoomConditionsController(RoomConditionsService roomConditionsService) {
+        this.roomConditionsService = roomConditionsService;
 
     }
 
@@ -37,7 +35,8 @@ public class RoomConditionsController extends ControllerBase {
     })
     @GetMapping("/{deviceId}")
     public ResponseEntity<RoomCondition> getReport(@PathVariable(name = "deviceId") String deviceId) {
-
-        return map(service.getReport(new Authorized<>(userId(), deviceId)));
+        return map(roomConditionsService.getReport(new Authorized<>(userId(), deviceId)));
     }
+
+
 }

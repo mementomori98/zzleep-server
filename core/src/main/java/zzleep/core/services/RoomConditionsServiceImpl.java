@@ -20,13 +20,10 @@ public class RoomConditionsServiceImpl extends ServiceBase implements RoomCondit
 
     @Override
     public Response<RoomCondition> getReport(Authorized<String> request) {
-
         if(!authorizationService.userHasDevice(request.getUserId(), request.getModel())) return unauthorized();
-
 
         try {
             return success(repository.getCurrentData(request.getModel()));
-
         } catch (RoomConditionsRepository.SleepNotFoundException e) {
             return notFound();
         } catch (RoomConditionsRepository.NoDataException e) {

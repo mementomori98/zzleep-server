@@ -4,6 +4,7 @@ import zzleep.core.models.RoomCondition;
 
 public interface RoomConditionsService {
 
-    Response<RoomCondition> getReport(Authorized<String> request);
+    Response<RoomCondition> getCurrent(Authorized<String> request);
+    Response<RoomCondition> getLatest(Authorized<String> request);
 
 }

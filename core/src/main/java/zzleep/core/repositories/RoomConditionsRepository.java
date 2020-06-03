@@ -3,9 +3,10 @@ package zzleep.core.repositories;
 import zzleep.core.models.RoomCondition;
 
 public interface RoomConditionsRepository {
-    RoomCondition getCurrentData(String deviceId) throws SleepNotFoundException, NoDataException;
 
+    RoomCondition getCurrent(String deviceId);
+    RoomCondition getLatest(String deviceId);
 
-    class SleepNotFoundException extends Exception{}
-    class NoDataException extends Exception{}
+    class SleepNotFoundException extends RuntimeException{}
+    class NoDataException extends RuntimeException{}
 }

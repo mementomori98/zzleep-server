@@ -9,38 +9,41 @@ import io.swagger.annotations.ApiModelProperty;
 import java.time.LocalDateTime;
 
 @ApiModel(description = "Represents the sleeping environment at a given time")
-public final class RoomCondition {
+public class RoomCondition {
 
     @ApiModelProperty(example = "3")
     @JsonSerialize
     @JsonProperty("sleepId")
-    private final int sleepId;
+    private int sleepId;
 
     @ApiModelProperty(example = "2020-05-21T13:48:16.141Z")
     @JsonSerialize
     @JsonProperty("timestamp")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private final LocalDateTime timestamp;
+    private LocalDateTime timestamp;
 
     @ApiModelProperty(example = "32.42", notes = "Represented in Celsius, rounded to 2 decimal digits")
     @JsonSerialize
     @JsonProperty("temperature")
-    private final int temperature;
+    private int temperature;
 
     @ApiModelProperty(notes = "Represented in ppm, rounded to 2 decimal digits", example = "553")
     @JsonSerialize
     @JsonProperty("co2")
-    private final int co2;
+    private int co2;
 
     @ApiModelProperty(notes = "Represented in dB, rounded to 2 decimal digits", example = "42.16")
     @JsonSerialize
     @JsonProperty("sound")
-    private final double sound;
+    private double sound;
 
     @ApiModelProperty(notes = "Represented in %, rounded to 2 decimal digits", example = "42.27")
     @JsonSerialize
     @JsonProperty("humidity")
-    private final double humidity;
+    private double humidity;
+
+    public RoomCondition() {
+    }
 
     public RoomCondition(int sleepId, LocalDateTime timestamp, int temperature, int co2, double sound, double humidity) {
         this.sleepId = sleepId;
@@ -75,7 +78,4 @@ public final class RoomCondition {
         return humidity;
     }
 
-    public RoomCondition roomConditionCopy() {
-        return new RoomCondition(this.sleepId, this.timestamp, this.temperature, this.co2, this.sound, this.humidity);
-    }
 }

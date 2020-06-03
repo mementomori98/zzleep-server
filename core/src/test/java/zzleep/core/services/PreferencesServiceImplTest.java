@@ -159,7 +159,7 @@ public class PreferencesServiceImplTest {
          * Reason: 1.the method was not returning the notFound() result. 'return' was omitted
          *         in the if statement.
          *         2.in the if statement the preference from the request (which is not null)
-         *         was used for checking the result from the repository.
+         *         was used for checking the result from the roomConditionsRepository.
          * Status: fixed
          */
         String userId = "user";

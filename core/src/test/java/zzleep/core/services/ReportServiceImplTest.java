@@ -205,16 +205,19 @@ public class ReportServiceImplTest {
         }
     }
 
-    @Test (expected = Exception.class)
+    @Test
     public void getIdealConditionsNullModel()
     {
-        try
-        {
-            sut.getIdealRoomConditions(new Authorized<>(""));
-        }
-        finally {
-            verify(warehouseRepository, never()).getIdealRoomCondition(any(String.class));
-        }
+        when(authorizationService.userHasDevice(any(), any())).thenReturn(true);
+        when(authorizationService.userHasDevice("user", null)).thenReturn(false);
+
+        Response<IdealRoomConditions>  result = sut.getIdealRoomConditions(new Authorized<>("user"));
+
+        assertEquals(UNAUTHORIZED, result.getStatus());
+        assertNull(null, result.getModel());
+        verify(warehouseRepository, never()).getIdealRoomCondition(any(String.class));
+
+
     }
 
     @Test

@@ -43,13 +43,18 @@ public class PreferencesServiceImplTest {
         }
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void getByDeviceIdNullModel() {
-        try {
-            sut.getByDeviceId(new Authorized<>(""));
-        } finally {
+
+        when(authorizationService.userHasDevice(any(), any())).thenReturn(true);
+        when(authorizationService.userHasDevice("user", null)).thenReturn(false);
+
+            Response<Preferences>  result = sut.getByDeviceId(new Authorized<>("user"));
+
+            assertEquals(UNAUTHORIZED, result.getStatus());
+            assertNull(null, result.getModel());
             verify(repository, never()).getPreferences(any(String.class));
-        }
+
     }
 
     @Test

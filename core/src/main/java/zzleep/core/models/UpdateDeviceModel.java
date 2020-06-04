@@ -20,6 +20,11 @@ public class UpdateDeviceModel {
     public UpdateDeviceModel() {
     }
 
+    public UpdateDeviceModel(String deviceId, String name) {
+        this.deviceId = deviceId;
+        this.name = name;
+    }
+
     public String getDeviceId() {
         return deviceId;
     }

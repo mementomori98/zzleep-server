@@ -57,11 +57,21 @@ public class SleepRepositoryImpl implements SleepRepository {
         );
     }
 
+    @Override
+    public Sleep getLatestSleep(String deviceId) {
+        return context.first(
+            DatabaseConstants.SLEEP_TABLE_NAME,
+            String.format("%s = '%s' order by %s desc",
+                DatabaseConstants.SLEEP_COL_DEVICE_ID, deviceId, DatabaseConstants.SLEEP_COL_START_TIME),
+            extractor
+        );
+    }
+
     private Sleep createSleep(String deviceId) {
         return context.insert(
             DatabaseConstants.SLEEP_TABLE_NAME,
             String.format("%s, %s", DatabaseConstants.SLEEP_COL_DEVICE_ID, DatabaseConstants.SLEEP_COL_START_TIME),
-            String.format("'%s', '%s'", deviceId, dateToString(LocalDateTime.now())),
+            String.format("'%s', now()+'2 hours'::interval", deviceId),
             extractor
         );
     }

@@ -3,6 +3,7 @@ package zzleep.core.repositories;
 import org.springframework.stereotype.Component;
 import zzleep.core.models.*;
 
+import javax.xml.crypto.Data;
 import java.util.List;
 
 @Component
@@ -72,7 +73,10 @@ public class WarehouseRepositoryImpl implements WarehouseRepository {
     public IntervalReport getReport(String deviceId, Interval interval) {
         List<SleepSession> query = context.selectComplex(
             DatabaseConstants.DW_TABLE_NAME, SLEEP_SESSION_SELECTOR,
-            String.format("%s = '%s'", DatabaseConstants.DW_COL_DEVICE_ID, deviceId),
+            String.format("%s = '%s' and %s >= '%s' and %s <= '%s'",
+                    DatabaseConstants.DW_COL_DEVICE_ID, deviceId,
+                    DatabaseConstants.DW_COL_TIME_START, interval.getStart(),
+                    DatabaseConstants.DW_COL_TIME_FINISH, interval.getEnd()),
             SLEEP_SESSION_GROUPER,
             sleepSessionExtractor
         );

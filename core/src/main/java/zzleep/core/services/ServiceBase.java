@@ -36,4 +36,5 @@ public class ServiceBase {
         return new Response<>(status, body);
     }
 
+    protected  <TType> Response<TType> conflict(){return custom(CONFLICT);}
 }

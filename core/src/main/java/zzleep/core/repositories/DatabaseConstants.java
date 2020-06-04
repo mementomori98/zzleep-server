@@ -37,15 +37,15 @@ public class DatabaseConstants {
     public static final String RC_COL_HUMIDITY = "humidity";
 
     //sleep sessions
-    public static final String SLEEP_SESSION_COL_SLEEP_ID = "sleepId";
-    public static final String SLEEP_SESSION_COL_DEVICE_ID = "deviceId";
-    public static final String SLEEP_SESSION_COL_RATING = "rating";
-    public static final String SLEEP_SESSION_COL_TIME_START = "timeStart";
-    public static final String SLEEP_SESSION_COL_TIME_FINISH = "timeFinish";
-    public static final String SLEEP_SESSION_COL_AVERAGE_CO2 = "avgCo2";
-    public static final String SLEEP_SESSION_COL_AVERAGE_HUMIDITY = "avgHumidity";
-    public static final String SLEEP_SESSION_COL_AVERAGE_TEMPERATURE = "avgTemperature";
-    public static final String SLEEP_SESSION_COL_AVERAGE_SOUND = "avgSound";
+    static final String SLEEP_SESSION_COL_SLEEP_ID = "sleepId";
+    static final String SLEEP_SESSION_COL_DEVICE_ID = "deviceId";
+    static final String SLEEP_SESSION_COL_RATING = "rating";
+    static final String SLEEP_SESSION_COL_TIME_START = "dateTimeStart";
+    static final String SLEEP_SESSION_COL_TIME_FINISH = "dateTimeEnd";
+    static final String SLEEP_SESSION_COL_AVERAGE_CO2 = "avgCo2";
+    static final String SLEEP_SESSION_COL_AVERAGE_HUMIDITY = "avgHumidity";
+    static final String SLEEP_SESSION_COL_AVERAGE_TEMPERATURE = "avgTemperature";
+    static final String SLEEP_SESSION_COL_AVERAGE_SOUND = "avgSound";
 
 
     //device
@@ -60,20 +60,21 @@ public class DatabaseConstants {
                     "inner join dw.dimDevice on factRoomConditions.deviceKey = dimDevice.deviceKey " +
                     "left outer join dw.dimRating on factRoomConditions.ratingKey = dimRating.ratingKey " +
                     "inner join dw.dimSleep on factRoomConditions.sleepKey = dimSleep.sleepKey";
-    public static final String DW_COL_SLEEP_ID = "sleepId";
-    public static final String DW_COL_TIMESTAMP = "timeRecorded";
-    public static final String DW_COL_TEMPERATURE = "temperatureLevel";
-    public static final String DW_COL_HUMIDITY = "humidityLevel";
-    public static final String DW_COL_SOUND = "soundLevel";
-    public static final String DW_COL_CO2 = "co2Level";
-    public static final String DW_COL_DEVICE_ID = "deviceId";
-    public static final String DW_COL_RATING = "rating";
-    public static final String DW_COL_TIME_START = "timeStart";
-    public static final String DW_COL_TIME_FINISH = "timeFinish";
-    public static final String DW_COL_AVERAGE_CO2 = "avgCo2";
-    public static final String DW_COL_AVERAGE_HUMIDITY = "avgHumidity";
-    public static final String DW_COL_AVERAGE_TEMPERATURE = "avgTemperature";
-    public static final String DW_COL_AVERAGE_SOUND = "avgSound";
+
+    static final String DW_COL_SLEEP_ID = "sleepId";
+    static final String DW_COL_TIMESTAMP = "timeRecorded";
+    static final String DW_COL_TEMPERATURE = "temperatureLevel";
+    static final String DW_COL_HUMIDITY = "humidityLevel";
+    static final String DW_COL_SOUND = "soundLevel";
+    static final String DW_COL_CO2 = "co2Level";
+    static final String DW_COL_DEVICE_ID = "deviceId";
+    static final String DW_COL_RATING = "rating";
+    static final String DW_COL_TIME_START = "dateTimeStart";
+    static final String DW_COL_TIME_FINISH = "dateTimeEnd";
+    static final String DW_COL_AVERAGE_CO2 = "avgCo2";
+    static final String DW_COL_AVERAGE_HUMIDITY = "avgHumidity";
+    static final String DW_COL_AVERAGE_TEMPERATURE = "avgTemperature";
+    static final String DW_COL_AVERAGE_SOUND = "avgSound";
 
     // auth
     public static final String AUTH_TABLE_NAME =

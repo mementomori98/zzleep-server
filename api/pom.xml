@@ -59,6 +59,11 @@
           <artifactId>spring-security-web</artifactId>
           <version>5.2.2.RELEASE</version>
       </dependency>
+      <dependency>
+          <groupId>com.google.firebase</groupId>
+          <artifactId>firebase-admin</artifactId>
+          <version>6.13.0</version>
+      </dependency>
   </dependencies>
 
   <build>

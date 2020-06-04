@@ -68,6 +68,7 @@ public class FakeDeviceSimulatorImpl implements FakeDeviceSimulator, Runnable
 
         while (true)
         {
+
             for (String device: new ArrayList<>(activateDevices))
             {
 

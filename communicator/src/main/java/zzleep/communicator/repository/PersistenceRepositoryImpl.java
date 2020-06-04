@@ -33,7 +33,6 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
 
     @Override
     public void putDataInDatabase(CurrentData data){
-
         Integer sleepId = getSleepId(data.getSource());
 
         if(sleepId != null)
@@ -46,7 +45,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
             }
             catch(HttpClientErrorException e)
             {
-
+                e.printStackTrace();
             }
     }
 

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import zzleep.core.models.*;
 import zzleep.core.repositories.AuthorizationService;
 import zzleep.core.repositories.WarehouseRepository;
+import zzleep.core.services.Authorized;
+import zzleep.core.services.ReportService;
 
 import java.time.LocalDate;
 
@@ -18,64 +20,57 @@ import java.time.LocalDate;
 @Api(tags = {"Reports"}, description = " ")
 public class ReportsController extends ControllerBase {
 
-    private final AuthorizationService authService;
-    private final WarehouseRepository warehouseRepository;
 
-    public ReportsController(AuthorizationService authService, WarehouseRepository warehouseRepository) {
-        this.authService = authService;
-        this.warehouseRepository = warehouseRepository;
+    private final ReportService reportService;
+
+    public ReportsController(ReportService reportService) {
+        this.reportService = reportService;
+
     }
 
     @ApiOperation(value = "Get a report on sleep", response = IntervalReport.class)
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Successfully retrieved a report"),
-        @ApiResponse(code = 403, message = "The user does not have a device with this ID"),
+            @ApiResponse(code = 200, message = "Successfully retrieved a report"),
+            @ApiResponse(code = 403, message = "The user does not have a device with this ID"),
     })
     @GetMapping("/{deviceId}")
     public ResponseEntity<IntervalReport> getReport(
-        @PathVariable(name = "deviceId")
-            String deviceId,
-        @RequestParam(name = "dateStart", defaultValue = "1970-01-01")
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate dateStart,
-        @RequestParam(name = "dateFinish", defaultValue = "2100-01-01")
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate dateFinish
+            @PathVariable(name = "deviceId")
+                    String deviceId,
+            @RequestParam(name = "dateStart", defaultValue = "1970-01-01")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                    LocalDate dateStart,
+            @RequestParam(name = "dateFinish", defaultValue = "2100-01-01")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                    LocalDate dateFinish
     ) {
-        if (!authService.userHasDevice(userId(), deviceId)) return forbidden();
-        IntervalReport report = warehouseRepository.getReport(deviceId, new Interval(dateStart, dateFinish));
-        return ResponseEntity
-            .status(200)
-            .body(report);
+        return map(
+                reportService.getReport(new Authorized<>(userId(), new GetIntervalReportModel(deviceId, dateStart, dateFinish)))
+        );
     }
 
     @ApiOperation(value = "Get data for a sleep", response = SleepData.class)
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "The sleep data has been successfully retrieved"),
-        @ApiResponse(code = 403, message = "There is no sleep with this ID associated with this user")
+            @ApiResponse(code = 200, message = "The sleep data has been successfully retrieved"),
+            @ApiResponse(code = 403, message = "There is no sleep with this ID associated with this user")
     })
     @GetMapping("/sleeps/{sleepId}")
     public ResponseEntity<SleepData> getSleepData(
-        @PathVariable(name = "sleepId") int sleepId
+            @PathVariable(name = "sleepId") int sleepId
     ) {
-        if (!authService.userHasSleep(userId(), sleepId)) return forbidden();
-        SleepData data = warehouseRepository.getSleepData(sleepId);
-        return data == null ? notFound() : success(data);
+        return map(reportService.getSleepData(new Authorized<>(userId(), sleepId)));
     }
 
     @ApiOperation(value = "Get the ideal room conditions for a device (room)", response = IdealRoomConditions.class)
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "The ideal room conditions have been successfully retrieved"),
-        @ApiResponse(code = 403, message = "The user does not have a device with this id")
+            @ApiResponse(code = 200, message = "The ideal room conditions have been successfully retrieved"),
+            @ApiResponse(code = 403, message = "The user does not have a device with this id")
     })
     @GetMapping("/ideal/{deviceId}")
     public ResponseEntity<IdealRoomConditions> getIdealRoomConditions(
-        @PathVariable(value = "deviceId") String deviceId
+            @PathVariable(value = "deviceId") String deviceId
     ) {
-        if (!authService.userHasDevice(userId(), deviceId)) return forbidden();
-        return success(
-            warehouseRepository.getIdealRoomCondition(deviceId)
-        );
+        return map(reportService.getIdealRoomConditions(new Authorized<>(userId(), deviceId)));
     }
 
 }

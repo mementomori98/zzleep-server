@@ -23,6 +23,9 @@ public final class Device {
     @JsonProperty("userId")
     private String userId;
 
+    public Device() {
+    }
+
     public Device(String deviceId, String name, String userId) {
         this.deviceId = deviceId;
         this.name = name;
@@ -39,5 +42,14 @@ public final class Device {
 
     public String getUserId() {
         return userId;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Device)) return false;
+        Device other = (Device) obj;
+        return deviceId.equals(other.deviceId) &&
+            name.equals(other.name) &&
+            userId.equals(other.userId);
     }
 }

@@ -7,30 +7,39 @@ import zzleep.core.models.RemoveDeviceModel;
 import zzleep.core.models.UpdateDeviceModel;
 import zzleep.core.repositories.AuthorizationService;
 import zzleep.core.repositories.DeviceRepository;
+import zzleep.core.repositories.PreferencesRepository;
+import zzleep.core.repositories.SleepRepository;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class DeviceServiceImpl extends ServiceBase implements DeviceService {
 
     private final DeviceRepository deviceRepository;
     private final AuthorizationService authService;
+    private final SleepRepository sleepRepository;
+    private final PreferencesRepository preferencesRepository;
 
     public DeviceServiceImpl(
         DeviceRepository deviceRepository,
-        AuthorizationService authService
+        AuthorizationService authService,
+        SleepRepository sleepRepository,
+        PreferencesRepository preferencesRepository
     ) {
         this.deviceRepository = deviceRepository;
         this.authService = authService;
+        this.sleepRepository = sleepRepository;
+        this.preferencesRepository = preferencesRepository;
     }
 
     @Override
     public Response<Device> add(Authorized<AddDeviceModel> request) {
         AddDeviceModel model = request.getModel();
         model.setUserId(request.getUserId());
-        Device device = deviceRepository.getById(model.getDeviceId());
 
-        if (device == null) return notFound();
+        if (!deviceRepository.exists(model.getDeviceId())) return notFound();
         if (authService.userHasDevice(request.getUserId(), model.getDeviceId())) return notAllowed();
         if (deviceRepository.hasUser(model.getDeviceId())) return unauthorized();
 
@@ -55,6 +64,9 @@ public class DeviceServiceImpl extends ServiceBase implements DeviceService {
     public Response<List<Device>> getAllByUser(Authorized<Void> request) {
         return success(
             deviceRepository.getAllByUserId(request.getUserId())
+                .stream()
+                .sorted(Comparator.comparing(Device::getName))
+                .collect(Collectors.toList())
         );
     }
 
@@ -77,6 +89,8 @@ public class DeviceServiceImpl extends ServiceBase implements DeviceService {
         if (!deviceRepository.exists(deviceId)) return notFound();
         if (!authService.userHasDevice(request.getUserId(), deviceId)) return unauthorized();
 
+        if (sleepRepository.isTracking(deviceId)) sleepRepository.stopTracking(deviceId);
+        preferencesRepository.delete(deviceId);
         deviceRepository.update(new RemoveDeviceModel(deviceId));
         return success();
     }
@@ -84,7 +98,9 @@ public class DeviceServiceImpl extends ServiceBase implements DeviceService {
     @Override
     public Response<List<String>> getAllAvailable() {
         return success(
-            deviceRepository.getAllAvailableIds()
+            deviceRepository.getAllAvailableIds().stream()
+                .sorted()
+                .collect(Collectors.toList())
         );
     }
 }

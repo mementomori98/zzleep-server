@@ -2,10 +2,10 @@ package zzleep.communicator.models;
 
 public class CurrentData {
 
-    private double co2Data;
-    private double temperatureData;
-    private double humidityData;
-    private double soundData;
+    private Integer co2Data;
+    private Integer temperatureData;
+    private Double humidityData;
+    private Double soundData;
     private String source;
     private String timeStamp;
 
@@ -14,13 +14,13 @@ public class CurrentData {
     {
         this.co2Data = 0;
         this.temperatureData = 0;
-        this.humidityData = 0;
-        this.soundData = 0;
+        this.humidityData = 0.0;
+        this.soundData = 0.0;
         this.source = "";
         this.timeStamp = "";
     }
 
-    public CurrentData(double co2Data, double temperatureData, double humidityData, double soundData, String source, String timeStamp) {
+    public CurrentData(int co2Data, int temperatureData, double humidityData, double soundData, String source, String timeStamp) {
         this.co2Data = co2Data;
         this.temperatureData = temperatureData;
         this.humidityData = humidityData;
@@ -29,35 +29,35 @@ public class CurrentData {
         this.timeStamp = timeStamp;
     }
 
-    public double getCo2Data() {
+    public Integer getCo2Data() {
         return co2Data;
     }
 
-    public void setCo2Data(double co2Data) {
+    public void setCo2Data(Integer co2Data) {
         this.co2Data = co2Data;
     }
 
-    public double getTemperatureData() {
+    public Integer getTemperatureData() {
         return temperatureData;
     }
 
-    public void setTemperatureData(double temperatureData) {
+    public void setTemperatureData(Integer temperatureData) {
         this.temperatureData = temperatureData;
     }
 
-    public double getHumidityData() {
+    public Double getHumidityData() {
         return humidityData;
     }
 
-    public void setHumidityData(double humidityData) {
+    public void setHumidityData(Double humidityData) {
         this.humidityData = humidityData;
     }
 
-    public double getSoundData() {
+    public Double getSoundData() {
         return soundData;
     }
 
-    public void setSoundData(double soundData) {
+    public void setSoundData(Double soundData) {
         this.soundData = soundData;
     }
 

@@ -2,6 +2,7 @@ package zzleep.core.repositories;
 
 import zzleep.core.models.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class ExtractorFactory {
@@ -33,14 +34,20 @@ public class ExtractorFactory {
             row.getString(DatabaseConstants.FACT_COL_SOURCE_URL)
     );
 
-    private static final Context.ResultSetExtractor<RoomCondition> roomConditionsExtractor = row -> new RoomCondition(
-        row.getInt(DatabaseConstants.RC_COL_SLEEP_ID),
-        row.getObject(DatabaseConstants.RC_COL_TIME, LocalDateTime.class),
-        row.getInt(DatabaseConstants.RC_COL_TEMPERATURE),
-        row.getInt(DatabaseConstants.RC_COL_CO2),
-        row.getDouble(DatabaseConstants.RC_COL_SOUND),
-        row.getDouble(DatabaseConstants.RC_COL_HUMIDITY)
-    );
+    private static final Context.ResultSetExtractor<RoomCondition> roomConditionsExtractor = row -> {
+        BigDecimal sound = row.getObject(DatabaseConstants.RC_COL_SOUND, BigDecimal.class);
+        BigDecimal humidity = row.getObject(DatabaseConstants.RC_COL_HUMIDITY, BigDecimal.class);
+        Double h = humidity == null ? null:humidity.doubleValue();
+        Double s = sound == null ? null:sound.doubleValue();
+        return new RoomCondition(
+                row.getInt(DatabaseConstants.RC_COL_SLEEP_ID),
+                row.getObject(DatabaseConstants.RC_COL_TIME, LocalDateTime.class),
+                row.getObject(DatabaseConstants.RC_COL_TEMPERATURE, Integer.class),
+                row.getObject(DatabaseConstants.RC_COL_CO2, Integer.class),
+                s,
+                h
+        );
+    };
 
     private static final Context.ResultSetExtractor<AuthObject> authObjectExtractor = row -> new AuthObject(
         row.getString(DatabaseConstants.AUTH_DEVICE_ID),
@@ -75,6 +82,10 @@ public class ExtractorFactory {
         row.getString(DatabaseConstants.DEVICE_COL_USER_ID)
     );
 
+    private static final Context.ResultSetExtractor<Integer> sleepIdExtractor = row-> row.getInt(DatabaseConstants.SLEEP_COL_SLEEP_ID);
+
+    private static final Context.ResultSetExtractor<String> deviceIdExtractor = row-> ""+row.getString(DatabaseConstants.DEVICE_COL_ID);
+
     public static Context.ResultSetExtractor<SleepSession> getSleepSessionExtractor() {
         return sleepSessionExtractor;
     }
@@ -105,5 +116,13 @@ public class ExtractorFactory {
 
     public static Context.ResultSetExtractor<AuthObject> getAuthObjectExtractor() {
         return authObjectExtractor;
+    }
+
+    public static Context.ResultSetExtractor<Integer> getSleepIdExtractor() {
+        return sleepIdExtractor;
+    }
+
+    public static Context.ResultSetExtractor<String> getDeviceIdExtractor() {
+        return deviceIdExtractor;
     }
 }

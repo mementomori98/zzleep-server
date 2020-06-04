@@ -52,4 +52,9 @@ public class Command {
                 ", value=" + value +
                 '}';
     }
+
+    public boolean equals(Command command)
+    {
+        return destination.equals(command.destination) && commandID == command.commandID && value == command.value;
+    }
 }

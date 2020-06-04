@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @ApiModel(description = "Represents the sleeping environment at a given time")
@@ -25,24 +26,24 @@ public final class RoomCondition {
     @ApiModelProperty(example = "32.42", notes = "Represented in Celsius, rounded to 2 decimal digits")
     @JsonSerialize
     @JsonProperty("temperature")
-    private final int temperature;
+    private final Integer temperature;
 
     @ApiModelProperty(notes = "Represented in ppm, rounded to 2 decimal digits", example = "553")
     @JsonSerialize
     @JsonProperty("co2")
-    private final int co2;
+    private final Integer co2;
 
     @ApiModelProperty(notes = "Represented in dB, rounded to 2 decimal digits", example = "42.16")
     @JsonSerialize
     @JsonProperty("sound")
-    private final double sound;
+    private final Double sound;
 
     @ApiModelProperty(notes = "Represented in %, rounded to 2 decimal digits", example = "42.27")
     @JsonSerialize
     @JsonProperty("humidity")
-    private final double humidity;
+    private final Double humidity;
 
-    public RoomCondition(int sleepId, LocalDateTime timestamp, int temperature, int co2, double sound, double humidity) {
+    public RoomCondition(int sleepId, LocalDateTime timestamp, Integer temperature, Integer co2, Double sound, Double humidity) {
         this.sleepId = sleepId;
         this.timestamp = timestamp;
         this.temperature = temperature;
@@ -59,23 +60,19 @@ public final class RoomCondition {
         return timestamp;
     }
 
-    public int getTemperature() {
+    public Integer getTemperature() {
         return temperature;
     }
 
-    public int getCo2() {
+    public Integer getCo2() {
         return co2;
     }
 
-    public double getSound() {
+    public Double getSound() {
         return sound;
     }
 
-    public double getHumidity() {
+    public Double getHumidity() {
         return humidity;
-    }
-
-    public RoomCondition roomConditionCopy() {
-        return new RoomCondition(this.sleepId, this.timestamp, this.temperature, this.co2, this.sound, this.humidity);
     }
 }

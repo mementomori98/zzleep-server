@@ -37,7 +37,9 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         Integer sleepId = getSleepId(data.getSource());
 
         if(sleepId != null)
-            insertRoomConditions(data, sleepId);
+        {
+            insertRoomConditions(checkConstraints(data), sleepId);
+        }
         else
             try {
                 logger.warn("Warning.SleepId is null");
@@ -81,6 +83,19 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
                 data.getHumidityData()
         );
         context.insert(DatabaseConstants.RC_TABLE_NAME,columns, values, sleepIdExtractor);
+    }
+
+    private CurrentData checkConstraints(CurrentData data)
+    {
+        if(data.getCo2Data() < 200 || data.getCo2Data() > 10000)
+            data.setCo2Data(null);
+        if(data.getTemperatureData() < -40 || data.getTemperatureData() > 55)
+            data.setTemperatureData(null);
+        if(data.getHumidityData() < 0 || data.getHumidityData() > 100)
+            data.setHumidityData(null);
+        if(data.getSoundData() < 0 || data.getSoundData() > 150)
+            data.setSoundData(null);
+        return data;
     }
 
     public void insertVentilationInDb(String deviceId)

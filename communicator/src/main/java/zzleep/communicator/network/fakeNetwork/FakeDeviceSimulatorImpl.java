@@ -74,7 +74,7 @@ public class FakeDeviceSimulatorImpl implements FakeDeviceSimulator, Runnable
                 String s = generateRandomData();
                 
                 LocalDateTime now = LocalDateTime.now();
-                ZoneId zoneId = ZoneId.systemDefault();
+                ZoneId zoneId = ZoneId.of("Europe/Paris");
                 long epoch = now.atZone(zoneId).toEpochSecond() * 1000;
 
                 

@@ -13,6 +13,7 @@ import zzleep.core.repositories.Context;
 import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 @Component
@@ -38,8 +39,13 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         if(sleepId != null)
             insertRoomConditions(data, sleepId);
         else
-            logger.warn("Warning.SleepId is null");
-        //there was a try catch here with HTTpClientErrorException
+            try {
+                logger.warn("Warning.SleepId is null");
+            }
+            catch(HttpClientErrorException e)
+            {
+
+            }
     }
 
     private Integer getSleepId(String deviceId)
@@ -65,7 +71,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
                 DatabaseConstants.RC_COL_SOUND,
                 DatabaseConstants.RC_COL_HUMIDITY
         );
-        String values = String.format(
+        String values = String.format(Locale.ROOT,
                 "%d, '%s', %d, %d, %.2f, %.2f",
                 sleepId,
                 data.getTimeStamp(),
@@ -82,7 +88,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         context.insert(
                 DatabaseConstants.ACTIVE_VENTILATION_TABLE,
                 DatabaseConstants.ACTIVE_VENTILATION_COL_DEVICE_ID,
-                deviceId,
+                String.format("'%s'", deviceId),
                 deviceIdExtractor);
     }
 
@@ -126,7 +132,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
          );
 
         String condition = String.format(
-                "%s.%s < %s.%s and %s.%s > %s.%s and %s.%s < %s.%s and %s.%s > %s.%s and %s.%s < %s.%s and %s.%s > now - '15 minutes'::interval and %s.%s = %d",
+                "%s.%s < %s.%s and %s.%s > %s.%s and %s.%s < %s.%s and %s.%s > %s.%s and %s.%s < %s.%s and %s.%s > now() - '15 minutes'::interval and %s.%s = %d",
                 DatabaseConstants.RC_TABLE_NAME,
                 DatabaseConstants.RC_COL_CO2,
                 DatabaseConstants.PREFERENCES_TABLE_NAME,
@@ -147,6 +153,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
                 DatabaseConstants.RC_COL_TEMPERATURE,
                 DatabaseConstants.PREFERENCES_TABLE_NAME,
                 DatabaseConstants.PREFERENCES_COL_TEMPERATURE_MAX,
+                DatabaseConstants.RC_TABLE_NAME,
                 DatabaseConstants.RC_COL_TIME,
                 DatabaseConstants.SLEEP_TABLE_NAME,
                 DatabaseConstants.SLEEP_COL_SLEEP_ID,

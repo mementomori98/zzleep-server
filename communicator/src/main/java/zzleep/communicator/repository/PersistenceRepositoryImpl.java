@@ -40,13 +40,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
             insertRoomConditions(checkConstraints(data), sleepId);
         }
         else
-            try {
-                logger.warn("Warning.SleepId is null");
-            }
-            catch(HttpClientErrorException e)
-            {
-                e.printStackTrace();
-            }
+            logger.warn("Warning.SleepId is null");
     }
 
     private Integer getSleepId(String deviceId)

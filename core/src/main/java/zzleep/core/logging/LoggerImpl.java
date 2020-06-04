@@ -100,15 +100,20 @@ public class LoggerImpl implements Logger {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        String url = "https://hooks.slack.com/services/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";
-        message = message.replace("\"", "\\\"");
-        String body = "{\"text\":\"" + message + "\"}";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON));
-        HttpEntity<String> entity = new HttpEntity<>(body, headers);
-        ResponseEntity<String> value = restTemplate.postForEntity(url, entity, String.class);
-        HttpStatus stih = value.getStatusCode();
+        try {
+            String url = "https://hooks.slack.com/services/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";
+            message = message.replace("\"", "\\\"");
+            String body = "{\"text\":\"" + message + "\"}";
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setAccept(Arrays.asList(MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON));
+            HttpEntity<String> entity = new HttpEntity<>(body, headers);
+            ResponseEntity<String> value = restTemplate.postForEntity(url, entity, String.class);
+            HttpStatus stih = value.getStatusCode();
+        }
+        catch (Exception e) {
+            // e.printStackTrace();
+        }
     }
 
     private String toJson(Object obj) {

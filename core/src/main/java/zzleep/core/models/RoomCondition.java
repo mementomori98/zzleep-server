@@ -15,33 +15,33 @@ public final class RoomCondition {
     @ApiModelProperty(example = "3")
     @JsonSerialize
     @JsonProperty("sleepId")
-    private int sleepId;
+    private final int sleepId;
 
     @ApiModelProperty(example = "2020-05-21T13:48:16.141Z")
     @JsonSerialize
     @JsonProperty("timestamp")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime timestamp;
+    private final LocalDateTime timestamp;
 
     @ApiModelProperty(example = "32.42", notes = "Represented in Celsius, rounded to 2 decimal digits")
     @JsonSerialize
     @JsonProperty("temperature")
-    private Integer temperature;
+    private final Integer temperature;
 
     @ApiModelProperty(notes = "Represented in ppm, rounded to 2 decimal digits", example = "553")
     @JsonSerialize
     @JsonProperty("co2")
-    private Integer co2;
+    private final Integer co2;
 
     @ApiModelProperty(notes = "Represented in dB, rounded to 2 decimal digits", example = "42.16")
     @JsonSerialize
     @JsonProperty("sound")
-    private Double sound;
+    private final Double sound;
 
     @ApiModelProperty(notes = "Represented in %, rounded to 2 decimal digits", example = "42.27")
     @JsonSerialize
     @JsonProperty("humidity")
-    private Double humidity;
+    private final Double humidity;
 
     public RoomCondition(int sleepId, LocalDateTime timestamp, Integer temperature, Integer co2, Double sound, Double humidity) {
         this.sleepId = sleepId;
@@ -50,9 +50,6 @@ public final class RoomCondition {
         this.co2 = co2;
         this.sound = sound;
         this.humidity = humidity;
-    }
-
-    public RoomCondition() {
     }
 
     public int getSleepId() {

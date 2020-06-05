@@ -4,6 +4,8 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.gson.Gson;
 
+
+import zzleep.communicator.controller.commandProtocolHandler.SendCommandProtocolHandler;
 import zzleep.communicator.models.Command;
 import zzleep.communicator.models.CurrentData;
 import zzleep.communicator.models.DownLinkMessage;
@@ -27,19 +29,21 @@ import org.apache.commons.codec.binary.Hex;
 import zzleep.core.logging.Logger;
 
 @Component
-public class EmbeddedControllerImpl implements EmbeddedController{
+public class EmbeddedControllerImpl implements EmbeddedController {
 
     private PersistenceRepository repository;
     private WebSocketHandler socketHandler;
-    private CommandsHandler commandsHandler;
+    private CommandsService commandsService;
+    private SendCommandProtocolHandler commandProtocol;
     private final Gson gson = new Gson();
     private final Logger logger;
 
-    public EmbeddedControllerImpl(PersistenceRepository dbService, Logger logger, CommandsHandler commandsHandler) {
+    public EmbeddedControllerImpl(PersistenceRepository dbService, Logger logger, CommandsService commandsService, SendCommandProtocolHandler commandProtocol) {
         this.repository = dbService;
         this.logger = logger;
-        this.commandsHandler = commandsHandler;
+        this.commandsService = commandsService;
         this.socketHandler = new Proxy(this::receiveData, logger);
+        this.commandProtocol = commandProtocol;
         onStart();
 
     }
@@ -47,10 +51,9 @@ public class EmbeddedControllerImpl implements EmbeddedController{
 
     @Override
     public void send(Command command) {
-        logger.info(command.toString());
+        logger.info("Sending command... " + command.toString());
         CharSequence charSequence = processCommand(command);
         socketHandler.send(charSequence);
-
     }
 
 
@@ -76,8 +79,6 @@ public class EmbeddedControllerImpl implements EmbeddedController{
     }
 
     private void onStart() {
-        onProgress();
-
         Thread progressThread = new Thread(this);
         progressThread.setDaemon(false);
         progressThread.start();
@@ -86,31 +87,33 @@ public class EmbeddedControllerImpl implements EmbeddedController{
 
     private void onProgress() {
 
-        ArrayList<Command> commands = commandsHandler.getUpdates();
+        ArrayList<Command> commands = commandsService.getUpdates();
 
         for (Command command : commands) {
-            send(command);
+            if (commandProtocol.shouldSend(command))
+                send(command);
         }
 
     }
 
-    private void receiveData(String s) {
+    public void receiveData(String s) {
         UpLinkMessage message = gson.fromJson(s, UpLinkMessage.class);
-        logger.info(message.toString());
-
         if (message.getCmd().equals("rx")) {
-            CurrentData currentData = processData(message);
-            // TODO REMOVE THIS, ZOLLY ASKED FOR IT
-            if (message.getEUI().equals("fake_device1")) {
-               currentData.setTemperatureData(new Random().nextInt() * 3 + 10);
+            if (shouldReceive(message))
+                receiveMessage(message);
+            if (commandProtocol.hasPendingCommand()) {
+                send(commandProtocol.getPendingCommand());
             }
-            logger.info(currentData.toString());
-            receive(currentData);
-
-// TODO: 5/28/2020 eliminate after figuring out the webSocket framework
-            Command command = new Command("0004A30B002181EC", 'D', 1);
-            send(command);
+//            // TODO: 6/5/2020 remove after insuring that embedded can receive it
+//            Command command = new Command("0004A30B002181EC", 'D', 0);
+//            send(command);
         }
+    }
+
+    private void receiveMessage(UpLinkMessage message) {
+        CurrentData currentData = processData(message);
+        logger.info("Received message: " + currentData.toString());
+        receive(currentData);
     }
 
 
@@ -136,22 +139,22 @@ public class EmbeddedControllerImpl implements EmbeddedController{
 
         String tempSHex = parts[0];
         String humSHex = parts[1];
-        if (parts.length==4) {
-            String co2Hex = parts[2];
-            String soundHex = parts[3];
-        }
+        String co2Hex = parts[2];
+        String soundHex = parts[3];
+
 
         int temp = Integer.parseInt(tempSHex, 16);
         int tempR = temp / 10;
         int hum = Integer.parseInt(humSHex, 16);
-        double humR = (double)hum / 10;
-        int co2 = getRandomNumberInRange(400, 600);
-        double sound = getRandomNumberInRange(30, 60);
+        double humR = (double) hum / 10;
+        int co2 = Integer.parseInt(co2Hex, 16);
+        int soundR = Integer.parseInt(soundHex, 16);
+        double sound = (double) soundR / 10;
 
         currentData.setTimeStamp(formatted);
         currentData.setHumidityData(humR);
         currentData.setTemperatureData(tempR);
-        currentData.setCo2Data(co2); // TODO: 5/21/2020  changes
+        currentData.setCo2Data(co2);
         currentData.setSoundData(sound);
 
         return currentData;
@@ -169,14 +172,15 @@ public class EmbeddedControllerImpl implements EmbeddedController{
 
     }
 
-    private static int getRandomNumberInRange(int min, int max) {
 
-        if (min >= max) {
-            throw new IllegalArgumentException("max must be greater than min");
-        }
+    private boolean shouldReceive(UpLinkMessage data) {
+        Iterable<String> result = Splitter.fixedLength(4).split(data.getData());
+        String[] parts = Iterables.toArray(result, String.class);
 
-        Random r = new Random();
-        return r.nextInt((max - min) + 1) + min;
+        if (parts.length == 4)
+            return true;
+        logger.warn("Message should not be received");
+        return false;
     }
 
 }

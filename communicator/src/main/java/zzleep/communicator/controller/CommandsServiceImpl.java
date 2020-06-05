@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class CommandsHandlerImpl implements CommandsHandler{
+public class CommandsServiceImpl implements CommandsService {
     private PersistenceRepository repository;
 
-    public CommandsHandlerImpl(PersistenceRepository repository) {
+    public CommandsServiceImpl(PersistenceRepository repository) {
         this.repository = repository;
     }
 

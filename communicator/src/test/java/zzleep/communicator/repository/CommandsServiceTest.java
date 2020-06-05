@@ -3,7 +3,7 @@ package zzleep.communicator.repository;
 
 import org.junit.*;
 
-import zzleep.communicator.controller.CommandsHandlerImpl;
+import zzleep.communicator.controller.CommandsServiceImpl;
 import zzleep.communicator.models.Command;
 import zzleep.core.models.Sleep;
 import org.mockito.Mock;
@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 
-public class CommandsHandlerTest {
+public class CommandsServiceTest {
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -28,11 +28,11 @@ public class CommandsHandlerTest {
     @Mock
     private PersistenceRepository repo;
 
-    private CommandsHandlerImpl commandsHandler;
+    private CommandsServiceImpl commandsHandler;
 
     @Before
     public void setUp() {
-        commandsHandler = new CommandsHandlerImpl(repo);
+        commandsHandler = new CommandsServiceImpl(repo);
     }
 
     private ArrayList<Sleep> instantiateSleeps() {

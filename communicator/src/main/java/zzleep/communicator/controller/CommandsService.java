@@ -4,6 +4,6 @@ import zzleep.communicator.models.Command;
 
 import java.util.ArrayList;
 
-public interface CommandsHandler {
+public interface CommandsService {
     ArrayList<Command> getUpdates();
 }

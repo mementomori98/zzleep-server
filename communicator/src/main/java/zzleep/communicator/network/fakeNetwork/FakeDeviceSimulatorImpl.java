@@ -99,28 +99,28 @@ public class FakeDeviceSimulatorImpl implements FakeDeviceSimulator, Runnable
     private String generateRandomData() {
 
         String r;
-        //r ="01100194";
 
-        // TODO: 5/28/2020 -----------fake
-        int temp = getRandomNumberInRange(15,24);
-        int co2 = getRandomNumberInRange(200, 300);
-        int hum = getRandomNumberInRange(38, 52);
-        int sound = getRandomNumberInRange(30, 60);
+        int randomTemp = getRandomNumberInRange(15,24);
+        int randomCo2 = getRandomNumberInRange(200, 300);
+        int randomHum = getRandomNumberInRange(38, 52);
+        int randomSound = getRandomNumberInRange(30, 60);
 
 
-        int tempL = temp*10;
-        int humL = hum*10;
+        int tempMultiplyBy10 = randomTemp*10;
+        int humMultiplyBy10 = randomHum*10;
+        int soundMultiplyBy10 = randomSound*10;
 
-        String tS = Integer.toString(tempL, 16);
-        String hS = Integer.toString(humL, 16);
-        String co2S = Integer.toString(co2, 16);
-        String soundS = Integer.toString(sound, 16);
-        String tSG = padLeftZeros(tS,4);
-        String hSG = padLeftZeros(hS, 4);
-        String cSG = padLeftZeros(tS,4);
-        String sSG = padLeftZeros(hS, 4);
+        String tempHex = Integer.toString(tempMultiplyBy10, 16);
+        String humHex = Integer.toString(humMultiplyBy10, 16);
+        String co2Hex = Integer.toString(randomCo2, 16);
+        String soundHex = Integer.toString(soundMultiplyBy10, 16);
 
-        r = tSG+hSG;
+        String tempFormatted = padLeftZeros(tempHex,4);
+        String humFormatted = padLeftZeros(humHex, 4);
+        String co2Formatted = padLeftZeros(co2Hex,4);
+        String soundFormatted = padLeftZeros(soundHex, 4);
+
+        r = tempFormatted+humFormatted+co2Formatted+soundFormatted;
 
         
 

@@ -57,7 +57,6 @@ public class DatabaseConstants {
     public static final String DW_TABLE_NAME =
             "dw.factRoomConditions " +
                     "inner join dw.dimDevice on factRoomConditions.deviceKey = dimDevice.deviceKey " +
-                    "left outer join dw.dimRating on factRoomConditions.ratingKey = dimRating.ratingKey " +
                     "inner join dw.dimSleep on factRoomConditions.sleepKey = dimSleep.sleepKey";
 
     static final String DW_COL_SLEEP_ID = "sleepId";

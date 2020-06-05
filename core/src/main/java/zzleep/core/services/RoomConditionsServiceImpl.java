@@ -9,7 +9,6 @@ import zzleep.core.repositories.RoomConditionsRepository;
 @Component
 public class RoomConditionsServiceImpl extends ServiceBase implements RoomConditionsService {
 
-
     private final AuthorizationService authorizationService;
     private final RoomConditionsRepository repository;
 

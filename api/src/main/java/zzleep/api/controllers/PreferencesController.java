@@ -39,8 +39,8 @@ public class PreferencesController extends ControllerBase {
     @ApiOperation(value = "Update user preferences")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successfully updated preferences"),
-        @ApiResponse(code = 400, message = "Invalid values (a min value is greater than a max value)"),
-        @ApiResponse(code = 403, message = "The user does not own a device with this ID")
+        @ApiResponse(code = 403, message = "The user does not own a device with this ID"),
+        @ApiResponse(code = 406, message = "Invalid values (a min value is greater than a max value)")
     })
     @PutMapping
     public ResponseEntity<Preferences> updatePreferences(

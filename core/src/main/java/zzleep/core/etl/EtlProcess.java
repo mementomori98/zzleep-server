@@ -10,7 +10,7 @@ public class EtlProcess implements Runnable {
         int year, month, day, hour, minute, second;
         String queryValues, tableName = "etl";
         Jdbc connection = Jdbc.getInstance();
-        while(true)
+        while (true)
         {
             Calendar cal = Calendar.getInstance();
             year = cal.get(Calendar.YEAR);

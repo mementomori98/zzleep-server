@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @ApiModel(description = "Represents the sleeping environment at a given time")
@@ -26,7 +25,6 @@ public class RoomCondition {
     @ApiModelProperty(example = "32.42", notes = "Represented in Celsius, rounded to 2 decimal digits")
     @JsonSerialize
     @JsonProperty("temperature")
-
     private Integer temperature;
 
     @ApiModelProperty(notes = "Represented in ppm, rounded to 2 decimal digits", example = "553")

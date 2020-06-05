@@ -15,12 +15,12 @@ public class FactServiceImpl extends ServiceBase implements FactService {
     }
 
     @Override
-    public Response<Fact> getFact(Authorized<Integer> request) {
-        return success(factRepository.get(request.getModel()));
+    public Response<Fact> getFact(int previous) {
+        return success(factRepository.get(previous));
     }
 
     @Override
-    public Response<List<Fact>> getAll(Authorized<Void> request) {
+    public Response<List<Fact>> getAll() {
         return success(factRepository.getAll());
     }
 }

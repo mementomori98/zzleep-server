@@ -6,8 +6,7 @@ import java.util.List;
 
 public interface FactService {
 
-    Response<Fact> getFact(Authorized<Integer> request);
-    Response<List<Fact>> getAll(Authorized<Void> request);
-
+    Response<Fact> getFact(int previous);
+    Response<List<Fact>> getAll();
 
 }

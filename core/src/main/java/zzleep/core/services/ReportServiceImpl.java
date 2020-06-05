@@ -16,11 +16,8 @@ public class ReportServiceImpl extends ServiceBase implements ReportService{
         this.authorizationService = authorizationService;
     }
 
-
-
     @Override
     public Response<IntervalReport> getReport(Authorized<GetIntervalReportModel> request) {
-
         GetIntervalReportModel model = request.getModel();
 
         if (!authorizationService.userHasDevice(request.getUserId(), model.getDeviceId())) return unauthorized();
@@ -31,7 +28,6 @@ public class ReportServiceImpl extends ServiceBase implements ReportService{
 
     @Override
     public Response<SleepData> getSleepData(Authorized<Integer> request) {
-
         String userId = request.getUserId();
         Integer sleepId = request.getModel();
         if(!authorizationService.userHasSleep(userId,sleepId)) return unauthorized();
@@ -43,8 +39,8 @@ public class ReportServiceImpl extends ServiceBase implements ReportService{
 
     @Override
     public Response<IdealRoomConditions> getIdealRoomConditions(Authorized<String> request) {
-
-        if(!authorizationService.userHasDevice(request.getUserId(), request.getModel())) return unauthorized();
+        if(!authorizationService.userHasDevice(request.getUserId(), request.getModel()))
+            return unauthorized();
 
         return success(warehouseRepository.getIdealRoomCondition(request.getModel()));
     }

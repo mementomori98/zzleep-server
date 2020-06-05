@@ -121,9 +121,6 @@ public interface Context {
     class QueryFailedException extends RuntimeException {
     }
 
-    class QueryEmptyException extends RuntimeException {
-    }
-
     class QueryContainsMultipleElementsException extends RuntimeException {
     }
 }

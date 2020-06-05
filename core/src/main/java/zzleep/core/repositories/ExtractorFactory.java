@@ -30,22 +30,21 @@ public class ExtractorFactory {
         row.getInt(DatabaseConstants.FACT_COL_FACT_ID),
         row.getString(DatabaseConstants.FACT_COL_TITLE),
         row.getString(DatabaseConstants.FACT_COL_CONTENT),
-            row.getString(DatabaseConstants.FACT_COL_SOURCE_TITLE),
-            row.getString(DatabaseConstants.FACT_COL_SOURCE_URL)
+        row.getString(DatabaseConstants.FACT_COL_SOURCE_TITLE),
+        row.getString(DatabaseConstants.FACT_COL_SOURCE_URL)
     );
 
     private static final Context.ResultSetExtractor<RoomCondition> roomConditionsExtractor = row -> {
-        BigDecimal sound = row.getObject(DatabaseConstants.RC_COL_SOUND, BigDecimal.class);
-        BigDecimal humidity = row.getObject(DatabaseConstants.RC_COL_HUMIDITY, BigDecimal.class);
-        Double h = humidity == null ? null:humidity.doubleValue();
-        Double s = sound == null ? null:sound.doubleValue();
+        BigDecimal soundBigDecimal = row.getObject(DatabaseConstants.RC_COL_SOUND, BigDecimal.class);
+        BigDecimal humidityBigDecimal = row.getObject(DatabaseConstants.RC_COL_HUMIDITY, BigDecimal.class);
+        Double sound = soundBigDecimal == null ? null : soundBigDecimal.doubleValue();
+        Double humidity = humidityBigDecimal == null ? null : humidityBigDecimal.doubleValue();
         return new RoomCondition(
-                row.getInt(DatabaseConstants.RC_COL_SLEEP_ID),
-                row.getObject(DatabaseConstants.RC_COL_TIME, LocalDateTime.class),
-                row.getObject(DatabaseConstants.RC_COL_TEMPERATURE, Integer.class),
-                row.getObject(DatabaseConstants.RC_COL_CO2, Integer.class),
-                s,
-                h
+            row.getInt(DatabaseConstants.RC_COL_SLEEP_ID),
+            row.getObject(DatabaseConstants.RC_COL_TIME, LocalDateTime.class),
+            row.getObject(DatabaseConstants.RC_COL_TEMPERATURE, Integer.class),
+            row.getObject(DatabaseConstants.RC_COL_CO2, Integer.class),
+            sound, humidity
         );
     };
 
@@ -66,15 +65,16 @@ public class ExtractorFactory {
         row.getDouble(DatabaseConstants.SLEEP_SESSION_COL_AVERAGE_SOUND),
         row.getDouble(DatabaseConstants.SLEEP_SESSION_COL_AVERAGE_TEMPERATURE)
     );
-    private static final Context.ResultSetExtractor<RoomCondition> dwRoomConditionExtractor = row -> new RoomCondition(
-        row.getInt(DatabaseConstants.DW_COL_SLEEP_ID),
-        row.getObject(DatabaseConstants.DW_COL_TIMESTAMP, LocalDateTime.class),
-        row.getInt(DatabaseConstants.DW_COL_TEMPERATURE),
-        row.getInt(DatabaseConstants.DW_COL_CO2),
-        row.getDouble(DatabaseConstants.DW_COL_SOUND),
-        row.getDouble(DatabaseConstants.DW_COL_HUMIDITY)
-    );
 
+    private static final Context.ResultSetExtractor<RoomCondition> dwRoomConditionExtractor =
+        row -> new RoomCondition(
+            row.getInt(DatabaseConstants.DW_COL_SLEEP_ID),
+            row.getObject(DatabaseConstants.DW_COL_TIMESTAMP, LocalDateTime.class),
+            row.getInt(DatabaseConstants.DW_COL_TEMPERATURE),
+            row.getInt(DatabaseConstants.DW_COL_CO2),
+            row.getDouble(DatabaseConstants.DW_COL_SOUND),
+            row.getDouble(DatabaseConstants.DW_COL_HUMIDITY)
+        );
 
     private static Context.ResultSetExtractor<Device> deviceExtractor = row -> new Device(
         row.getString(DatabaseConstants.DEVICE_COL_ID),
@@ -82,9 +82,11 @@ public class ExtractorFactory {
         row.getString(DatabaseConstants.DEVICE_COL_USER_ID)
     );
 
-    private static final Context.ResultSetExtractor<Integer> sleepIdExtractor = row-> row.getInt(DatabaseConstants.SLEEP_COL_SLEEP_ID);
+    private static final Context.ResultSetExtractor<Integer> sleepIdExtractor =
+        row -> row.getInt(DatabaseConstants.SLEEP_COL_SLEEP_ID);
 
-    private static final Context.ResultSetExtractor<String> deviceIdExtractor = row-> ""+row.getString(DatabaseConstants.DEVICE_COL_ID);
+    private static final Context.ResultSetExtractor<String> deviceIdExtractor =
+        row -> "" + row.getString(DatabaseConstants.DEVICE_COL_ID);
 
     public static Context.ResultSetExtractor<SleepSession> getSleepSessionExtractor() {
         return sleepSessionExtractor;

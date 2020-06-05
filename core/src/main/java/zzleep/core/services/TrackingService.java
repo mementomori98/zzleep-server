@@ -9,4 +9,5 @@ public interface TrackingService {
     Response<Sleep> stopTracking(Authorized<String> request);
     Response<Sleep> setRating(Authorized<SleepRating> request);
     Response<Boolean> isTracking(Authorized<String> request);
+
 }

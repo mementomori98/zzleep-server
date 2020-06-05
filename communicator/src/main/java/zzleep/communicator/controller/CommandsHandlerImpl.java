@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class CommandsHandlerImpl implements CommandsHandler{
+public class CommandsHandlerImpl implements CommandsHandler {
     private PersistenceRepository repository;
 
     public CommandsHandlerImpl(PersistenceRepository repository) {
@@ -21,15 +21,13 @@ public class CommandsHandlerImpl implements CommandsHandler{
         return mergeCommandsInOne(getActiveSleepCommands(), getStoppedSleepCommands(), getVentilationCommands());
     }
 
-    public ArrayList<Command> mergeCommandsInOne(ArrayList<Command> activeSleepCommands, ArrayList<Command> stoppedSleepCommands, ArrayList<Command> ventilationCommands)
-    {
+    public ArrayList<Command> mergeCommandsInOne(ArrayList<Command> activeSleepCommands, ArrayList<Command> stoppedSleepCommands, ArrayList<Command> ventilationCommands) {
         activeSleepCommands.addAll(stoppedSleepCommands);
         activeSleepCommands.addAll(ventilationCommands);
         return activeSleepCommands;
     }
 
-    public ArrayList<Command> getActiveSleepCommands()
-    {
+    public ArrayList<Command> getActiveSleepCommands() {
         ArrayList<Command> commands = new ArrayList<>();
         List<Sleep> startDevices = getActiveSleeps();
         for (Sleep source : startDevices) {
@@ -53,64 +51,52 @@ public class CommandsHandlerImpl implements CommandsHandler{
 
     public ArrayList<Command> stopVentilationForStoppedSleeps(List<Sleep> stopDevicesForSleeps) {
         ArrayList<Command> commands = new ArrayList<>();
-        for(int i = 0; i < stopDevicesForSleeps.size(); ++i)
-        {
-            if(repository.getDeviceIdFromActiveVentilations(stopDevicesForSleeps.get(i).getDeviceId()) != null)
-            {
-                repository.deleteVentilationFromDb(stopDevicesForSleeps.get(i).getDeviceId());
+        for (int i = 0; i < stopDevicesForSleeps.size(); ++i) {
+            if (repository.getDeviceIdFromActiveVentilations(stopDevicesForSleeps.get(i).getDeviceId()) != null) {
+                repository.deleteVentilation(stopDevicesForSleeps.get(i).getDeviceId());
                 commands.add(new Command(stopDevicesForSleeps.get(i).getDeviceId(), 'V', 0));
             }
         }
         return commands;
     }
 
-    public ArrayList<Command> getVentilationCommands()
-    {
+    public ArrayList<Command> getVentilationCommands() {
         ArrayList<Command> commands = new ArrayList<>();
         List<Sleep> sleeps = repository.getActiveSleepsWhereRegulationIsEnabled();
 
-        for(int i = 0; i < sleeps.size(); ++i)
-        {
+        for (int i = 0; i < sleeps.size(); ++i) {
             Command c = createCommand(sleeps.get(i), repository.getCountOfLatestGoodValues(sleeps.get(i).getSleepId()));
-            if(c != null)
+            if (c != null)
                 commands.add(c);
         }
         return commands;
     }
 
     public Command createCommand(Sleep sleep, int count) {
-        if(count < 3)
-        {
+        if (count < 3) {
             return getStartVentilationCommand(sleep);
-        }
-        else
-        {
+        } else {
             return getStopVentilationCommand(sleep);
         }
     }
 
-    public Command getStartVentilationCommand(Sleep sleep)
-    {
-        if(!isSleepAlreadyRegulated(sleep))
-        {
-            repository.insertVentilationInDb(sleep.getDeviceId());
+    public Command getStartVentilationCommand(Sleep sleep) {
+        if (!isSleepAlreadyRegulated(sleep)) {
+            repository.insertVentilation(sleep.getDeviceId());
             return new Command(sleep.getDeviceId(), 'V', 1);
         }
         return null;
     }
 
-    public Command getStopVentilationCommand(Sleep sleep)
-    {
-        if(isSleepAlreadyRegulated(sleep))
-        {
-            repository.deleteVentilationFromDb(sleep.getDeviceId());
+    public Command getStopVentilationCommand(Sleep sleep) {
+        if (isSleepAlreadyRegulated(sleep)) {
+            repository.deleteVentilation(sleep.getDeviceId());
             return new Command(sleep.getDeviceId(), 'V', 0);
         }
         return null;
     }
 
-    public boolean isSleepAlreadyRegulated(Sleep sleep)
-    {
+    public boolean isSleepAlreadyRegulated(Sleep sleep) {
         String deviceId = repository.getDeviceIdFromActiveVentilations(sleep.getDeviceId());
         return !(deviceId == null);
     }
@@ -122,9 +108,8 @@ public class CommandsHandlerImpl implements CommandsHandler{
         return sleeps;
     }
 
-    public void removeFromActiveSleeps(List<Sleep> sleeps)
-    {
-        for(int i = 0; i < sleeps.size(); ++i)
+    public void removeFromActiveSleeps(List<Sleep> sleeps) {
+        for (int i = 0; i < sleeps.size(); ++i)
             repository.removeActiveSleep(sleeps.get(i).getSleepId());
     }
 
@@ -134,11 +119,9 @@ public class CommandsHandlerImpl implements CommandsHandler{
         return newSleeps;
     }
 
-    public void insertNewSleepsInActiveSleeps(List<Sleep> sleeps)
-    {
-        for(int i = 0; i < sleeps.size(); ++i)
-        {
-            repository.insertInActiveSleeps(sleeps.get(i).getSleepId());
+    public void insertNewSleepsInActiveSleeps(List<Sleep> sleeps) {
+        for (int i = 0; i < sleeps.size(); ++i) {
+            repository.insertActiveSleep(sleeps.get(i).getSleepId());
         }
     }
 }

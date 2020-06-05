@@ -1,5 +1,5 @@
 package zzleep.communicator.models;
-//KARLAAAAAA
+
 public class UpLinkMessage {
 
     private String cmd;
@@ -11,9 +11,7 @@ public class UpLinkMessage {
     private String encdata;
     private String data;
 
-
-    public UpLinkMessage()
-    {
+    public UpLinkMessage() {
 
     }
 
@@ -92,7 +90,6 @@ public class UpLinkMessage {
         this.data = data;
     }
 
-
     @Override
     public String toString() {
         return "UpLinkMessage{" +
@@ -106,5 +103,4 @@ public class UpLinkMessage {
                 ", data='" + data + '\'' +
                 '}';
     }
-
 }

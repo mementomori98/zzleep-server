@@ -21,18 +21,12 @@ public class Proxy implements WebSocketHandler {
 
     @Override
     public void send(CharSequence data) {
-
         String s = data.toString();
         DownLinkMessage message = gson.fromJson(s, DownLinkMessage.class);
-        if(message.getEUI().equals("0004A30B002181EC"))
-        {
+        if (message.getEUI().equals("0004A30B002181EC")) {
             webSocket.send(data);
-        }
-        else {
+        } else {
             simulator.simulate(message);
         }
-
-
     }
-
 }

@@ -59,7 +59,7 @@ public class CommandsHandlerTest {
     public void testInsertActiveSleeps() {
         ArrayList<Sleep> sleeps = instantiateSleeps();
         commandsHandler.insertNewSleepsInActiveSleeps(sleeps);
-        verify(repo, times(5)).insertInActiveSleeps(any(Integer.class));
+        verify(repo, times(5)).insertActiveSleep(any(Integer.class));
     }
 
     @Test
@@ -137,7 +137,7 @@ public class CommandsHandlerTest {
 
         ArrayList<Command> commands = commandsHandler.stopVentilationForStoppedSleeps(sleeps);
 
-        verify(repo, times(5)).deleteVentilationFromDb(any(String.class));
+        verify(repo, times(5)).deleteVentilation(any(String.class));
         assertEquals(commands.size(), sleeps.size());
 
         for (int i = 0; i < commands.size(); ++i)
@@ -152,7 +152,7 @@ public class CommandsHandlerTest {
 
         ArrayList<Command> commands = commandsHandler.stopVentilationForStoppedSleeps(sleeps);
 
-        verify(repo, times(0)).deleteVentilationFromDb(any(String.class));
+        verify(repo, times(0)).deleteVentilation(any(String.class));
         assertEquals(commands.size(), 0);
     }
 
@@ -165,7 +165,7 @@ public class CommandsHandlerTest {
 
         ArrayList<Command> commands = commandsHandler.stopVentilationForStoppedSleeps(sleeps);
 
-        verify(repo, times(1)).deleteVentilationFromDb(any(String.class));
+        verify(repo, times(1)).deleteVentilation(any(String.class));
         assertEquals(commands.size(), 1);
         assertEquals(commands.get(0).getDestination(), "device1");
     }
@@ -175,7 +175,7 @@ public class CommandsHandlerTest {
         ArrayList<Sleep> sleeps = new ArrayList<>();
         ArrayList<Command> commands = commandsHandler.stopVentilationForStoppedSleeps(sleeps);
 
-        verify(repo, times(0)).deleteVentilationFromDb(any(String.class));
+        verify(repo, times(0)).deleteVentilation(any(String.class));
 
         assertEquals(commands.size(), 0);
     }

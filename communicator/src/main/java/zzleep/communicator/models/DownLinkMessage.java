@@ -1,5 +1,5 @@
 package zzleep.communicator.models;
-//KARLAAAAAAAAAAAAAAAAA!
+
 public class DownLinkMessage {
 
     private String cmd;
@@ -12,7 +12,6 @@ public class DownLinkMessage {
     {
 
     }
-
 
     public DownLinkMessage(String cmd, String eui, long port, boolean confirmed, String data) {
         this.cmd = cmd;

@@ -13,52 +13,20 @@ import java.util.function.Consumer;
 
 public class WebSocketImpl implements WebSocketHandler, WebSocket.Listener {
 
-
     private Consumer<String> listener;
     private Logger logger;
     private WebSocket socket;
 
-
     public WebSocketImpl(Consumer<String> listener, Logger logger) {
         this.listener = listener;
         this.logger = logger;
-        reinitializeWebSocket(null);
-
+        initializeWebSocket(null);
     }
 
     @Override
-    public void onOpen(WebSocket webSocket) {
-
-        webSocket.request(1);
-        logger.info("WebSocket Listener has been opened for requests.");
-
-
+    public void send(CharSequence data) {
+        sendText(data, true);
     }
-
-
-    @Override
-    public void onError(WebSocket webSocket, Throwable error) {
-        logger.error("A " + error.getCause() + " exception was thrown.");
-        logger.info("Message: " + error.getLocalizedMessage());
-
-
-        reinitializeWebSocket(webSocket);
-        logger.info("onError completed");
-
-    }
-
-
-    @Override
-    public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
-        logger.warn("WebSocket closed!");
-        logger.info("Status:" + statusCode + " Reason: " + reason);
-
-
-        reinitializeWebSocket(webSocket);
-
-        return new CompletableFuture().completedFuture("onClose() completed.").thenAccept(logger::info);
-    }
-
 
     @Override
     public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
@@ -68,10 +36,32 @@ public class WebSocketImpl implements WebSocketHandler, WebSocket.Listener {
         return new CompletableFuture().completedFuture("onText() completed.").thenAccept(logger::info);
     }
 
+    @Override
+    public void onOpen(WebSocket webSocket) {
+        webSocket.request(1);
+        logger.info("WebSocket Listener has been opened for requests.");
+    }
 
-    //@Override
+    @Override
+    public void onError(WebSocket webSocket, Throwable error) {
+        logger.error("A " + error.getCause() + " exception was thrown.");
+        logger.info("Message: " + error.getLocalizedMessage());
+
+        initializeWebSocket(webSocket);
+        logger.info("onError completed");
+    }
+
+    @Override
+    public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
+        logger.warn("WebSocket closed!");
+        logger.info("Status:" + statusCode + " Reason: " + reason);
+
+        initializeWebSocket(webSocket);
+
+        return new CompletableFuture().completedFuture("onClose() completed.").thenAccept(logger::info);
+    }
+
     public CompletableFuture<WebSocket> sendText(CharSequence data, boolean last) {
-
         socket.sendText(data, true);
         socket.request(1);
         logger.info("sentText completed");
@@ -79,8 +69,7 @@ public class WebSocketImpl implements WebSocketHandler, WebSocket.Listener {
         return new CompletableFuture().newIncompleteFuture().thenAccept(System.out::println);
     }
 
-
-    private void reinitializeWebSocket(WebSocket webSocket) {
+    private void initializeWebSocket(WebSocket webSocket) {
 
         HttpClient client = HttpClient.newHttpClient();
         CompletableFuture<WebSocket> ws = client.newWebSocketBuilder()
@@ -92,13 +81,6 @@ public class WebSocketImpl implements WebSocketHandler, WebSocket.Listener {
             webSocket.abort();
         }
 
-    }
-
-
-    @Override
-    public void send(CharSequence data) {
-
-        sendText(data, true);
     }
 
 }

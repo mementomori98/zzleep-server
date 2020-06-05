@@ -14,7 +14,7 @@ public interface DeviceService {
     Response<Device> getById(Authorized<String> request);
     Response<Void> remove(Authorized<String> request);
 
-    // For development purposes, should be removed for production.
+    // FIXME For development purposes, should be removed for production.
     Response<List<String>> getAllAvailable();
 
 }

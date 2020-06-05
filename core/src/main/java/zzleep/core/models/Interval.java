@@ -1,7 +1,6 @@
 package zzleep.core.models;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public class Interval {
     private final LocalDate start;

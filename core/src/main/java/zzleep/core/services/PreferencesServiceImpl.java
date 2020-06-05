@@ -32,10 +32,9 @@ public class PreferencesServiceImpl extends ServiceBase implements PreferencesSe
         try {
             Preferences returnPreferences = preferencesRepository.setPreferences(preferences);
             if (returnPreferences == null) return notFound();
-            else
-                return success(returnPreferences);
+            else return success(returnPreferences);
         } catch (PreferencesRepository.InvalidValuesException e) {
-            return notFound();
+            return notAllowed();
         }
     }
 }

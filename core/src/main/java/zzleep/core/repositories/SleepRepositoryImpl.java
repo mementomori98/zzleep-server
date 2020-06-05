@@ -75,6 +75,7 @@ public class SleepRepositoryImpl implements SleepRepository {
             extractor
         );
     }
+
     private Sleep getById(int sleepId) {
         return context.single(
             DatabaseConstants.SLEEP_TABLE_NAME,

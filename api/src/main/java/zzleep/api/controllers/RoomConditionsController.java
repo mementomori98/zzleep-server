@@ -18,7 +18,6 @@ import zzleep.core.services.RoomConditionsService;
 @Api(tags = {"Room Conditions"}, description = " ")
 public class RoomConditionsController extends ControllerBase {
 
-
     private final RoomConditionsService roomConditionsService;
 
     public RoomConditionsController(RoomConditionsService roomConditionsService) {
@@ -35,7 +34,9 @@ public class RoomConditionsController extends ControllerBase {
     })
     @GetMapping("/{deviceId}")
     public ResponseEntity<RoomCondition> getCurrent(@PathVariable(name = "deviceId") String deviceId) {
-        return map(roomConditionsService.getCurrent(new Authorized<>(userId(), deviceId)));
+        return map(
+            roomConditionsService.getCurrent(new Authorized<>(userId(), deviceId))
+        );
     }
 
     @ApiOperation(value = "Get the latest recorded room condition for a device", response = RoomCondition.class)
@@ -46,7 +47,11 @@ public class RoomConditionsController extends ControllerBase {
         @ApiResponse(code = 404, message = "No measurements have been made on this device yet")
     })
     @GetMapping("/{deviceId}/latest")
-    public ResponseEntity<RoomCondition> getLatest(@PathVariable(name = "deviceId") String deviceId) {
-        return map(roomConditionsService.getLatest(new Authorized<>(userId(), deviceId)));
+    public ResponseEntity<RoomCondition> getLatest(
+        @PathVariable(name = "deviceId") String deviceId
+    ) {
+        return map(
+            roomConditionsService.getLatest(new Authorized<>(userId(), deviceId))
+        );
     }
 }

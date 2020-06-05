@@ -6,8 +6,7 @@ public class Command {
     private char commandID;  //D - Device; V - Ventilation
     private int value; //1 - ON; 0 - OFF
 
-    public Command()
-    {
+    public Command() {
         this.destination = "";
         this.commandID = ' ';
         this.value = 0;
@@ -18,7 +17,6 @@ public class Command {
         this.commandID = commandID;
         this.value = value;
     }
-
 
     public String getDestination() {
         return destination;
@@ -47,14 +45,13 @@ public class Command {
     @Override
     public String toString() {
         return "Command{" +
-                "destination='" + destination + '\'' +
-                ", commandID=" + commandID +
-                ", value=" + value +
-                '}';
+            "destination='" + destination + '\'' +
+            ", commandID=" + commandID +
+            ", value=" + value +
+            '}';
     }
 
-    public boolean equals(Command command)
-    {
+    public boolean equals(Command command) {
         return destination.equals(command.destination) && commandID == command.commandID && value == command.value;
     }
 }

@@ -40,10 +40,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("User " + userId + " not found.");
         }
         return User
-        .withUsername(userId)
-        .password(passwordEncoder().encode("1234"))
-        .roles("USER")
-        .build();
+            .withUsername(userId)
+            .password(passwordEncoder().encode("1234"))
+            .roles("USER")
+            .build();
     }
 
     @Bean
@@ -52,7 +52,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     private static void initializeFirebase() {
-        InputStream serviceAccount = null;
+        InputStream serviceAccount;
         try {
             serviceAccount = new FileInputStream("api\\zzleep-firebase-key.json");
         } catch (FileNotFoundException e) {

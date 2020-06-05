@@ -6,6 +6,7 @@ import zzleep.core.models.Preferences;
 
 @Component
 public class PreferencesRepositoryImpl implements PreferencesRepository {
+
     private Context context;
 
     private final DeviceRepository deviceRepository;

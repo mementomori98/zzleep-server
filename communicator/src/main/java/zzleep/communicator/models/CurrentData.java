@@ -9,7 +9,6 @@ public class CurrentData {
     private String source;
     private String timeStamp;
 
-
     public CurrentData()
     {
         this.co2Data = 0;

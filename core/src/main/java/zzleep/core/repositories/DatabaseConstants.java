@@ -47,7 +47,6 @@ public class DatabaseConstants {
     static final String SLEEP_SESSION_COL_AVERAGE_TEMPERATURE = "avgTemperature";
     static final String SLEEP_SESSION_COL_AVERAGE_SOUND = "avgSound";
 
-
     //device
     public static final String DEVICE_TABLE_NAME = "datamodels.device";
     public static final String DEVICE_COL_ID = "deviceId";

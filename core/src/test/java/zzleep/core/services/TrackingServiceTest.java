@@ -25,52 +25,58 @@ public class TrackingServiceTest {
     AuthorizationService authorizationService;
 
     @Mock
-    SleepRepository repo;
+    SleepRepository sleepRepository;
 
-    TrackingService service;
+    TrackingService sut;
 
     @Before
     public void setUp()
     {
-        service = new TrackingServiceImpl(repo,authorizationService);
+        sut = new TrackingServiceImpl(sleepRepository,authorizationService);
     }
 
-    private void goodAuthDeviceSetup(String userId, String deviceId)
+    private void setupGoodDeviceAuth(String userId, String deviceId)
     {
         when(authorizationService.userHasDevice(userId, deviceId)).thenReturn(true);
     }
 
-    private void badAuthDeviceSetup(String userId, String deviceId)
-    {
-        when(authorizationService.userHasDevice(userId, deviceId)).thenReturn(false);
-    }
-
-    private void goodAuthSleepSetup(String userId, int sleepId)
+    private void setupGoodSleepAuth(String userId, int sleepId)
     {
         when(authorizationService.userHasSleep(userId, sleepId)).thenReturn(true);
     }
 
-    private void badAuthSleepSetup(String userId, int sleepId)
+    private void setupBadSleepAuth(String userId, int sleepId)
     {
+        when(authorizationService.userHasSleep(any(), anyInt())).thenReturn(true);
         when(authorizationService.userHasSleep(userId, sleepId)).thenReturn(false);
+    }
+
+    private void setupBadDeviceAuth(String userId, String deviceId)
+    {
+        when(authorizationService.userHasDevice(any(), any())).thenReturn(true);
+        when(authorizationService.userHasDevice(userId, deviceId)).thenReturn(false);
     }
 
     @Test
     public void testStartTrackingBadAuth()
     {
-        badAuthDeviceSetup("user1", "device1");
-        Response<Sleep> response = service.startTracking(new Authorized<>("user1", "device1"));
+        setupBadDeviceAuth("user1", "device1");
+        Response<Sleep> response = sut.startTracking(
+            new Authorized<>("user1", "device1")
+        );
         assertEquals(response.getStatus(), Status.UNAUTHORIZED);
-        verify(repo, never()).startTracking(any(String.class));
+        verify(sleepRepository, never()).startTracking(any(String.class));
     }
 
     @Test
     public void testStartTrackingGoodAuth()
     {
-        goodAuthDeviceSetup("user1", "device1");
-        when(repo.startTracking("device1")).thenReturn(new Sleep(1, "device1", LocalDateTime.now(), null, 0));
+        setupGoodDeviceAuth("user1", "device1");
+        when(sleepRepository.startTracking("device1"))
+            .thenReturn(new Sleep(1, "device1", LocalDateTime.now(), null, 0));
 
-        Response<Sleep> response = service.startTracking(new Authorized<>("user1", "device1"));
+        Response<Sleep> response = sut.startTracking(new Authorized<>("user1", "device1"));
+
         assertEquals(response.getStatus(), Status.SUCCESS);
         assertEquals(response.getModel().getDeviceId(), "device1");
         assertEquals(response.getModel().getSleepId(), 1);
@@ -82,40 +88,43 @@ public class TrackingServiceTest {
     @Test
     public void testStartTrackingGoodAuthSleepNotStopped()
     {
-        goodAuthDeviceSetup("user1", "device1");
-        when(repo.startTracking("device1")).thenThrow(new SleepRepository.SleepNotStoppedException());
+        setupGoodDeviceAuth("user1", "device1");
+        when(sleepRepository.startTracking("device1"))
+            .thenThrow(new SleepRepository.SleepNotStoppedException());
 
-        Response<Sleep> response = service.startTracking(new Authorized<>("user1", "device1"));
+        Response<Sleep> response = sut.startTracking(new Authorized<>("user1", "device1"));
         assertEquals(response.getStatus(), Status.CONFLICT);
         assertNull(response.getModel());
     }
 
     @Test
-    public void testStartTrackingGoodAuthDeviceNotFound()
+    public void testStartTrackingDeviceNotFound()
     {
-        goodAuthDeviceSetup("user1", "device1");
-        when(repo.startTracking("device1")).thenThrow(new SleepRepository.DeviceNotFoundException());
+        setupGoodDeviceAuth("user1", "device1");
+        when(sleepRepository.startTracking("device1"))
+            .thenThrow(new SleepRepository.DeviceNotFoundException());
 
-        Response<Sleep> response = service.startTracking(new Authorized<>("user1", "device1"));
+        Response<Sleep> response = sut.startTracking(new Authorized<>("user1", "device1"));
         assertEquals(response.getStatus(), Status.NOT_FOUND);
     }
 
     @Test
     public void testStopTrackingBadAuth()
     {
-        badAuthDeviceSetup("user1", "device1");
-        Response<Sleep> response = service.stopTracking(new Authorized<>("user1", "device1"));
+        setupBadDeviceAuth("user1", "device1");
+        Response<Sleep> response = sut.stopTracking(new Authorized<>("user1", "device1"));
         assertEquals(response.getStatus(), Status.UNAUTHORIZED);
-        verify(repo, never()).startTracking(any(String.class));
+        verify(sleepRepository, never()).startTracking(any(String.class));
     }
 
     @Test
     public void testStopTrackingGoodAuth()
     {
-        goodAuthDeviceSetup("user1", "device1");
-        when(repo.stopTracking("device1")).thenReturn(new Sleep(1, "device1", LocalDateTime.now(), LocalDateTime.now(), 0));
+        setupGoodDeviceAuth("user1", "device1");
+        when(sleepRepository.stopTracking("device1"))
+            .thenReturn(new Sleep(1, "device1", LocalDateTime.now(), LocalDateTime.now(), 0));
 
-        Response<Sleep> response = service.stopTracking(new Authorized<>("user1", "device1"));
+        Response<Sleep> response = sut.stopTracking(new Authorized<>("user1", "device1"));
         assertEquals(response.getStatus(), Status.SUCCESS);
         assertEquals(response.getModel().getDeviceId(), "device1");
         assertEquals(response.getModel().getSleepId(), 1);
@@ -125,23 +134,25 @@ public class TrackingServiceTest {
     }
 
     @Test
-    public void testStopTrackingGoodAuthSleepNotStarted()
+    public void testStopTrackingSleepNotStarted()
     {
-        goodAuthDeviceSetup("user1", "device1");
-        when(repo.stopTracking("device1")).thenThrow(new SleepRepository.SleepNotStartedException());
+        setupGoodDeviceAuth("user1", "device1");
+        when(sleepRepository.stopTracking("device1"))
+            .thenThrow(new SleepRepository.SleepNotStartedException());
 
-        Response<Sleep> response = service.stopTracking(new Authorized<>("user1", "device1"));
+        Response<Sleep> response = sut.stopTracking(new Authorized<>("user1", "device1"));
         assertEquals(response.getStatus(), Status.CONFLICT);
         assertNull(response.getModel());
     }
 
     @Test
-    public void testStopTrackingGoodAuthDeviceNotFound()
+    public void testStopTrackingDeviceNotFound()
     {
-        goodAuthDeviceSetup("user1", "device1");
-        when(repo.stopTracking("device1")).thenThrow(new SleepRepository.DeviceNotFoundException());
+        setupGoodDeviceAuth("user1", "device1");
+        when(sleepRepository.stopTracking("device1"))
+            .thenThrow(new SleepRepository.DeviceNotFoundException());
 
-        Response<Sleep> response = service.stopTracking(new Authorized<>("user1", "device1"));
+        Response<Sleep> response = sut.stopTracking(new Authorized<>("user1", "device1"));
         assertEquals(response.getStatus(), Status.NOT_FOUND);
         assertNull(response.getModel());
     }
@@ -149,21 +160,22 @@ public class TrackingServiceTest {
     @Test
     public void testSetRatingBadAuth()
     {
-        badAuthSleepSetup("user1", 1);
+        setupBadSleepAuth("user1", 1);
         SleepRating sleepRating = new SleepRating(1, 4);
-        Response<Sleep> response = service.setRating(new Authorized<>("user1", sleepRating));
+        Response<Sleep> response = sut.setRating(new Authorized<>("user1", sleepRating));
         assertEquals(response.getStatus(), Status.UNAUTHORIZED);
-        verify(repo, never()).startTracking(any(String.class));
+        verify(sleepRepository, never()).startTracking(any(String.class));
     }
 
     @Test
-    public void testSetRatingSetGoodAuth()
+    public void testSetRatingGoodAuth()
     {
-        goodAuthSleepSetup("user1", 1);
+        setupGoodSleepAuth("user1", 1);
         SleepRating sleepRating = new SleepRating(1, 4);
-        when(repo.rateSleep(any(Integer.class), any(Integer.class))).thenReturn(new Sleep(1, "device1", LocalDateTime.now(), LocalDateTime.now(), 4));
+        when(sleepRepository.rateSleep(any(Integer.class), any(Integer.class)))
+            .thenReturn(new Sleep(1, "device1", LocalDateTime.now(), LocalDateTime.now(), 4));
 
-        Response<Sleep> response = service.setRating(new Authorized<>("user1", sleepRating));
+        Response<Sleep> response = sut.setRating(new Authorized<>("user1", sleepRating));
         assertEquals(response.getStatus(), Status.SUCCESS);
         assertEquals(response.getModel().getDeviceId(), "device1");
         assertEquals(response.getModel().getSleepId(), 1);
@@ -173,13 +185,14 @@ public class TrackingServiceTest {
     }
 
     @Test
-    public void testSetRatingSetGoodAuthSleepNotFound()
+    public void testSetRatingSleepNotFound()
     {
-        goodAuthSleepSetup("user1", 1);
+        setupGoodSleepAuth("user1", 1);
         SleepRating sleepRating = new SleepRating(1, 4);
-        when(repo.rateSleep(any(Integer.class), any(Integer.class))).thenThrow(new SleepRepository.SleepNotFoundException());
+        when(sleepRepository.rateSleep(any(Integer.class), any(Integer.class)))
+            .thenThrow(new SleepRepository.SleepNotFoundException());
 
-        Response<Sleep> response = service.setRating(new Authorized<>("user1", sleepRating));
+        Response<Sleep> response = sut.setRating(new Authorized<>("user1", sleepRating));
         assertEquals(response.getStatus(), Status.NOT_FOUND);
         assertNull(response.getModel());
     }
@@ -187,22 +200,22 @@ public class TrackingServiceTest {
     @Test
     public void testIsTrackingBadAuth()
     {
-        badAuthDeviceSetup("user1", "device1");
-        Response<Boolean> response = service.isTracking(new Authorized<>("user1", "device1"));
+        setupBadDeviceAuth("user1", "device1");
+        Response<Boolean> response = sut.isTracking(new Authorized<>("user1", "device1"));
         assertEquals(response.getStatus(), Status.UNAUTHORIZED);
-        verify(repo, never()).isTracking(any(String.class));
+        verify(sleepRepository, never()).isTracking(any(String.class));
     }
 
     @Test
     public void testIsTrackingGoodAuth()
     {
-        goodAuthDeviceSetup("user1", "device1");
-        goodAuthDeviceSetup("user1", "device2");
-        when(repo.isTracking("device1")).thenReturn(true);
-        when(repo.isTracking("device2")).thenReturn(false);
+        setupGoodDeviceAuth("user1", "device1");
+        setupGoodDeviceAuth("user1", "device2");
+        when(sleepRepository.isTracking("device1")).thenReturn(true);
+        when(sleepRepository.isTracking("device2")).thenReturn(false);
 
-        Response<Boolean> response = service.isTracking(new Authorized<>("user1", "device1"));
-        Response<Boolean> response2 = service.isTracking(new Authorized<>("user1", "device2"));
+        Response<Boolean> response = sut.isTracking(new Authorized<>("user1", "device1"));
+        Response<Boolean> response2 = sut.isTracking(new Authorized<>("user1", "device2"));
         assertEquals(response.getStatus(), Status.SUCCESS);
         assertEquals(response2.getStatus(), Status.SUCCESS);
         assertTrue(response.getModel());
@@ -212,10 +225,10 @@ public class TrackingServiceTest {
     @Test
     public void testIsTrackingGoodAuthDeviceNotFound()
     {
-        goodAuthDeviceSetup("user1", "device1");
-        when(repo.isTracking("device1")).thenThrow(new SleepRepository.DeviceNotFoundException());
+        setupGoodDeviceAuth("user1", "device1");
+        when(sleepRepository.isTracking("device1")).thenThrow(new SleepRepository.DeviceNotFoundException());
 
-        Response<Boolean> response = service.isTracking(new Authorized<>("user1", "device1"));
+        Response<Boolean> response = sut.isTracking(new Authorized<>("user1", "device1"));
         assertEquals(response.getStatus(), Status.NOT_FOUND);
         assertNull(response.getModel());
     }

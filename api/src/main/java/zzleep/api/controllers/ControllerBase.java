@@ -4,11 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import zzleep.core.services.Response;
 
-import static zzleep.core.services.Status.*;
-
 public abstract class ControllerBase {
-
-    protected static final String NOT_FOUND_MESSAGE = "The resource could not be found";
 
     protected String userId() {
         return SecurityContextHolder

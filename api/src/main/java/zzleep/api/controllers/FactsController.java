@@ -23,7 +23,6 @@ public class FactsController extends ControllerBase {
 
     private final FactService factService;
 
-
     public FactsController(FactService factService) {
         this.factService = factService;
 
@@ -34,7 +33,8 @@ public class FactsController extends ControllerBase {
             @ApiResponse(code = 200, message = "Successfully retrieved a fact")
     })
     @GetMapping("/random")
-    public ResponseEntity<Fact> getFact(@RequestParam(name = "previousFactId", defaultValue = "-1") int factId)
+    public ResponseEntity<Fact> getFact(
+        @RequestParam(name = "previousFactId", defaultValue = "-1") int factId)
     {
         return map(factService.getFact(new Authorized<>(userId(),factId)));
     }

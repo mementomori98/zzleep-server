@@ -8,13 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import zzleep.core.models.AddDeviceModel;
 import zzleep.core.models.Device;
-import zzleep.core.models.RemoveDeviceModel;
 import zzleep.core.models.UpdateDeviceModel;
-import zzleep.core.repositories.AuthorizationService;
-import zzleep.core.repositories.DeviceRepository;
 import zzleep.core.services.Authorized;
 import zzleep.core.services.DeviceService;
-import zzleep.core.services.Response;
 
 import java.util.List;
 
@@ -36,7 +32,9 @@ public class DevicesController extends ControllerBase {
         @ApiResponse(code = 406, message = "This device is already associated with this user")
     })
     @PostMapping
-    public ResponseEntity<Device> addDevice(@RequestBody AddDeviceModel model) {
+    public ResponseEntity<Device> addDevice(
+        @RequestBody AddDeviceModel model
+    ) {
         return map(
             deviceService.add(new Authorized<>(userId(), model))
         );
@@ -48,7 +46,9 @@ public class DevicesController extends ControllerBase {
         @ApiResponse(code = 403, message = "This device does not belong to this user"),
     })
     @PatchMapping
-    public ResponseEntity<Device> updateDevice(@RequestBody UpdateDeviceModel model) {
+    public ResponseEntity<Device> updateDevice(
+        @RequestBody UpdateDeviceModel model
+    ) {
         return map(
             deviceService.update(new Authorized<>(userId(), model))
         );
@@ -56,7 +56,7 @@ public class DevicesController extends ControllerBase {
 
     @ApiOperation(value = "Get devices by userId", response = Device[].class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully retrieved devices"),
+        @ApiResponse(code = 200, message = "Successfully retrieved devices"),
     })
     @GetMapping
     public ResponseEntity<List<Device>> getAllUserDevices() {
@@ -71,7 +71,9 @@ public class DevicesController extends ControllerBase {
         @ApiResponse(code = 403, message = "The device is not connected to this user")
     })
     @GetMapping("/{deviceId}")
-    public ResponseEntity<Device> getById(@PathVariable(value = "deviceId") String deviceId) {
+    public ResponseEntity<Device> getById(
+        @PathVariable(value = "deviceId") String deviceId
+    ) {
         return map(
             deviceService.getById(new Authorized<>(userId(), deviceId))
         );
@@ -83,7 +85,9 @@ public class DevicesController extends ControllerBase {
         @ApiResponse(code = 403, message = "The device is not associated with this user")
     })
     @DeleteMapping("/{deviceId}")
-    public ResponseEntity<Void> remove(@PathVariable(value = "deviceId") String deviceId) {
+    public ResponseEntity<Void> remove(
+        @PathVariable(value = "deviceId") String deviceId
+    ) {
         return map(
             deviceService.remove(new Authorized<>(userId(), deviceId))
         );

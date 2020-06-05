@@ -17,11 +17,11 @@ public class SecurityConfig {
 
     @Configuration
     @Order(1)
-    public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+    public static class ApiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
         private final UserDetailsServiceImpl userDetailsService;
 
-        public ApiWebSecurityConfigurationAdapter(UserDetailsServiceImpl userDetailsService) {
+        public ApiSecurityConfigurationAdapter(UserDetailsServiceImpl userDetailsService) {
             this.userDetailsService = userDetailsService;
         }
 
@@ -34,13 +34,12 @@ public class SecurityConfig {
 
         @Override
         protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-
             auth.userDetailsService(userDetailsService);
         }
     }
 
     @Configuration
-    public static class FormLoginWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
+    public static class SwaggerUiSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {

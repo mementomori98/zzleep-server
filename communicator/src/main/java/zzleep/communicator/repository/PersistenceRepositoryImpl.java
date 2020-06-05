@@ -3,15 +3,12 @@ package zzleep.communicator.repository;
 import zzleep.core.models.Sleep;
 import zzleep.core.repositories.DatabaseConstants;
 import zzleep.core.repositories.ExtractorFactory;
-import org.springframework.web.client.HttpClientErrorException;
-import zzleep.communicator.models.Command;
+
 import zzleep.communicator.models.CurrentData;
 import org.springframework.stereotype.Component;
 import zzleep.core.logging.Logger;
 import zzleep.core.repositories.Context;
 
-import javax.xml.crypto.Data;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -25,26 +22,22 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
     private static final Context.ResultSetExtractor<Integer> sleepIdExtractor = ExtractorFactory.getSleepIdExtractor();
     private static final Context.ResultSetExtractor<String> deviceIdExtractor = ExtractorFactory.getDeviceIdExtractor();
 
-    public PersistenceRepositoryImpl(Context context, Logger logger)
-    {
+    public PersistenceRepositoryImpl(Context context, Logger logger) {
         this.context = context;
         this.logger = logger;
     }
 
     @Override
-    public void putDataInDatabase(CurrentData data){
+    public void putDataInDatabase(CurrentData data) {
         Integer sleepId = getSleepId(data.getSource());
 
-        if(sleepId != null)
-        {
+        if (sleepId != null) {
             insertRoomConditions(checkConstraints(data), sleepId);
-        }
-        else
+        } else
             logger.warn("Warning.SleepId is null");
     }
 
-    private Integer getSleepId(String deviceId)
-    {
+    private Integer getSleepId(String deviceId) {
         return context.single(
                 DatabaseConstants.SLEEP_TABLE_NAME,
                 String.format("%s is null and %s = '%s'",
@@ -55,8 +48,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         );
     }
 
-    private void insertRoomConditions(CurrentData data, int sleepId)
-    {
+    private void insertRoomConditions(CurrentData data, int sleepId) {
         String columns = String.format(
                 "%s, %s, %s, %s, %s, %s",
                 DatabaseConstants.RC_COL_SLEEP_ID,
@@ -67,7 +59,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
                 DatabaseConstants.RC_COL_HUMIDITY
         );
         String values = String.format(Locale.ROOT,
-                "%d, '%s', %d, %d, %.2f, %.2f",
+                "%d, '%s', %d, %d, %s, %s",
                 sleepId,
                 data.getTimeStamp(),
                 data.getTemperatureData(),
@@ -75,24 +67,24 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
                 data.getSoundData(),
                 data.getHumidityData()
         );
-        context.insert(DatabaseConstants.RC_TABLE_NAME,columns, values, sleepIdExtractor);
+
+        context.insert(DatabaseConstants.RC_TABLE_NAME, columns, values, sleepIdExtractor);
+
     }
 
-    private CurrentData checkConstraints(CurrentData data)
-    {
-        if(data.getCo2Data() < 200 || data.getCo2Data() > 10000)
+    private CurrentData checkConstraints(CurrentData data) {
+        if (data.getCo2Data() < 200 || data.getCo2Data() > 10000)
             data.setCo2Data(null);
-        if(data.getTemperatureData() < -40 || data.getTemperatureData() > 55)
+        if (data.getTemperatureData() < -40 || data.getTemperatureData() > 55)
             data.setTemperatureData(null);
-        if(data.getHumidityData() < 0 || data.getHumidityData() > 100)
+        if (data.getHumidityData() < 0 || data.getHumidityData() > 100)
             data.setHumidityData(null);
-        if(data.getSoundData() < 0 || data.getSoundData() > 150)
+        if (data.getSoundData() < 0 || data.getSoundData() > 150)
             data.setSoundData(null);
         return data;
     }
 
-    public void insertVentilationInDb(String deviceId)
-    {
+    public void insertVentilationInDb(String deviceId) {
         context.insert(
                 DatabaseConstants.ACTIVE_VENTILATION_TABLE,
                 DatabaseConstants.ACTIVE_VENTILATION_COL_DEVICE_ID,
@@ -100,8 +92,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
                 deviceIdExtractor);
     }
 
-    public void deleteVentilationFromDb(String deviceId)
-    {
+    public void deleteVentilationFromDb(String deviceId) {
         context.delete(
                 DatabaseConstants.ACTIVE_VENTILATION_TABLE,
                 String.format(
@@ -112,8 +103,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         );
     }
 
-    public String getDeviceIdFromActiveVentilations(String deviceId)
-    {
+    public String getDeviceIdFromActiveVentilations(String deviceId) {
         return context.single(DatabaseConstants.ACTIVE_VENTILATION_TABLE,
                 String.format(
                         "%s = '%s'",
@@ -122,8 +112,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
                 deviceIdExtractor);
     }
 
-    public int getCountOfLatestGoodValues(int sleepId)
-    {
+    public int getCountOfLatestGoodValues(int sleepId) {
         String bigJoinTable = String.format(
                 "%s join %s on %s.%s = %s.%s join %s on %s.%s = %s.%s",
                 DatabaseConstants.RC_TABLE_NAME,
@@ -137,7 +126,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
                 DatabaseConstants.PREFERENCES_COL_DEVICE_ID,
                 DatabaseConstants.SLEEP_TABLE_NAME,
                 DatabaseConstants.SLEEP_COL_DEVICE_ID
-         );
+        );
 
         String condition = String.format(
                 "%s.%s < %s.%s and %s.%s > %s.%s and %s.%s < %s.%s and %s.%s > %s.%s and %s.%s < %s.%s and %s.%s > now() - '15 minutes'::interval and %s.%s = %d",
@@ -173,8 +162,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         return sleeps.size();
     }
 
-    public List<Sleep> getActiveSleepsWhereRegulationIsEnabled()
-    {
+    public List<Sleep> getActiveSleepsWhereRegulationIsEnabled() {
         String regulationEnabledDeviceId = String.format("select %s from %s where %s is true",
                 DatabaseConstants.PREFERENCES_COL_DEVICE_ID,
                 DatabaseConstants.PREFERENCES_TABLE_NAME,
@@ -191,11 +179,10 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
                 DatabaseConstants.SLEEP_TABLE_NAME,
                 condition,
                 ExtractorFactory.getSleepExtractor()
-                );
+        );
     }
 
-    public List<Sleep> getFinishedSleeps()
-    {
+    public List<Sleep> getFinishedSleeps() {
         String selectFromActiveSleeps = String.format(
                 "select %s from %s",
                 DatabaseConstants.ACTIVE_SLEEPS_COL_SLEEP_ID,
@@ -209,8 +196,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         return context.select(DatabaseConstants.SLEEP_TABLE_NAME, condition, ExtractorFactory.getSleepExtractor());
     }
 
-    public void removeActiveSleep(int sleepId)
-    {
+    public void removeActiveSleep(int sleepId) {
         context.delete(
                 DatabaseConstants.ACTIVE_SLEEPS_TABLE,
                 String.format(
@@ -220,8 +206,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         );
     }
 
-    public List<Sleep> getNewSleeps()
-    {
+    public List<Sleep> getNewSleeps() {
         String selectFromActiveSleeps = String.format(
                 "select %s from %s",
                 DatabaseConstants.ACTIVE_SLEEPS_COL_SLEEP_ID,
@@ -235,8 +220,7 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
         return context.select(DatabaseConstants.SLEEP_TABLE_NAME, condition, ExtractorFactory.getSleepExtractor());
     }
 
-    public void insertInActiveSleeps(int sleepId)
-    {
+    public void insertInActiveSleeps(int sleepId) {
         context.insert(
                 DatabaseConstants.ACTIVE_SLEEPS_TABLE,
                 DatabaseConstants.ACTIVE_SLEEPS_COL_SLEEP_ID,

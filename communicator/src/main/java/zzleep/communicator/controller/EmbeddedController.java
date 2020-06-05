@@ -6,7 +6,6 @@ import zzleep.communicator.models.CurrentData;
 
 public interface EmbeddedController extends Runnable{
     void receive(CurrentData data) ;
-    void receiveData(String s);
-    void send(Command command);
+
 
 }

@@ -41,7 +41,6 @@ public class SendCommandProtocolHandlerImpl implements SendCommandProtocolHandle
 
     private boolean isForFakeDevice(Command command) {
         if (!command.getDestination().equals("0004A30B002181EC")) {
-            System.out.println("Setting pending command...."); // TODO: 6/5/2020 remove after ensuring functionality 
             setPendingCommand(command);
             return true;
         }

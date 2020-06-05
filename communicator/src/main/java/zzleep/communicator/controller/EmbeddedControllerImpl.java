@@ -21,7 +21,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-import java.util.Random;
 import java.util.TimeZone;
 
 
@@ -49,8 +48,8 @@ public class EmbeddedControllerImpl implements EmbeddedController {
     }
 
 
-    @Override
-    public void send(Command command) {
+
+    private void send(Command command) {
         logger.info("Sending command... " + command.toString());
         CharSequence charSequence = processCommand(command);
         socketHandler.send(charSequence);

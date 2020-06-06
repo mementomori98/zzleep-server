@@ -103,9 +103,6 @@ public class EmbeddedControllerImpl implements EmbeddedController {
             if (commandProtocol.hasPendingCommand()) {
                 send(commandProtocol.getPendingCommand());
             }
-//            // TODO: 6/5/2020 remove after insuring that embedded can receive it
-//            Command command = new Command("0004A30B002181EC", 'D', 0);
-//            send(command);
         }
     }
 

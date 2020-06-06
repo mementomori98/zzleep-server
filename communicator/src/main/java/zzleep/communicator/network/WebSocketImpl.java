@@ -94,7 +94,6 @@ public class WebSocketImpl implements WebSocketHandler, WebSocket.Listener {
 
     }
 
-
     @Override
     public void send(CharSequence data) {
 

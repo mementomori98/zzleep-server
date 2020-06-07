@@ -25,6 +25,7 @@ public class SecurityConfig {
             this.userDetailsService = userDetailsService;
         }
 
+        @Override
         protected void configure(HttpSecurity http) throws Exception {
             http.csrf().disable()
                 .antMatcher("/api/**")

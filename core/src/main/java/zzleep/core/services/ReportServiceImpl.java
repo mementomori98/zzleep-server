@@ -28,8 +28,6 @@ public class ReportServiceImpl extends ServiceBase implements ReportService{
         if (!authorizationService.userHasDevice(request.getUserId(), model.getDeviceId())) return unauthorized();
         IntervalReport report = warehouseRepository.getReport(model.getDeviceId(), new Interval(model.getStart(),model.getEnd()));
 
-        report.getSleepSessions().sort((o1, o2) -> o1.getTimeStart().isAfter(o2.getTimeStart()) ? -1 : 1);
-
         return success(report);
     }
 

@@ -63,7 +63,6 @@ public class EmbeddedControllerImpl implements EmbeddedController {
             onProgress();
             try {
                 Thread.sleep(5000);//5sec
-                logger.info("Delay passed");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -82,6 +81,7 @@ public class EmbeddedControllerImpl implements EmbeddedController {
         Thread progressThread = new Thread(this);
         progressThread.setDaemon(false);
         progressThread.start();
+
     }
 
     private void onProgress() {

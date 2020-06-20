@@ -34,7 +34,6 @@ public class CommandsServiceImpl implements CommandsService {
             Command command = new Command(source.getDeviceId(), 'D', 1);
             commands.add(command);
         }
-        System.out.println("Active sleep commands: " + commands.size());
         return commands;
     }
 
@@ -47,7 +46,6 @@ public class CommandsServiceImpl implements CommandsService {
         }
         ArrayList<Command> stoppedSleepsVentilationCommands = stopVentilationForStoppedSleeps(stopDevices);
         commands.addAll(stoppedSleepsVentilationCommands);
-        System.out.println("Stopped sleep commands: " + commands.size());
         return commands;
     }
 
@@ -71,7 +69,6 @@ public class CommandsServiceImpl implements CommandsService {
             if (c != null)
                 commands.add(c);
         }
-        System.out.println("Ventilation commands: " + commands.size());
         return commands;
     }
 

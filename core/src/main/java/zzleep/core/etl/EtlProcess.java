@@ -24,9 +24,9 @@ public class EtlProcess implements Runnable {
 
             try
             {
-                System.out.println(" -- Triggering ETL");
+                // System.out.println(" -- Triggering ETL");
                 connection.insert(tableName, queryValues);
-                System.out.println(" -- ETL Triggered");
+                // System.out.println(" -- ETL Triggered");
             }
             catch (SQLException e)
             {
